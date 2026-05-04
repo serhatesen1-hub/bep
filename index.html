@@ -1,8 +1,14 @@
+/**
+ * Bireyselleştirilmiş Eğitim Programı (BEP) Hazırlama Sistemi
+ * Bu uygulama, MEB standartlarına uygun olarak özel gereksinimli öğrenciler için 
+ * kaba değerlendirme formları ve BEP dosyaları oluşturmak amacıyla tasarlanmıştır.
+ */
+
 import React, { useState, useEffect } from 'react';
 import { 
   Users, UserPlus, FileText, Calendar, BookOpen, User, Lock, LogOut, 
   CheckSquare, ArrowRight, Printer, AlertCircle, CheckCircle2, Edit, Trash2,
-  ChevronRight, ListChecks, CheckCircle, CheckSquare2
+  ChevronRight, ListChecks, CheckCircle, CheckSquare2, Info
 } from 'lucide-react';
 
 // --- SABİTLER VE DEMOGRAFİK VERİLER ---
@@ -308,7 +314,13 @@ const validateTC = (tc) => {
 
 // --- ANA UYGULAMA BİLEŞENİ ---
 export default function App() {
-  const [users, setUsers] = useState([{ username: 'serhatesen1@gmail.com', password: '123456', firstName: '', lastName: '', branch: 'Özel Eğitim Öğretmeni' }]);
+  const [users, setUsers] = useState([{ 
+    username: 'demo@ornek.com', // GitHub'da paylaşmak için demo hesap
+    password: 'demo', 
+    firstName: 'Örnek', 
+    lastName: 'Öğretmen', 
+    branch: 'Özel Eğitim Öğretmeni' 
+  }]);
   const [currentUser, setCurrentUser] = useState(null);
   
   const [view, setView] = useState('auth'); 
@@ -549,9 +561,19 @@ export default function App() {
         </div>
         <div className="w-1/2 p-12">
           <h2 className="text-2xl font-bold text-slate-800 mb-6 flex items-center"><Lock className="mr-2" size={24}/> Giriş Yap</h2>
+          
+          <div className="mb-6 bg-blue-50 border-l-4 border-blue-500 p-4 rounded text-sm text-blue-800 shadow-sm flex items-start">
+            <Info className="mr-3 text-blue-500 flex-shrink-0" size={20} />
+            <div>
+              <strong>Demo Giriş Bilgileri:</strong><br/>
+              E-posta: <em>demo@ornek.com</em><br/>
+              Şifre: <em>demo</em>
+            </div>
+          </div>
+
           <form onSubmit={handleLogin} className="space-y-4 mb-8">
-            <input name="identifier" defaultValue="serhatesen1@gmail.com" type="text" placeholder="E-posta / Telefon" required className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 outline-none" />
-            <input name="password" defaultValue="123456" type="password" placeholder="Şifre" required className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 outline-none" />
+            <input name="identifier" defaultValue="demo@ornek.com" type="text" placeholder="E-posta / Telefon" required className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 outline-none" />
+            <input name="password" defaultValue="demo" type="password" placeholder="Şifre" required className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 outline-none" />
             <button type="submit" className="w-full bg-blue-600 text-white py-2 rounded-lg hover:bg-blue-700 font-medium transition">Giriş Yap</button>
           </form>
           <div className="border-t pt-6">
@@ -748,7 +770,7 @@ export default function App() {
             </div>
           </section>
 
-          {/* AİLE BİLGİLENDİRME SÜRECİ (YENİ EKLENDİ) */}
+          {/* AİLE BİLGİLENDİRME SÜRECİ */}
           <section>
             <h3 className="text-sm uppercase font-bold text-slate-400 border-b pb-2 mb-4">Aile Bilgilendirme Süreci Kararları</h3>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
