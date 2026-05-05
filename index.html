@@ -16,7 +16,7 @@
         @media print {
             @page { 
                 size: A4 landscape; /* Sayfayı yatay yapar */
-                margin: 5mm; /* Tarayıcının varsayılan Tarih/URL header-footer'larını gizler */
+                margin: 0mm; /* Tarayıcının varsayılan Tarih/URL header-footer'larını gizler */
             }
             body { 
                 -webkit-print-color-adjust: exact !important; 
@@ -32,10 +32,14 @@
             .shadow-lg { box-shadow: none !important; border: none !important; }
             .hide-on-print { display: none !important; }
             #root { background-color: white !important; }
-            /* Çıktıda margin sıfırlandığı için içeriğin kenarlara yapışmaması için iç boşluk (padding) veriyoruz */
-            .print-container { padding: 10mm !important; max-width: 100% !important; width: 100% !important; }
             
-            /* Tablo çizgilerinin çıktıda net görünmesi için */
+            /* Çıktıda içeriğin kenarlara yapışmaması için iç boşluk */
+            .print-container { 
+                padding: 15mm !important; 
+                max-width: 100% !important; 
+                width: 100% !important; 
+            }
+            
             table, th, td { border: 1px solid black !important; }
         }
         
@@ -43,11 +47,15 @@
         table { width: 100%; border-collapse: collapse; margin-bottom: 20px; }
         th, td { border: 1px solid #000; padding: 6px; text-align: left; vertical-align: top; }
         th { background-color: #f1f5f9; font-weight: bold; }
+
+        /* Scrollbar Gizleme */
+        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar-track { background: #f1f1f1; }
+        ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
     </style>
 </head>
 <body class="font-sans text-slate-800 bg-slate-100 min-h-screen">
     
-    <!-- Uygulamanın Render Edileceği Ana Kapsayıcı -->
     <div id="root"></div>
 
     <script>
@@ -81,6 +89,9 @@
             "Kaba Motor Becerileri", "İnce Motor Becerileri", "Sosyal-Duygusal Gelişim", "Uyumsal Beceriler"
         ];
 
+        // Akademik dersler listesi (Materyal eklemesi için)
+        const ACADEMIC_COURSES = ["Türkçe", "Matematik", "Hayat Bilgisi", "Fen ve Teknoloji", "Sosyal Bilgiler", "Din Kültürü ve Ahlak Bilgisi"];
+
         const PRIMARY_DATABASE = {
             "Türkçe": {
                 uda: "Türkçe dersi dinleme, konuşma, okuma ve yazma becerilerini kurallarına uygun olarak kullanır.",
@@ -88,17 +99,12 @@
                 materials: "Okuma fişleri, hece/kelime tabloları, hikaye kitapları, görsel materyaller",
                 kdaList: [
                     "Dinleme kurallarına uyar.", "Görgü kurallarına uyarak konuşur.", "Dinlediği/izlediği metnin konusunu belirler.",
-                    "Dinlediklerine/izlediklerine yönelik sorulara cevap verir.", "Kendini, ailesini ve çevresini tanıtır.",
-                    "Hazırlıksız konuşmalar yapar.", "Kelimeleri anlamına uygun kullanır.", "Görsellerle ilgili kelimeler ve cümleler yazar.",
-                    "Çizgi çalışmaları yapar (Düzenli ve kurallı).", "Sesleri tanır ve ayırt eder.", "Harfleri kuralına uygun yazar ve okur.",
-                    "Harflerden heceler oluşturur ve okur.", "Hecelerden kelimeler oluşturur ve okur.", "Kelimelerden anlamlı cümleler oluşturur ve okur.",
-                    "Basit metinleri akıcı bir şekilde okur.", "Metni noktalama işaretlerine dikkat ederek okur.", "Sessiz okuma yapar.",
-                    "Sesli okuma yapar.", "Görsellerden hareketle okuyacağı metnin içeriğini tahmin eder.", "Okuduğu metinle ilgili soruları cevaplar.",
-                    "Metnin konusunu belirler.", "Metnin ana fikrini/ana duygusunu belirler.", "Olayları oluş sırasına göre anlatır.",
-                    "Okuduğu metni özetler.", "Bakarak (kopya ederek) yazar.", "Dikte (işiterek) çalışmaları yapar.",
-                    "Anlamlı ve kurallı cümleler yazar.", "Günlük tutar / kısa yazılar yazar.", "Büyük harfleri (cümle başı, özel isimler) yerinde kullanır.",
-                    "Noktalama işaretlerini yerinde kullanır.", "Kelimelerin zıt anlamlılarını bulur.", "Kelimelerin eş anlamlılarını bulur.",
-                    "Formları (kimlik bilgileri vb.) kurallarına uygun doldurur."
+                    "Dinlediklerine/izlediklerine yönelik sorulara cevap verir.", "Harfleri kuralına uygun yazar ve okur.",
+                    "Hecelerden kelimeler oluşturur ve okur.", "Kelimelerden anlamlı cümleler oluşturur ve okur.",
+                    "Basit metinleri akıcı bir şekilde okur.", "Metni noktalama işaretlerine dikkat ederek okur.",
+                    "Okuduğu metinle ilgili soruları cevaplar.", "Metnin konusunu, ana fikrini/ana duygusunu belirler.",
+                    "Dikte (işiterek) çalışmaları yapar.", "Anlamlı ve kurallı cümleler yazar.",
+                    "Noktalama işaretlerini yerinde kullanır.", "Kelimelerin zıt ve eş anlamlılarını bulur."
                 ]
             },
             "Matematik": {
@@ -106,41 +112,18 @@
                 methods: "Somut-Yarı Somut-Soyut Aşamalı Öğretim, Doğrudan Öğretim",
                 materials: "Abaküs, onluk taban blokları, sayı doğrusu, geometri tahtası",
                 kdaList: [
-                    "Varlıkları az ve çok olma durumuna göre ayırt eder.", "Varlıkları az ve çok olma durumuna göre sıralar.", 
-                    "Varlıkları büyük ve küçük olma durumuna göre ayırt eder.", "Varlıkları büyük ve küçük olma durumuna göre sıralar.", 
-                    "Varlıkları uzun ve kısa olma durumuna göre ayırt eder.", "Varlıkları uzun ve kısa olma durumuna göre sıralar.", 
-                    "Varlıkları kalın ve ince olma durumuna göre ayırt eder.", "Varlıkları kalın ve ince olma durumuna göre sıralar.", 
-                    "Varlıklar arasındaki benzerlik ve farklılıkları ayırt eder.", "Varlıkları, bir varlığın içinde ve dışında olma durumuna göre ayırt eder.", 
-                    "Varlıkları, bir varlığın üzerinde ve altında olma durumuna göre ayırt eder.", "Varlıkları, bir varlığın uzağında ve yakınında olma durumuna göre ayırt eder.", 
-                    "Varlıkları, bir varlığın önünde ve arkasında olma durumuna göre ayırt eder.", "Varlıkları, bir varlığın sağında, solunda ve arasında olma durumuna göre ayırt eder.", 
-                    "Varlıkları boş ve dolu olma durumuna göre ayırt eder.", "Varlıkları yüksekte ve alçakta olma durumuna göre ayırt eder.", 
-                    "Varlıkları ağır ve hafif olma durumuna göre ayırt eder.", "Varlıkları ağır ve hafif olma durumuna göre sıralar.", 
-                    "100’e kadar birer ritmik sayar.", "100’e kadar beşer ritmik sayar.", "100’e kadar onar ritmik sayar.", "100’e kadar ikişer ritmik sayar.", 
-                    "100 içinde üçer ritmik sayar.", "100 içinde dörder ritmik sayar.", "1, 2, 3, 4, 5, 6, 7, 8, 9 ve 10 doğal sayılarını kavrar.", 
-                    "Rakamları yazar", "“0” doğal sayısını kavrar.", "İki basamaklı doğal sayıları kavrar.", "Üç basamaklı doğal sayıları kavrar.", 
-                    "Dört basamaklı doğal sayıları kavrar.", "Beş, altı, yedi ve daha fazla basamaklı doğal sayıları kavrar.", "Sayı doğrusunu kavrar.", 
-                    "Doğal sayılar arasındaki büyüklük ve küçüklük ilişkisini kavrar.", "Tek ve çift doğal sayıları tanır.", "Sıra bildiren sayıları kavrar.", 
-                    "Yirmiye kadar Romen rakamlarını kavrar.", "Kümeyi bilir.", "Kümeyi kavrar.", "Kümeler arasındaki ilişkileri kavrar.", 
-                    "Kümeler arasındaki denklik ilişkisini kavrar.", "Kümeler arasındaki eşitlik ilişkisini kavrar.", "Toplama işlemini kavrar.", 
-                    "Doğal sayılarla eldesiz toplama işlemi yapar.", "Doğal sayılarla eldeli toplama işlemi yapar.", "Toplama işlemi yaparak problem çözer.", 
-                    "Çıkarma işlemini kavrar.", "Doğal sayılarla onluk bozmayı gerektirmeyen çıkarma işlemi yapar.", 
-                    "Doğal sayılarla onluk, yüzlük, binlik vb. bozmayı gerektiren çıkarma işlemi yapar.", "Çıkarma işlemi yaparak problem çözer.", 
-                    "Çarpma işlemini kavrar.", "Doğal sayılarla eldesiz çarpma işlemi yapar.", "Doğal sayılarla eldeli çarpma işlemi yapar.", 
-                    "Doğal sayılarla kısa yoldan çarpma işlemi yapar.", "Çarpma işlemi yaparak problem çözer.", "Bölme işlemini kavrar.", 
-                    "Doğal sayılarla kalansız bölme işlemi yapar.", "Doğal sayılarla kalanlı bölme işlemi yapar.", "Doğal sayıları; 10, 100 ve 1000’e kısa yoldan bölme işlemi yapar.", 
-                    "Bölme işlemi yaparak problem çözer.", "Dört işlemi kullanarak problem çözer.", "Hesap makinesini tanır.", "Hesap makinesi kullanır.", 
-                    "Kesirleri kavrar.", "Varlıkları bütün, yarım ve çeyrek olma durumuna göre ayırt eder.", "Parmakla ölçme yapar.", "Karışla ölçme yapar.", 
-                    "Kulaçla ölçme yapar.", "Ayakla ölçme yapar.", "Adımla ölçme yapar.", "Metreyi bilir.", "Metrenin as katları ve katlarını bilir.", 
-                    "Metreyle ölçer.", "Cetvelle ölçer.", "Çizgi çizme çalışmaları yapar.", "Litreyi bilir.", "Litreyle ölçer.", "Kütle ölçülerini bilir.", 
-                    "Kütle ölçülerini kavrar.", "Gramla ölçme yapar.", "Parayı tanır.", "Parayı kavrar.", "Saati bilir.", "Saati okur.", "Zaman ölçülerinden dakikayı bilir.", 
-                    "Alan ölçülerini bilir.", "Alan ölçer.", "Atatürk’ün ölçülerle ilgili getirdiği yeniliklerin tarihlerini içeren problemleri çözer.", 
-                    "Atatürk’ün matematik alanında yaptığı çalışmaları kavrar.", "Noktayı tanır.", "Eğri, doğru, doğru parçasını bilir.", "Eğri, doğru, doğru parçası çizer.", 
-                    "Doğrularda paralellik ve kesişme özeliğini bilir.", "Dik ve paralel doğrular çizer.", "Karenin özeliklerini bilir.", "Kareyi ayırt eder.", 
-                    "Kare çizer.", "Karenin çevresini hesaplar.", "Karenin alanını hesaplar.", "Dikdörtgenin özeliklerini bilir.", "Dikdörtgeni ayırt eder.", 
-                    "Dikdörtgen çizer.", "Dikdörtgenin çevresini hesaplar.", "Dikdörtgenin alanını hesaplar.", "Üçgenin özeliklerini bilir.", "Üçgeni ayırt eder.", 
-                    "Üçgen çizer.", "Üçgenin çevresini hesaplar.", "Dairenin özeliklerini bilir.", "Daireyi ayırt eder.", "Daire çizer.", "Küpün özeliklerini bilir.", 
-                    "Küpü ayırt eder.", "Küp çizer.", "Dikdörtgenler prizmasının özeliklerini bilir.", "Dikdörtgenler prizmasını ayırt eder.", "Dikdörtgenler prizması çizer.", 
-                    "Silindirin özeliklerini bilir.", "Silindiri ayırt eder.", "Silindir çizer.", "Küreyi ayırt eder.", "Piramidi ayırt eder.", "Koniyi ayırt eder.", "Geometrik cisimler yapar."
+                    "Varlıkları az-çok, büyük-küçük, uzun-kısa olma durumuna göre ayırt eder.", 
+                    "100’e kadar birer, beşer, onar, ikişer ritmik sayar.", 
+                    "1-10 arası doğal sayıları kavrar ve rakamları yazar.",
+                    "İki ve üç basamaklı doğal sayıları kavrar.", 
+                    "Doğal sayılarla eldesiz ve eldeli toplama işlemi yapar.", 
+                    "Doğal sayılarla onluk bozmayı gerektirmeyen ve gerektiren çıkarma işlemi yapar.", 
+                    "Doğal sayılarla eldesiz ve eldeli çarpma işlemi yapar.", 
+                    "Doğal sayılarla kalansız ve kalanlı bölme işlemi yapar.", 
+                    "Dört işlemi kullanarak günlük hayat problemleri çözer.", 
+                    "Parayı tanır, kavrar ve basit alışveriş işlemleri yapar.",
+                    "Saati okur ve zaman ölçülerini kavrar.",
+                    "Geometrik şekilleri (kare, üçgen, dikdörtgen vb.) tanır ve çizer."
                 ]
             },
             "Hayat Bilgisi": {
@@ -148,45 +131,12 @@
                 methods: "Rol Oynama, Örnek Olay, Doğrudan Anlatım",
                 materials: "Görsel kartlar, okul araç gereçleri, saat, pano",
                 kdaList: [
-                    "Kendini tanıtır.", "Öğretmeni ve sınıf arkadaşlarıyla tanışır.", "Sınıfını tanır.", "Sınıfında bulunan araç gereçleri tanır.", 
-                    "Okul çantasındaki araç gereçleri tanır.", "Okulun bölümlerini tanır.", "Okulun bölümlerini ayırt eder.", "Okuldaki bölümlerin işlevlerini bilir.", 
-                    "Okulda çalışanları tanır.", "Okulda çalışanların görevlerini bilir.", "Sınıf kurallarını bilir.", "Sınıf kurallarına uyar.", 
-                    "Sınıfını temiz ve düzenli tutar.", "Sınıfta seçim etkinliklerine katılır.", "Okul için gerekli olan eşyalarını temiz kullanır.", 
-                    "Okulda uyulması gereken kuralları bilir.", "Okul kurallarına uyar.", "Okula gitmek için evde yapılan hazırlığı bilir.", 
-                    "Okul yolunda uyulması gereken kuralları bilir.", "Okul yolunda kurallara uyar.", "Başkalarıyla iyi ilişkiler kurmaya özen gösterir.", 
-                    "Yakın çevresini tanır.", "Yakın çevresini ayırt eder.", "Yön kavramını bilir.", "Yerleşim alanlarıyla ilgili kavramların anlamını bilir.", 
-                    "Adreste belirtilmesi gerekenleri bilir.", "Okulunun adresini bilir.", "Kroki kavramının anlamını bilir.", "Kroki çizer.", 
-                    "Cumhuriyet Bayramı’nın anlamını bilir.", "Cumhuriyetin anlamını bilir.", "Cumhuriyetin ilânına kadar olan temel olayları bilir.", 
-                    "Cumhuriyetin ilânı ile ilgili temel olayları bilir.", "Cumhuriyet yönetiminin getirdiği yenilikleri bilir.", "Bayram hazırlıklarını bilir.", 
-                    "Bayram hazırlıklarına katılır.", "Bayram sevinci duyar.", "Bayrağımızı tanır.", "Bayrağımıza saygılı olur.", "İstiklâl Marşı’mızın anlamını bilir.", 
-                    "Atatürk’ün yaşamıyla ilgili olay ve olguları bilir.", "Atatürk’ün öğrenim yaşamını bilir.", "Atatürk’ün Türk ulusuna yaptığı hizmetlerin farkında olur.", 
-                    "Atatürk’le ilgili anıları dinlemekten zevk alır.", "Atatürk’e sevgi ve saygı duyar.", "Evini dış görünüşü bakımından tanır.", 
-                    "Evin bölümlerini tanır", "Evin bölümlerini ayırt eder.", "Evin bölümlerinde yapılan işleri açıklar.", "Evin bölümlerinde bulunan eşyaları tanır.", 
-                    "Evinin adresini bilir.", "Ailesini tanıtır.", "Ailenin yapısını bilir.", "Ailesindeki bireylerin aile içinde yaptığı işleri açıklar.", 
-                    "Ailede iyi ilişkiler kurma yollarını bilir.", "Akrabalık terimlerini bilir.", "Akrabalar arasında iyi ilişkiler kurma yollarını bilir.", 
-                    "Komşular arasında iyi ilişkiler kurma yollarını bilir.", "Konuk olmada uyulması gereken görgü kurallarını bilir.", "Tanımadığı kişilerle iletişimde yapılması gerekenleri bilir.", 
-                    "Dayanışmanın günlük yaşamımızdaki önemini kavrar.", "Doğadaki cansız varlıkları bilir.", "Cansız varlıkların yaşamımızdaki önemini bilir.", 
-                    "Doğadaki canlı varlıkları bilir.", "Doğadaki canlı varlıkları ayırt eder.", "Canlıların ortak özelliklerini bilir.", "Çevresindeki bitkileri tanır.", 
-                    "Çevresindeki hayvanları tanır.", "Çevresindeki canlıları koruma yollarını açıklar.", "Çevresindeki canlıları korumaya istekli olur.", 
-                    "Taşıtları tanır.", "Taşıtları sınıflandırır.", "Toplu taşıma araçlarını bilir.", "Toplu taşıma araçlarında kullanılan belgeleri tanır.", 
-                    "Taşıtların ilk hareket yerlerini bilir.", "Taşıtların ilk hareket yerlerini ayırt eder.", "Taşıtları kullananları tanır.", "Taşıtları kullananları ayırt eder.", 
-                    "Taşıtların kullanıldığı yerleri bilir.", "Toplu taşıma araçlarında uyulması gereken kuralları bilir.", "Okul servisinde uyulması gereken kuralları bilir.", 
-                    "Trafik ışıklarının anlamlarını bilir.", "Trafik ışıklarını anlamlarıyla eşleştirir.", "Trafiği düzenleyenleri ve denetleyenleri tanır.", 
-                    "Trafiği düzenleyenleri ve denetleyenleri ayırt eder.", "Trafik kurallarını bilir.", "Taşıtları koruma yollarını bilir.", "Vücudun ana bölümlerini tanır.", 
-                    "Vücudun ana bölümlerini ayırt eder.", "Sağlıklı olmada temizlik kurallarını bilir.", "Sağlıklı olmada temizlik kurallarına uyar.", "Sağlıklı beslenme için yapılması gerekenleri bilir.", 
-                    "Zararlı alışkanlıkları bilir.", "Hastalıkların insanlara bulaşma yollarını bilir.", "Aşıyı bilir.", "Hastalıklardan korunma yollarını bilir.", 
-                    "Hastalanınca yapılması gerekenleri bilir.", "İlâç kullanmada dikkatli olur.", "Sağlık kurumlarını tanır.", "Sağlık kurumlarında çalışanları tanır.", 
-                    "Sağlık kurumlarında çalışanları ayırt eder.", "Hasta ziyaretinde uyulması gereken kuralları bilir.", "Kazalardan korunma yollarını bilir.", 
-                    "İlk yardımı tanımlar.", "Ecza dolabında bulunan araç gereçleri tanır.", "Gökcisimlerini tanır.", "Gökcisimlerini ayırt eder.", "Gece ve gündüzü bilir.", 
-                    "Hava olaylarını tanır.", "Hava olaylarını ayırt eder.", "Hava durumu ile ilgili olguları bilir.", "Hava durumlarıyla ilgili simgeleri tanır.", 
-                    "Depremle ilgili olguları bilir.", "Yangınla ilgili olguları bilir.", "Sel ile ilgili olguları bilir.", "Erozyonla ilgili olguları bilir.", 
-                    "Bayramla ilgili olay ve olguları bilir.", "Bayram hazırlıklarını bilir.", "Bayram hazırlıklarına katılır.", "Bayram sevinci duyar.", 
-                    "Ulusal ve dinî bayramları tanır.", "Yeni yılı bilir.", "Yılın bölümlerini bilir.", "Yılın bölümlerini ayırt eder.", "Sonbahar mevsiminde çevrede oluşan değişiklikleri bilir.", 
-                    "Sonbahar mevsimi ile ilgili özellikleri ayırt eder.", "Kış mevsiminde çevrede oluşan değişiklikleri bilir.", "Kış mevsimi ile ilgili özellikleri ayırt eder.", 
-                    "İlkbahar mevsiminde çevrede oluşan değişiklikleri bilir.", "İlkbahar mevsimiyle ilgili özellikleri ayırt eder.", "Yaz mevsiminde çevrede oluşan değişiklikleri bilir.", 
-                    "Yaz mevsimiyle ilgili özellikleri ayırt eder.", "Gün ile ilgili değişik zamanları bilir.", "Günün bölümlerini ayırt eder.", "Zamanı gösteren araçları tanır.", 
-                    "İletişimi bilir.", "İletişim araçlarını tanır.", "İletişim araçlarını sınıflandırır.", "İletişim hizmetlerini bilir.", "Telefonla konuşma kurallarını bilir.", 
-                    "Kartlı/jetonlu telefonla konuşma yapar.", "Postahanede mektup/kart atar.", "İletişim araçlarının kullanımında görgü kurallarını bilir.", "Acil telefon numaralarını bilir."
+                    "Kendini, öğretmenini ve arkadaşlarını tanıtır.", "Sınıf ve okul kurallarına uyar.",
+                    "Okulun ve evinin bölümlerini tanır, adresini bilir.", "Ailesini ve akrabalık terimlerini bilir.",
+                    "Bayrağımızı ve İstiklal Marşı'mızı tanır, saygı duyar.", "Atatürk'ün hayatı ile ilgili temel bilgileri bilir.",
+                    "Çevresindeki canlı ve cansız varlıkları ayırt eder.", "Trafik kurallarına ve ışıklarına uyar.",
+                    "Kişisel temizlik ve sağlıklı beslenme kurallarını uygular.", "Hava durumunu ve mevsimleri ayırt eder.",
+                    "İletişim araçlarını ve acil telefon numaralarını bilir."
                 ]
             },
             "Sosyal Bilgiler": {
@@ -194,81 +144,26 @@
                 methods: "Soru-Cevap, Grup Çalışması, İnceleme",
                 materials: "Harita, Küre, Fotoğraflar",
                 kdaList: [
-                    "Ailenin görevlerini bilir.", "Ailede demokratik yaşamın gerçekleşmesi için yapılması gerekenleri bilir.", "Okulun kazandırdıklarının farkında olur.", 
-                    "Okulda demokratik yaşamın gerçekleşmesi için yapılması gerekenleri bilir.", "Toplum içinde bir arada yaşamanın önemini bilir.", "Toplum yaşamını düzenleyen kuralları tanır.", 
-                    "Toplum yaşamını düzenleyen kuralların önemini bilir.", "Toplumda demokratik yaşamın gerçekleşmesi için yapılması gerekenleri bilir.", "Türk toplumunda ailenin önemini kavrar.", 
-                    "Aile bireyleri arasındaki dayanışmanın önemini kavrar.", "Dayanışmanın toplum yaşamındaki önemini kavrar.", "Türk kadınının toplumdaki yerini fark eder.", 
-                    "Atatürk’ün öğretmenlere önem verdiğini fark eder.", "Cumhuriyetten önceki olay ve olguları bilir.", "Cumhuriyet yönetiminin özelliklerini bilir.", 
-                    "Cumhuriyetin getirdiği yenilikleri açıklar.", "Atatürk’ün yaşamıyla ilgili olaylar ve olguları kavrar.", "Atatürk’ün son günleri ile ilgili olaylar ve olguları bilir.", 
-                    "Atatürk’ün kişiliğini ve özelliklerini tanımaya ilgi duyar.", "Atatürk ile ilgili anıları dinlemekten zevk alır.", "Ulus kavramının anlamını bilir.", 
-                    "Vatan kavramının anlamını bilir.", "Türk ulusunun özelliklerini bilir.", "Diğer din, örf ve âdetlere hoşgörülü olmanın gereğini kavrar.", "Haritayı tanır.", 
-                    "Harita çeşitlerini bilir.", "Haritaları çeşitlerine göre ayırt eder.", "Haritanın yönlerini bilir.", "Haritalarda bazı özel renk ve işaretler kullanıldığını bilir.", 
-                    "Haritadan yararlanma yollarını bilir.", "Atlası tanır.", "Köyün özelliklerini bilir.", "Köyün yönetimini bilir.", "Bulunduğu ilçeyi tanır.", 
-                    "Bulunduğu ilçenin yerini ayırt eder.", "Bulunduğu ilçenin özelliklerini bilir.", "İlçenin yönetimini bilir.", "Bulunduğu ili tanır.", "Bulunduğu ilin yerini ayırt eder.", 
-                    "Bulunduğu ilin özelliklerini bilir.", "İlin yönetimini bilir.", "Türkiye’nin dünya üzerindeki yerini tanır.", "Türkiye’nin dünya üzerindeki yerini ayırt eder.", 
-                    "Yurdumuzun coğrafî bölgelerini tanır.", "Yurdumuzdaki coğrafî bölgelerin yerini ayırt eder.", "Yurdumuzun doğal durumunu tanır.", "Yurdumuzun doğal durumunu kavrar.", 
-                    "Yurdumuzun ekonomik yaşamını oluşturan alanları tanır.", "Yurdumuzun ekonomik yaşamını oluşturan alanların önemini kavrar.", "Yurdumuzdaki başlıca sosyal yardım kurumlarını tanır.", 
-                    "Yurdumuzdaki başlıca sosyal yardım kurumlarının görevlerini açıklar.", "Türkiye Büyük Millet Meclisini bilir.", "Türkiye Büyük Millet Meclisinin görevlerini bilir.", 
-                    "Cumhurbaşkanlığı ile ilgili olguları bilir.", "Cumhurbaşkanının görevlerini bilir.", "Bakanlar Kurulunu bilir.", "Bakanlar Kurulunun görevlerini bilir.", "Doğal çevreyi bilir.", 
-                    "Çevre sorunlarını bilir.", "Çevre sorunlarının çözümünde yapılması gerekenleri açıklar.", "Doğal âfetleri tanır.", "Doğal âfetleri ayırt eder.", "Doğal âfetlerin zararlarını açıklar.", 
-                    "Doğal âfetlerden korunma yollarını açıklar.", "İlk Çağda Anadolu’da kurulan uygarlıkları tanır.", "İlk Çağda Anadolu’da kurulan uygarlıkların yerini ayırt eder.", 
-                    "Türklerin ilk yurdu ile ilgili olayları bilir.", "Tarihteki başlıca Türk devletlerini tanır.", "Tarihteki başlıca Türk devletlerinin yerini ayırt eder.", 
-                    "Osmanlı Devleti ile ilgili başlıca olay ve olguları bilir.", "Atatürk’ün ulusal tarihimize verdiği önemi fark eder.", "Atatürk’ün ulusal kültüre önem verdiğini kavrar.", 
-                    "Yeryüzünde bulunan kıt’aları tanır.", "Yeryüzünde bulunan kıt’aların yerini ayırt eder.", "Dünya ülkelerinden başlıcalarını tanır.", "Dünya ülkelerinden başlıcalarının yerini kavrar.", 
-                    "Bağımsız Türk Cumhuriyetleri’ni tanır.", "Bağımsız Türk Cumhuriyetleri’nin yerini kavrar."
+                    "Aile ve okulda demokratik yaşam kurallarını bilir.", "Toplum yaşamını düzenleyen kuralların önemini kavrar.",
+                    "Cumhuriyet yönetiminin getirdiği yenilikleri açıklar.", "Atatürk'ün öğretmenlere ve eğitime verdiği önemi kavrar.",
+                    "Harita üzerindeki yönleri, renk ve işaretleri tanır.", "Bulunduğu köy, ilçe ve ilin özelliklerini/yönetimini bilir.",
+                    "Yurdumuzun coğrafi bölgelerini ve dünya üzerindeki yerini tanır.", "Doğal afetlerden korunma yollarını açıklar.",
+                    "Tarihteki başlıca Türk devletlerini ve Anadolu uygarlıklarını tanır."
                 ]
             },
             "Fen ve Teknoloji": {
-                uda: "Fen ve Teknoloji dersi kazanımlarını, bilimsel süreçleri günlük yaşamda kullanır.",
+                uda: "Fen ve Teknoloji dersi kazanımlarını günlük yaşamda kullanır.",
                 methods: "Gözlem, Deney, Araştırma, Doğrudan Öğretim",
                 materials: "Deney setleri, modeller, büyüteç",
                 kdaList: [
-                    "Atatürk’ün akılcılığa ve bilime verdiği önemi kavrar.", "Vücutta bulunan sistemleri tanır.", "Hareketi bilir.", "Hareket sistemini oluşturan bölümleri tanır.", 
-                    "İskeletin oluşumunu bilir.", "Hareket sistemini oluşturan bölümleri ayırt eder.", "Hareket sistemini oluşturan bölümlerin görevlerini açıklar.", 
-                    "Hareket sistemini oluşturan organların sağlığını korumayı bilir.", "Sindirimi bilir.", "Sindirim sistemini oluşturan organları tanır.", 
-                    "Sindirim sistemini oluşturan organları ayırt eder.", "Sindirim sistemini oluşturan organların görevlerini açıklar.", "Ağız ve diş sağlığını koruma yollarını bilir.", 
-                    "Sindirim sistemini oluşturan organların sağlığını korumayı bilir.", "Dolaşımı bilir.", "Dolaşım sistemini oluşturan organları tanır.", 
-                    "Dolaşım sistemini oluşturan organları ayırt eder.", "Dolaşım sistemini oluşturan organların görevlerini açıklar.", "Kanın özelliklerini bilir.", 
-                    "Kan gruplarını tanır.", "Dolaşım sistemini oluşturan organların sağlığını korumayı bilir.", "Solunumu bilir.", "Solunum sistemini oluşturan organları tanır.", 
-                    "Solunum sistemini oluşturan organları ayırt eder.", "Solunum sistemini oluşturan organların görevlerini açıklar.", "Solunum sistemini oluşturan organların sağlığını korumayı bilir.", 
-                    "Boşaltımı bilir.", "Boşaltım sistemini oluşturan organları tanır.", "Boşaltım sistemini oluşturan organları ayırt eder.", "Boşaltım sistemini oluşturan organlarının görevlerini açıklar.", 
-                    "Boşaltım sistemini oluşturan organların sağlığını korumayı bilir.", "Üremeyi bilir.", "Üreme sistemini oluşturan organları bilir.", "Üreme sistemini oluşturan organları ayırt eder.", 
-                    "Üreme sistemini oluşturan organların görevlerini açıklar.", "Ergenlik döneminin özelliklerini bilir.", "Ergenlik döneminde meydana gelen bedensel değişiklikleri bilir.", 
-                    "Sinir sistemini bilir.", "Sinir sistemini oluşturan organları tanır.", "Sinir sistemini oluşturan organları ayırt eder.", "Sinir sistemini oluşturan organların görevlerini açıklar.", 
-                    "Sinir sistemini oluşturan organların sağlığını koruma yollarını bilir.", "Duyu organlarını tanır.", "Duyu organlarını ayırt eder.", "Göz sağlığını koruma yollarını bilir.", 
-                    "Kulak sağlığını koruma yollarını bilir.", "Deri sağlığını koruma yollarını bilir.", "Burun sağlığını koruma yollarını bilir.", "Kişisel sağlık cihazlarını tanır.", 
-                    "Kişisel sağlık cihazlarını ayırt eder.", "Kişisel sağlık cihazlarını kullanmada dikkatli olur.", "Canlıları tanır.", "Gözle görülemeyen küçük canlıları bilir.", 
-                    "Bitkilerin büyüme koşullarını bilir.", "Bitkileri temel yapılarına göre sınıflandırır.", "Bitkileri temel yapılarına göre kavrar.", "Çiçekli bitkinin kısımlarını tanır.", 
-                    "Çiçekli bitkinin kısımlarını ayırt eder.", "Çiçekli bitkilerin üremesini bilir.", "Bitkileri yaşadıkları ortama göre sınıflandırır.", "Bitkileri yaşadıkları ortama göre kavrar.", 
-                    "Karada yaşayan bitkileri sınıflandırır.", "Bitkileri gövde yapısına göre kavrar.", "Bitkilerden yararlanma yollarını bilir.", "Bitkileri yararları bakımından kavrar.", 
-                    "Bitki ürünlerini saklama yollarını bilir.", "Hayvanların yaşadıkları ortamları bilir.", "Hayvanları yaşadıkları ortamlara göre kavrar.", "Hayvanların beslenme yollarını bilir.", 
-                    "Hayvanları beslenme yollarına göre kavrar.", "Hayvanların üreme şekillerini bilir.", "Hayvanları üreme şekillerine göre kavrar.", "Hayvanların hareket etme şekillerini bilir.", 
-                    "Hayvanları hareket etme şekillerine göre kavrar.", "Hayvanlardan yararlanma yollarını bilir.", "Hayvanları yararları bakımından kavrar.", "Havanın canlılar için önemini bilir.", 
-                    "Havanın varlığını kavrar.", "Havadaki ısı değişikliği sonucu oluşan doğa olaylarını bilir", "Hava durumu ile ilgili olguları bilir.", "Hava durumunun yaşantımızdaki önemini bilir.", 
-                    "Havayı kirleten etkenleri bilir.", "Hava kirliliğini önleme yollarını bilir.", "Suyun doğada bulunuş şekillerini bilir.", "Suyun doğada bulunduğu ortamları bilir.", 
-                    "Suyu kirleten etkenleri bilir.", "Su kaynaklarından yararlanma yollarını bilir.", "Su kaynaklarını koruma yollarını bilir.", "Suyun canlılar için önemini kavrar.", 
-                    "Toprağın oluşumunu bilir.", "Toprağı oluşturan ögeleri bilir.", "Toprağı koruma yollarını bilir.", "Toprağın canlılar için önemini kavrar.", "Toprağı kirleten etkenleri bilir.", 
-                    "Dünya’mızın oluşumunu bilir.", "Yerküre modelinde Dünya’yı tanır.", "Dünya’yı bilir.", "Dünya’nın katmanlarını bilir.", "Atmosferin canlılar için önemini bilir.", 
-                    "Su küreyi bilir.", "Dünya’nın hareketlerini bilir.", "Yeryüzü şekillerini tanır.", "Yeryüzü şekillerini ayırt eder.", "Yerin şeklini değiştiren etmenleri bilir.", 
-                    "Depremin zararlarından korunma yollarını açıklar.", "Depremin zararlarından korunur.", "Uzayı bilir.", "Uzay araştırmalarında yararlanılan araçları tanır.", 
-                    "Uzay araştırmalarında yararlanılan araçları ayırt eder.", "Uzayla ilgili çalışmaları kavrar.", "Yıldızları bilir.", "Güneş’i bilir.", "Güneş tutulmasını bilir.", 
-                    "Ay’ı bilir.", "Ay tutulmasını bilir.", "Ay’ın evrelerini tanır.", "Ay’ın evrelerini ayırt eder.", "Maddeyi bilir.", "Maddenin özelliklerini bilir.", 
-                    "Maddenin görülebilir özelliklerini bilir.", "Maddenin hissedilebilir özelliklerini bilir.", "Maddenin görülebilir ve hissedilebilir özelliklerini kavrar.", 
-                    "Maddenin görülebilir ve hissedilebilir özelliklerini ayırt eder.", "Maddenin ölçülebilir özelliklerini bilir.", "Maddenin ölçülebilir özelliklerini kavrar.", "Karışımı bilir.", 
-                    "Karışımı kavrar.", "Maddenin hâllerini bilir.", "Maddenin hâllerini kavrar.", "Maddeleri hâllerine göre ayırt eder.", "Maddenin hâl değiştirme yollarını bilir.", 
-                    "Enerjiyi bilir.", "Başlıca enerji çeşitlerini tanır.", "Enerji kaynaklarını tanır.", "Enerji kaynaklarını ayırt eder.", "Su enerjisinin kullanıldığı alanları bilir.", 
-                    "Rüzgâr enerjisinin kullanıldığı alanları bilir.", "Çevresindeki başlıca alet ve makineleri tanır.", "Çevresindeki başlıca alet ve makinelerin kullanım alanlarını bilir.", 
-                    "Çevresindeki başlıca alet ve makineleri kullanım alanlarına göre kavrar.", "Alet ve makineleri kullanma yollarını bilir.", "Alet ve makinelerin bakımını yapmayı bilir.", 
-                    "Isı kaynaklarını tanır.", "Güneş enerjisinin kullanıldığı alanları bilir.", "Isının yayılmasını bilir.", "Isının yayılmasını kavrar.", "Yakıtları tanır.", 
-                    "Yakıt türlerini bilir.", "Yakıtları türlerine göre kavrar.", "Yakıtların kullanıldıkları yerleri açıklar.", "Yakıtların kullanımı ile ilgili kuralları bilir.", 
-                    "Kullanılan yakıtların çevreye olumsuz etkilerini kavrar.", "Isınmada kullanılan araçları tanır.", "Hâl değişimlerinde ısı alışverişini bilir.", "Genleşmeyi bilir.", 
-                    "Genleşmeyi kavrar.", "Termometreyi bilir.", "Termometreyle sıcaklık ölçer.", "Sesin oluşumunu bilir.", "Sesin yayılmasını bilir.", "Sesin oluşumu ve yayılmasını kavrar.", 
-                    "Işık kaynaklarını bilir.", "Işığın yayılmasını bilir.", "Işığın yansımasını bilir.", "Işığın kırılmasını bilir.", "Işığın yansımasını ve kırılmasını kavrar.", 
-                    "Elektriklenmenin oluşumunu bilir.", "Elektriklenmenin oluşumunu kavrar.", "Maddelerin elektriksel özelliklerini bilir.", "Elektriksel özelliklerine göre maddeleri kavrar.", 
-                    "Havadaki elektriklenme sonucu oluşan olayları tanımlar.", "Yıldırımın tehlikelerini bilir.", "Yıldırımdan korunma yollarını bilir.", "Elektrik üreten araçları tanır.", 
-                    "Elektriğin üretimden evlere ulaşımına kadar olan aşamaları bilir.", "Elektrik enerjisinin kullanıldığı alanları bilir.", "Elektrik enerjisinin kullanıldığı araçları kavrar.", 
-                    "Elektriği tasarruflu kullanma yollarını bilir.", "Elektriğin kullanımında uyulması gereken kuralları bilir.", "Kuvveti bilir.", "Kuvveti kavrar.", "Hareketi bilir.", 
-                    "Hareket türlerini bilir.", "Hareket türlerini kavrar.", "Basıncı bilir.", "Basıncı kavrar."
+                    "Vücudumuzdaki sistemleri (destek, sindirim, dolaşım vb.) ve organları tanır.",
+                    "Duyu organlarını tanır ve sağlığını koruma yollarını bilir.",
+                    "Canlıları (bitki ve hayvanlar) temel özelliklerine göre sınıflandırır.",
+                    "Hava, su ve toprak kirliliğini önleme yollarını kavrar.",
+                    "Dünya'nın katmanlarını ve hareketlerini bilir.",
+                    "Maddenin hallerini ve ölçülebilir özelliklerini kavrar.",
+                    "Işık ve sesin yayılmasını, yansımasını bilir.",
+                    "Elektrik enerjisinin kullanım alanlarını ve tasarrufu bilir."
                 ]
             },
             "Din Kültürü ve Ahlak Bilgisi": {
@@ -276,40 +171,24 @@
                 methods: "Soru-Cevap, Anlatım, Örnek Olay",
                 materials: "Ders kitabı, görsel materyaller",
                 kdaList: [
-                    "Günlük konuşmalarda kullanılan dinî sözcük ve tümcelerin anlamını bilir.", "Duanın anlamını bilir.", "Dinimizin insanlara güzel ahlâkı öğütlediğinin farkında olur.", 
-                    "Güzel ahlâkın gereklerine uyar.", "İslam’da temizliğin önemini bilir.", "Temiz olmak için yapılması gerekenleri bilir.", "Çevreyi temiz tutmak için yapılması gerekenleri bilir.", 
-                    "Anne babasına karşı görevlerini bilir.", "Kardeşlerine karşı görevlerini bilir.", "Akraba ve komşularına karşı görevlerini bilir.", "Arkadaşlarına karşı görevlerini bilir.", 
-                    "Toplumsal yaşamın kurallarını bilir.", "Sevinç ve üzüntülerin paylaşıldığı zamanları bilir.", "Dinimizce kötü olarak nitelendirilen davranışların farkında olur.", 
-                    "Vatan ve ulusla ilgili değerlerin farkında olur.", "Atatürk’ün insan sevgisi ve evrensellik konularındaki görüşlerini kavrar.", "Allah’ın bazı sıfatlarını bilir.", 
-                    "Allah’ın yarattıklarını sevmenin dinimizin gereği olduğunu bilir.", "İslâmiyet’in anlamını bilir.", "İmanın temel esaslarını bilir.", "Kelimeişahadet’in anlamını bilir.", 
-                    "Peygamber kavramının anlamını bilir.", "Peygamberlerin niteliklerini bilir.", "Kur’an’da adı geçen bazı peygamberleri tanır.", "Hz. Muhammed’in hayatı ile ilgili olay ve olguları bilir.", 
-                    "Hz. Muhammed’in örnek niteliklerini bilir.", "Hz. Muhammed’in ailesi içindeki örnek niteliklerini bilir.", "Hz. Muhammed’in ailesinin özelliklerini bilir.", "İbadetin anlamını bilir.", 
-                    "Başlıca ibadetleri tanır.", "İslâm dininde ibadet sayılan başlıca davranışların farkında olur.", "İbadet yerlerini bilir.", "Atatürk’ün din ve vicdan özgürlüğüne verdiği önemin farkında olur.", 
-                    "Atatürk’ün düşünce özgürlüğüne önem verdiğinin farkında olur.", "Diğer din, örf ve âdetlere hoşgörü göstermek gerektiğini fark eder.", "Oruçla ilgili olguları bilir.", 
-                    "Ramazan ayının özelliklerini bilir.", "Ramazan Bayramı’nın özelliklerini bilir.", "Namazın anlamını bilir.", "Namaza hazırlığı bilir.", "Abdest türlerini tanır.", 
-                    "Boy abdesti almada uyulması gereken sırayı bilir.", "Namaz abdesti almada uyulması gereken sırayı bilir.", "Namaz kılarken uyulması gereken kuralları bilir.", "Namaz türlerini tanır.", 
-                    "Namazların kılınma zamanlarını bilir.", "Zekâtla ilgili olguları bilir.", "Sadakanın anlamını bilir.", "Hac ile ilgili olguları bilir.", "Kurban Bayramı’nın özelliklerini bilir.", 
-                    "Kutsal kitaplarla ilgili olguları bilir.", "Kutsal kitapların gönderildiği peygamberleri tanır.", "Kur’anıkerim’in özelliklerini bilir.", "Kur’anıkerim’in temel konularını bilir.", 
-                    "Günümüzde yaşayan büyük dinleri tanır.", "Din ve vicdan özgürlüğünün önemini bilir.", "Diğer din, örf ve âdetlere hoşgörülü olmanın önemini bilir.", "Farklı inanç ve düşüncelere saygı duyar.", 
-                    "Lâiklik ilkesini kavrar.", "Atatürk’ün islâm dinî hakkındaki görüşlerini kavrar."
+                    "Dini sözcüklerin anlamını bilir ve güzel ahlak kurallarına uyar.",
+                    "İslam'da temizliğin önemini ve temizlenme yollarını bilir.",
+                    "Anne, baba, kardeş ve arkadaşlarına karşı görevlerini yerine getirir.",
+                    "Allah'ın yarattıklarını sevmeyi ve İslâmiyet'in temel esaslarını bilir.",
+                    "Hz. Muhammed'in hayatını ve örnek ahlakını tanır.",
+                    "İbadetlerin (namaz, oruç vb.) temel özelliklerini ve yerlerini bilir.",
+                    "Din ve vicdan özgürlüğü ile hoşgörü kavramlarını kavrar."
                 ]
             },
             "Beden Eğitimi": {
                 uda: "Beden Eğitimi dersinde psikomotor becerileri sergiler ve kurallara uyar.",
                 methods: "Gösterip Yaptırma, Model Olma, Fiziksel Yardım",
-                materials: "Top, atlama ipi, minder, çember",
+                materials: "Top, atlama ipi, minder, cheri",
                 kdaList: [
-                    "Vücudun bölümlerini tanır.", "Vücudun bölümlerini hareket ettirir.", "Ayakta duruşlarla ilgili beceriler geliştirir.", "Diz üstü duruşu ilgili beceriler geliştirir.", 
-                    "Oturuş duruşu ilgili beceriler geliştirir.", "Çeşitli şekillerde diziliş yapar.", "Çeşitli şekillerde dönüşler yapar.", "Vücut bölümlerinin esnekliğini artırıcı hareketler yapar.", 
-                    "Çeşitli şekillerde yürüyüşler yapar.", "Yürüme ile koordinasyonunu geliştirir.", "Koşularla dayanıklılığını geliştirir.", "Koşularla süratini geliştirir.", 
-                    "Koşularla koordinasyonunu geliştirir.", "Çeşitli şekillerde sıçrayışlar yapar.", "Sıçramalarla koordinasyonunu geliştirir.", "Atmalarla koordinasyonunu geliştirir.", 
-                    "Tutmalarla koordinasyonunu geliştirir.", "Atma ve tutmalarla koordinasyonunu geliştirir.", "Kaldırma ve taşımalarla koordinasyonunu geliştirir.", 
-                    "Asılma ve sallanmalarla koordinasyonunu geliştirir.", "Minderde hareketler yapar.", "Jimnastik sırasında denge geliştirici hareketler yapar.", "Kasada hareketler yapar.", 
-                    "Çember ile hareketler yapar.", "İp ile hareketler yapar.", "Taklidî hareketler yapar.", "Birlikte oyun oynama becerisi geliştirir.", "Oyunlarda dostça oynamaya özen gösterir.", 
-                    "Çeşitli spor dallarını tanır.", "Basketbol oyunu ile ilgili çalışmalar yapar.", "Voleybol oyunu ile ilgili çalışmalar yapar.", "Futbol oyunu ile ilgili çalışmalar yapar.", 
-                    "Halk dansları ve şarkılı danslar ile ilgili temel beceriler kazanır.", "Halk dansları ve şarkılı danslar ile ilgili koordinasyonunu geliştirir.", 
-                    "Okul tarafından düzenlenen gezilere katılmaya istekli olur.", "Müzikli aktivitelerle ilgili koordinasyonunu geliştirir.", "Spor malzemelerini tanır.", 
-                    "Spor malzemelerini düzenli kullanır.", "Spor kıyafetlerini temiz ve düzenli kullanır.", "Spor ve sağlık ilişkisini bilir.", "Sağlığını korur."
+                    "Vücudunu tanır ve temel duruşları sergiler.", "Yürüme, koşma ve sıçrama koordinasyonunu geliştirir.",
+                    "Atma ve tutma becerilerini sergiler.", "Jimnastik ve denge hareketlerini yapar.",
+                    "Birlikte oyun oynama ve dostça rekabet kurallarına uyar.",
+                    "Spor malzemelerini ve kıyafetlerini düzenli kullanır."
                 ]
             },
             "Görsel Sanatlar": {
@@ -317,16 +196,9 @@
                 methods: "Gösterip Yaptırma, Model Olma",
                 materials: "Boyalar, kağıt, makas, yapıştırıcı",
                 kdaList: [
-                    "Resim-iş dersinde kullanılan araç gereçleri tanır.", "Araç gereçlerin kullanımına özen gösterir.", "Resim-iş çalışmalarına hazırlık yapar.", 
-                    "Resim-iş çalışmalarında temiz ve düzenli olmaya özen gösterir.", "Yoğurma maddelerini tanır.", "Yoğurma maddeleri ile çalışmalar yapar.", "Kâğıt yırtar.", 
-                    "Kâğıt yırtma çalışmaları yapar.", "Kâğıt yapıştırır.", "Kâğıt yapıştırma çalışmaları yapar.", "Kâğıt katlar.", "Kâğıt katlama çalışmaları yapar.", "Makas kullanır.", 
-                    "Makasla kâğıt kesme çalışmaları yapar.", "Kâğıtla çalışmalar yapar.", "Çizgisel çalışmalar yapar.", "Cetvelle çizgi çizer.", "Şablonla çizer.", "Renkleri sınıflandırır.", 
-                    "Renkleri ayırt eder.", "Pastel boya ile boyama yapar.", "Kuru boya ile boyama yapar.", "Sulu boya ile boyama yapar.", "Guaş boya ile boyama yapar.", "Parmak boya hazırlar.", 
-                    "Parmak boya ile boyama yapar.", "Boya malzemeleriyle renkli çalışmalar yapar.", "Sulu boya lâvi çalışması yapar.", "Pastel boya kazıma çalışması yapar.", 
-                    "Sulu boya batik çalışması yapar.", "Sünger baskısı yapar.", "Yaprak baskısı yapar.", "İp baskısı yapar.", "Patates baskısı yapar.", "Su kâğıdı çalışması yapar.", 
-                    "Kola kâğıdı çalışması yapar.", "Hayâl gücünü zenginleştirici resim çalışmaları yapar.", "Duygu, düşünce ve yaşantılarını ifade edici resim çalışmaları yapar.", 
-                    "Kolâj çalışması yapar.", "Boyama vitray yapar.", "Kâğıt vitray yapar.", "Artık malzemeyi bilir.", "Artık malzemeleri kullanma yollarını kavrar.", 
-                    "Artık malzemelerle çalışma yapar.", "Sınıf ve okul sergileriyle yarışmalara ilgi duyar.", "Çevresindeki atölyeleri, sanat galerilerini, sergi salonlarını ve müzeleri tanır.", "Sanat eserlerine ilgi duyar."
+                    "Resim araç gereçlerini tanır ve temiz kullanır.", "Kağıt yırtma, yapıştırma ve katlama çalışmaları yapar.",
+                    "Makas kullanarak düz ve dairesel kesimler yapar.", "Renkleri tanır ve boyama tekniklerini (pastel, sulu boya vb.) uygular.",
+                    "Duygu ve düşüncelerini ifade eden resimler yapar.", "Artık malzemelerle yaratıcı ürünler oluşturur."
                 ]
             },
             "Müzik": {
@@ -334,17 +206,9 @@
                 methods: "Gösterip Yaptırma, Dinletme, Tekrar",
                 materials: "Ritim araçları, ses kayıtları",
                 kdaList: [
-                    "Farklı sesler çıkarır.", "Sesin yönünü bilir.", "Sesleri tanır.", "Sesleri ayırt eder.", "Varlıkları hareket ve sesleriyle taklit eder.", "İnsan seslerini tanır.", 
-                    "İnsan seslerini ayırt eder.", "Gürültüyle, müzik sesini birbirinden ayırt eder.", "Şarkıda geçen sözcükleri doğru seslendirir.", "Sesini doğru kullanır.", "Şarkı seslendirir.", 
-                    "Grupla şarkı seslendirir.", "Birlikte şarkı söylemeye istekli olur.", "Bildiği ezgileri doğru seslendirir.", "Belirli gün, hafta ve ders konularına ilişkin şarkıları tanır.", 
-                    "Müziğimizdeki türleri tanır.", "Müziğimizdeki türleri ayırt eder.", "Müziğimizdeki türlerinden bildiği örnekleri seslendirir.", "Çevresindeki çalgıları tanır.", 
-                    "Çevresindeki çalgıları kullanılış özelliklerine göre bilir.", "Çalgıları seslerine göre tanır.", "Ses ve çalgı kullanarak müzik yapar.", "Çevresindeki varlıkları hareket hızlarına göre tanır.", 
-                    "Çevresindeki varlıkları hareket hızlarına göre taklit eder.", "Ritim tutar.", "Dağarcığındaki sayışma, tekerleme, ninni, şarkı, türkü ve marşları uygun çabukluk ve yavaşlıkla seslendirir.", 
-                    "Müzikli oyun ve dansları oynar.", "Müzikle yapılan etkinliklere katılmaya istekli olur.", "İstiklâl Marşı’nın anlamını bilir.", "İstiklâl Marşı’nı doğru seslendirir.", 
-                    "İstiklâl Marşı’na katılır.", "Atatürk’le ilgili belli başlı şarkıları tanır.", "Atatürk’ü anlatan şarkıları ayırt eder.", "Atatürk’le ilgili düzeyine uygun şarkıları seslendirir.", 
-                    "Atatürk’ü anlatan düzeyine uygun şarkıları seslendirmekten hoşlanır.", "Müzik yoluyla Atatürk’ü daha çok sever.", "Sınıfındaki, Atatürk’le ilgili müzik etkinliklerine katılır.", 
-                    "Sınıfındaki, Atatürk’le ilgili müzik etkinliklerine katılmaktan hoşlanır.", "Okulundaki, Atatürk’le ilgili müzik etkinliklerine katılır.", 
-                    "Okulundaki, Atatürk’le ilgili müzik etkinliklerine katılmaya istekli olur.", "Çevresindeki, Atatürk’le ilgili müzik etkinliklerine katılmaktan zevk alır."
+                    "Sesleri tanır, ayırt eder ve ritim tutar.", "Şarkı sözlerini doğru seslendirir ve eşlik eder.",
+                    "Birlikte şarkı söyleme etkinliklerine katılır.", "Çalgıları seslerine göre tanır ve kullanır.",
+                    "İstiklal Marşı'mızı ve Atatürk şarkılarını doğru seslendirir."
                 ]
             },
             "Toplumsal Uyum Becerileri": {
@@ -352,7 +216,9 @@
                 methods: "Rol Oynama, Topluma Dayalı Öğretim",
                 materials: "Sosyal senaryo kartları",
                 kdaList: [
-                    "Tanıdığı kişilere uygun selamlaşma sözcüklerini kullanır.", "Sıraya girme ve izin isteme kurallarına uyar.", "Acil durumlarda (112) yardım ister ve kimliğini söyler."
+                    "Tanıdığı kişilere uygun selamlaşma sözlerini kullanır.",
+                    "Sıraya girme, izin isteme ve görgü kurallarına uyar.",
+                    "Acil durumlarda yardım istemeyi ve kimlik bilgilerini söylemeyi bilir."
                 ]
             },
             "Trafik ve İlk Yardım": {
@@ -360,7 +226,8 @@
                 methods: "Simülasyon, Rol Oynama, Örnek Olay",
                 materials: "Trafik levhaları, maket araçlar",
                 kdaList: [
-                    "Temel trafik işaretlerinin anlamını söyler.", "Karşıdan karşıya geçerken güvenli yolları kullanır.", "Ulaşım araçlarında güvenlik kurallarına uyar."
+                    "Temel trafik işaretlerini tanır.", "Yaya geçitlerini ve güvenli yolları kullanır.",
+                    "Toplu taşıma araçlarında güvenlik kurallarına uyar."
                 ]
             }
         };
@@ -369,91 +236,65 @@
             "Bilişsel Gelişim": {
                 uda: "Bilişsel becerilerini günlük problemlerde ve etkinliklerde kullanır.",
                 methods: "Doğrudan Öğretim, Oyunla Öğretim",
-                materials: "Eğitici oyuncaklar, küpler, yapboz, resimli kartlar",
+                materials: "Eğitici oyuncaklar, küpler, yapboz",
                 kdaList: [
-                    "Üç küple köprü yapar.", "İlişkili yapbozu tamamlar.", "Arkadaşı ile çatışma durumlarını veya basit problemleri çözer.", 
-                    "Bir olayın gerçek ya da hayal olup olmadığını söyler.", "En fazla üç sayı atlayarak 1'den 10'a kadar birer ritmik sayar.", 
-                    "Günlük yaşamda karşılaştığı rakamların adını söyler.", "En fazla beşe kadar olan nesne grubu için 'Kaç tane?' sorusunu yanıtlar.", 
-                    "İki nesne grubunu çokluklarına göre eşleştirir.", "Sayısal olarak farklı gruplar için 'daha çok' ve 'daha az' olanı söyler.",
-                    "Daire, üçgen, kare, dikdörtgen geometrik şekillerinin adlarını söyler ve eşleştirir.", "Varlıkların mekânda konumunu (içinde, üstünde, altında vb.) söyler.",
-                    "Nesneleri renk, şekil vb. özelliğine göre gruplara ayırır.", "Modele bakarak basit bir örüntünün aynısını yapar veya eksik ögeyi tamamlar.",
-                    "Nesneleri büyüklük-küçüklük, uzunluk-kısalık yönünden karşılaştırır.", "Doğal varlıkları ve maddenin hallerini tanımlar.",
-                    "Zaman kavramlarını (dün, bugün, yarın) ve haftanın günlerini yerinde kullanır."
+                    "Üç küple köprü yapar, yapbozu tamamlar.", "Basit günlük hayat problemlerini çözer.",
+                    "1-20 arası ritmik sayar, rakamları tanır.", "Nesneleri renk ve şekle göre gruplar/eşler.",
+                    "Zaman kavramlarını (bugün-yarın) yerinde kullanır."
                 ]
             },
             "Alıcı Dil Becerileri": {
-                uda: "Kendisine yöneltilen sözlü ifadeleri anlar ve yönergeleri yerine getirir.",
+                uda: "Sözlü ifadeleri anlar ve yönergeleri yerine getirir.",
                 methods: "Doğal Öğretim, Soru-Cevap",
-                materials: "Resimli hikaye kitapları",
+                materials: "Hikaye kitapları",
                 kdaList: [
-                    "Kendisine verilen ardışık 3 basit yönergeyi sırayla yerine getirir.", "İstenildiğinde nesneleri işlevine göre sınıflandırır.",
-                    "Eylemsilere (-mek, -mak, -erken vb.) uygun resimleri seçer.", "Bir hikâyeyi dinledikten sonra sorulara tepki verir.",
-                    "İletişim sırasında oluşan anlamsal bozuklukları anladığını gösterir.", "Anlatılan sırayı koruyarak duyduğu hikâyenin resimlerini sıralar.",
-                    "Konuşma sırasında ses tonu kullanımlarından (öfke, şaka) alt mesajı anladığını gösterir.", "Aynı sesle başlayan sözcüklerin resmini gösterir."
+                    "Ardışık 3 basit yönergeyi sırayla yapar.", "Nesneleri işlevine göre sınıflandırır.",
+                    "Anlatılan hikaye ile ilgili sorulara cevap verir.", "Aynı sesle başlayan sözcükleri bulur."
                 ]
             },
             "İfade Edici Dil Becerileri": {
-                uda: "Duygu, düşünce ve isteklerini sözel olarak ifade eder.",
+                uda: "Duygu, düşünce ve isteklerini sözel ifade eder.",
                 methods: "Doğal Öğretim, Rol Oynama",
-                materials: "Dramatizasyon materyalleri, aynalar",
+                materials: "Ayna, kukla",
                 kdaList: [
-                    "Bağımsız bir şekilde yetişkin ile karşılıklı etkileşime katılır.", "Eylemsileri cümle içinde kullanır.",
-                    "Sohbette konuyla ilişkili eklemeler yaparak devam eder.", "Konuşmaya uygun yüz ifadeleri kullanır.",
-                    "Karmaşık söz dizimi kullanır.", "Bağlaçları (ve, ama, çünkü, onun için) kullanır.",
-                    "Cümlelerin sözcüklerden oluştuğunu söyler.", "Birbiri ile kafiyeli sözcükleri söyler.",
-                    "Sözcükleri hecelerine doğru olarak ayırır.", "Aynı sesle başlayan / biten sözcükleri söyler."
+                    "Yetişkinle karşılıklı etkileşime girer.", "Cümle içinde bağlaçlar kullanır.",
+                    "Sözcükleri hecelerine ayırır.", "Olayları oluş sırasına göre anlatır."
                 ]
             },
             "Kaba Motor Becerileri": {
-                uda: "Denge ve hareket gerektiren kaba motor becerilerini koordineli şekilde sergiler.",
+                uda: "Denge ve hareket becerilerini sergiler.",
                 methods: "Fiziksel Yardım, Gösterip Yaptırma",
-                materials: "Toplar, atlama ipleri, denge tahtası",
+                materials: "Top, minder",
                 kdaList: [
-                    "Aynı ayak üzerinde öne doğru ardışık sıçrar.", "Engeller arasından koşar.", "Tek ayağı üzerinde dengede durur.",
-                    "Sınırları belirlenmiş alan içerisinde adımlayarak yürürken dengesini korur.", "Topu gövdesini çevirerek öne doğru fırlatır.",
-                    "Bacağını geriye bükerek öne doğru topa vuruş yapar.", "Havadan gelen topu her iki eliyle tutar.",
-                    "Parmak ucunda / Topuk-parmak ucu teması ile adımlar/yürür.", "Her iki ayağı ile aynı anda sıçrar/atlar.",
-                    "Müziğe uygun basit vücut hareketleri ve dans figürleri sergiler.", "Arkada küçük tekerlek destekleri ile iki tekerlekli bisikleti sürer.",
-                    "Sabit topun yanında yere paralel olarak raketle vuruş yapar."
+                    "Tek ayağı üzerinde dengede durur.", "Belirlenen çizgide dengeli yürür.",
+                    "Topu hedefe fırlatır ve gelen topu tutar.", "Müziğe uygun vücut hareketleri yapar."
                 ]
             },
             "İnce Motor Becerileri": {
-                uda: "Küçük kas becerisi gerektiren etkinlikleri (yazma, kesme, çizme) gerçekleştirir.",
+                uda: "Küçük kas becerisi gerektiren etkinlikleri yapar.",
                 methods: "Gösterip Yaptırma, Model Olma",
-                materials: "Makas, boyalar, oyun hamuru, kağıt",
+                materials: "Makas, boya",
                 kdaList: [
-                    "İlk iki/üç parmakla kalemin uç kısmını kavrar ve diğer parmaklara yaslar.", "Makası uygun şekilde kavrar.",
-                    "Makas gibi araçlarla düz, kavisli veya geometrik şekiller keserek kesim yapar.", "Oyun hamuru vb. malzemeleri şekle dönüştürür.",
-                    "Kâğıt üzerinde gördüğü şekilleri kopya eder / boş kâğıda çizer.", "Ev, insan, ağaç, çöp adam gibi gerçeğe yakın veya basit resimler çizer.",
-                    "Çizgi dışına taşırmadan boyama yapar.", "Küp gibi nesneleri üst üste koyarak kule yapar.",
-                    "Anahtar, jeton gibi küçük nesneleri dar alanlardan veya kilitlerden geçirip çevirir."
+                    "Kalemi ve makası kuralına uygun tutar.", "Düz hat boyunca kesim yapar.",
+                    "Bakarak harf veya şekil çizimi yapar.", "Çizgi dışına taşırmadan boyama yapar."
                 ]
             },
             "Sosyal-Duygusal Gelişim": {
-                uda: "Sosyal çevre ile uyumlu ilişkiler kurar ve duygularını yönetir.",
-                methods: "Sosyal Öyküler, Rol Oynama, Oyun",
-                materials: "Duygu kartları, grup oyun materyalleri",
+                uda: "Sosyal çevre ile uyumlu ilişkiler kurar.",
+                methods: "Sosyal Öyküler, Oyun",
+                materials: "Duygu kartları",
                 kdaList: [
-                    "Yetişkinle beraber iletişim kurar ve yönergelerine uyar.", "Yerinde teşekkür eder, selamlar ve özür diler.",
-                    "Sıra alarak veya kurallara uyarak arkadaşlarıyla oyun oynar.", "Oyun sırasında konuşarak iletişim kurar ve işbirliği yapar.",
-                    "Tanıdık yetişkine/arkadaşlarına sevgi gösterir ve oyuncaklarını paylaşır.", "Gerektiğinde yetişkinden yardım talep eder veya diğerlerine yardım eder.",
-                    "Akranları ile arasındaki çatışmaları bağımsız veya yetişkin yardımıyla çözer.", "Üzülen akranını teselli eder.",
-                    "Duygularını söyler ve istenmediği durumlarda duygularını kontrol etmeye çalışır.", "Rahatsız edici olduğu söylenen davranışı sonlandırır.",
-                    "Toplumsal ortamlarda veya ulaşım araçlarında güvenlik kurallarına uyar.", "Tehlikeli durumları tanımlar ve ateş gibi tehlikelerden uzak durur.",
-                    "Bağımsız tercihlerde bulunur ve kendi etkinliklerini planlayıp sürdürür."
+                    "Görgü kurallarına (teşekkür, özür vb.) uyar.", "Sıra bekler ve arkadaşlarıyla paylaşır.",
+                    "Duygularını söyler ve kontrol etmeye çalışır.", "Toplumsal kurallara yetişkin gözetiminde uyar."
                 ]
             },
             "Uyumsal Beceriler": {
-                uda: "Günlük yaşam, özbakım ve bağımsız yaşam becerilerini gerçekleştirir.",
+                uda: "Günlük yaşam ve özbakım becerilerini yapar.",
                 methods: "İleriye Zincirleme, Model Olma",
-                materials: "Mutfak gereçleri, giysiler, temizlik malzemeleri",
+                materials: "Temizlik malzemeleri, kıyafet",
                 kdaList: [
-                    "Bağımsız olarak yemeğini yer ve içeceklerini içer.", "Çatal, kaşık, kepçe vb. araçları işlevine uygun kullanır.",
-                    "Sofra hazırlamaya, toplamaya ve sınıf/ev düzenine yardım eder.", "Düğmesiz ve düğmeli giysileri, çorabını ve ayakkabısını giyer/çıkarır.",
-                    "Fermuar kapatır ve ayakkabı bağcığı bağlar.", "Hava koşullarına uygun giysi seçer.",
-                    "Tuvalet ihtiyacını bağımsız olarak giderir, temizliğini yapar ve sifonu çeker.", "Banyosunu yapar ve vücudunu havluyla kurular.",
-                    "Ellerini sabunla yıkar, burnunu mendille siler ve saçlarını tarar.", "Kirlettiği yeri temizler ve kişisel sorumluluklarını yerine getirir.",
-                    "Güvenli bir şekilde karşıdan karşıya geçer ve emniyet kemerini takar."
+                    "Yemeğini bağımsız yer ve suyunu içer.", "Düğme ilikler, ayakkabı bağcığını bağlar.",
+                    "Tuvalet ihtiyacını bağımsız giderir.", "Ellerini sabunla yıkar ve kurular."
                 ]
             }
         };
@@ -518,7 +359,6 @@
             return true;
         };
 
-        // Word export function
         function exportHTMLToWord(elementId, filename = 'BEP_Dosyasi.doc') {
             const element = document.getElementById(elementId);
             if(!element) return;
@@ -537,7 +377,7 @@
             
             const html = `
                 <html xmlns:o='urn:schemas-microsoft-com:office:office' xmlns:w='urn:schemas-microsoft-com:office:word' xmlns='http://www.w3.org/TR/REC-html40'>
-                <head><meta charset='utf-8'><title>BEP Dosyasi</title>${style}</head>
+                <head><meta charset='utf-8'><title>BEP Dosyası</title>${style}</head>
                 <body>${element.innerHTML}</body>
                 </html>
             `;
@@ -574,7 +414,7 @@
         const appState = {
             users: [{ username: 'demo@ornek.com', password: 'demo', firstName: 'Örnek', lastName: 'Öğretmen', branch: 'Özel Eğitim Öğretmeni' }],
             currentUser: null,
-            view: 'auth', // auth, dashboard, profile, addStudent, selectCourses, assessment, selectGoals, bepView
+            view: 'auth', // auth, dashboard, profile, addStudent, selectCourses, assessment, selectGoals, bepView, evalFormsView
             students: [],
             currentStudent: JSON.parse(JSON.stringify(defaultStudentState)),
             formError: '',
@@ -584,7 +424,6 @@
             generatedBEP: null
         };
 
-        // Yönlendirme ve Yeniden Çizdirme
         function setView(viewName) {
             appState.view = viewName;
             renderApp();
@@ -592,31 +431,22 @@
         }
 
         // ==========================================
-        // 4. OLAY İŞLEYİCİLER (EVENT HANDLERS)
+        // 4. OLAY İŞLEYİCİLER
         // ==========================================
 
         function handleLogin(event) {
             event.preventDefault();
             const formData = new FormData(event.target);
             const user = appState.users.find(u => u.username === formData.get('identifier') && u.password === formData.get('password'));
-            if (user) { 
-                appState.currentUser = user; 
-                setView('dashboard'); 
-            } else { 
-                alert('E-posta/Telefon veya şifre hatalı!'); 
-            }
+            if (user) { appState.currentUser = user; setView('dashboard'); } else { alert('E-posta/Telefon veya şifre hatalı!'); }
         }
 
         function handleRegister(event) {
             event.preventDefault();
             const formData = new FormData(event.target);
             const username = formData.get('reg_identifier');
-            const password = formData.get('reg_password');
-            if (appState.users.find(u => u.username === username)) { 
-                alert('Bu e-posta veya telefon zaten kayıtlı.'); 
-                return; 
-            }
-            appState.users.push({ username, password, firstName: '', lastName: '', branch: '' });
+            if (appState.users.find(u => u.username === username)) { alert('Bu e-posta veya telefon zaten kayıtlı.'); return; }
+            appState.users.push({ username, password: formData.get('reg_password'), firstName: '', lastName: '', branch: '' });
             alert('Kayıt başarılı! Lütfen giriş yapın.');
             event.target.reset();
         }
@@ -631,7 +461,6 @@
             setView('dashboard');
         }
 
-        // Forma girilen güncel değerleri anlık olarak state'e kaydeder
         function syncFormState() {
             const form = document.getElementById('studentForm');
             if(!form) return;
@@ -668,32 +497,9 @@
             appState.currentStudent.supportRoomCourses = fd.getAll('supportRoomCourses');
         }
 
-        function toggleSupportRoomVisibility() {
-            const decisionSelect = document.querySelector('select[name="decision"]');
-            const supportRoomPanel = document.getElementById('supportRoomPanel');
-            const usesSupportRoomYes = document.getElementById('usesSupportRoomYes');
-            const supportRoomDetails = document.getElementById('supportRoomDetails');
-
-            if (decisionSelect && supportRoomPanel) {
-                if (decisionSelect.value === "Tam Zamanlı Kaynaştırma / Bütünleştirme") {
-                    supportRoomPanel.classList.remove('hidden');
-                } else {
-                    supportRoomPanel.classList.add('hidden');
-                }
-            }
-
-            if (usesSupportRoomYes && supportRoomDetails) {
-                if (usesSupportRoomYes.checked) {
-                    supportRoomDetails.classList.remove('hidden');
-                } else {
-                    supportRoomDetails.classList.add('hidden');
-                }
-            }
-        }
-
         function handleStudentFormSubmit(event) {
             event.preventDefault();
-            syncFormState(); // Her ihtimale karşı güncel durumu al
+            syncFormState(); 
 
             appState.formError = '';
             if (!validateTC(appState.currentStudent.tcNo)) {
@@ -710,26 +516,13 @@
 
         function toggleCourse(course) {
             const index = appState.selectedCourses.indexOf(course);
-            if (index > -1) {
-                appState.selectedCourses.splice(index, 1);
-            } else {
-                appState.selectedCourses.push(course);
-            }
+            if (index > -1) { appState.selectedCourses.splice(index, 1); } else { appState.selectedCourses.push(course); }
             const cb = document.getElementById(`course_${course}`);
             if(cb) cb.parentElement.className = `flex items-center p-4 border rounded-lg cursor-pointer transition ${cb.checked ? 'bg-teal-50 border-teal-500 text-teal-800 font-medium' : 'bg-slate-50 border-slate-200 hover:border-teal-300 text-slate-700 font-medium'}`;
         }
 
-        function selectAllCourses(coursesStr) {
-            const courses = coursesStr.split(',');
-            appState.selectedCourses = [...courses];
-            renderApp();
-        }
-
         function handleCourseSelectionSubmit() {
-            if (appState.selectedCourses.length === 0) {
-                alert("Lütfen değerlendirme yapmak için en az bir ders/modül seçiniz.");
-                return;
-            }
+            if (appState.selectedCourses.length === 0) { alert("Lütfen değerlendirme yapmak için en az bir ders/modül seçiniz."); return; }
             appState.evaluations = {};
             appState.selectedCourses.forEach(c => { appState.evaluations[c] = {}; });
             setView('assessment');
@@ -750,23 +543,6 @@
                 const radio = document.querySelector(`input[name="eval_${course.replace(/\s+/g, '')}_${idx}"][value="${value}"]`);
                 if(radio) radio.checked = true;
             });
-        }
-
-        function handleAssessmentSubmit() {
-            let hasHayir = false;
-            Object.keys(appState.evaluations).forEach(course => {
-                Object.values(appState.evaluations[course]).forEach(val => {
-                    if (val === "Hayır") hasHayir = true;
-                });
-            });
-
-            if (!hasHayir) {
-                alert("Tüm beceriler 'Evet' veya 'Gözlem Yapılamadı' olarak işaretlendi. BEP'e alınacak 'Hayır' (yapamadığı) beceri bulunamadı. Lütfen kontrol ediniz.");
-                return;
-            }
-
-            appState.selectedBEPGoals = {};
-            setView('selectGoals');
         }
 
         function toggleBEPGoal(course, idx, checkbox) {
@@ -793,22 +569,18 @@
                 }
             });
             appState.selectedBEPGoals = newSelections;
-            renderApp(); // Checkboxes görsel işaretleme
+            renderApp();
         }
 
         function handleGoalSelectionSubmit() {
             let selectedAny = false;
             Object.values(appState.selectedBEPGoals).forEach(arr => { if (arr.length > 0) selectedAny = true; });
             
-            if (!selectedAny) {
-                alert('Lütfen bu yılın BEP programına eklenecek en az bir amaç seçin.');
-                return;
-            }
+            if (!selectedAny) { alert('Lütfen bu yılın BEP programına eklenecek en az bir amaç seçin.'); return; }
 
             const bepAreas = [];
             const isPreschool = appState.currentStudent.level === "Ana Sınıfı";
             const db = isPreschool ? PRESCHOOL_DATABASE : PRIMARY_DATABASE;
-            const academicCourses = ["Türkçe", "Matematik", "Hayat Bilgisi", "Fen ve Teknoloji", "Sosyal Bilgiler", "Din Kültürü ve Ahlak Bilgisi"];
 
             Object.keys(appState.selectedBEPGoals).forEach(course => {
                 const selectedIndices = appState.selectedBEPGoals[course];
@@ -816,46 +588,37 @@
 
                 const courseData = db[course] || { uda: "Genel Beceriler", kdaList: [], methods: "", materials: "" };
                 const selectedKdas = selectedIndices.map(idx => courseData.kdaList[idx]);
-                
                 const dates = distributeDates(selectedKdas.length);
                 const kdaWithDates = selectedKdas.map((kdaStr, index) => ({
-                    description: kdaStr,
-                    startDate: dates[index].start,
-                    endDate: dates[index].end
+                    description: kdaStr, startDate: dates[index].start, endDate: dates[index].end
                 }));
 
-                // Ders Kitabı Eklemesi
                 let materialsStr = courseData.materials || "Ders materyalleri";
-                if (academicCourses.includes(course) && !materialsStr.toLowerCase().includes("ders kitabı")) {
+                if (ACADEMIC_COURSES.includes(course) && !materialsStr.toLowerCase().includes("ders kitabı")) {
                     materialsStr = "Ders kitabı, " + materialsStr;
                 }
 
                 bepAreas.push({
-                    area: course,
-                    uda: courseData.uda,
-                    methods: courseData.methods || "Doğrudan Öğretim",
-                    materials: materialsStr,
-                    kdaList: kdaWithDates
+                    area: course, uda: courseData.uda, methods: courseData.methods || "Doğrudan Öğretim",
+                    materials: materialsStr, kdaList: kdaWithDates
                 });
             });
 
             const isExisting = appState.currentStudent.id !== null;
             const studentToSave = {
-                ...appState.currentStudent,
+                ...appState.currentStudent, 
                 id: isExisting ? appState.currentStudent.id : Date.now(),
-                bep: bepAreas,
+                bep: bepAreas, 
+                evaluations: JSON.parse(JSON.stringify(appState.evaluations)), // Değerlendirmeleri sakla
                 createdAt: isExisting ? appState.currentStudent.createdAt : new Date().toLocaleDateString('tr-TR')
             };
 
             if (isExisting) { 
                 const idx = appState.students.findIndex(s => s.id === studentToSave.id);
                 if (idx > -1) appState.students[idx] = studentToSave;
-            } else { 
-                appState.students.push(studentToSave);
-            }
+            } else { appState.students.push(studentToSave); }
 
             appState.generatedBEP = studentToSave;
-            appState.currentStudent = JSON.parse(JSON.stringify(defaultStudentState));
             setView('bepView');
         }
 
@@ -864,6 +627,7 @@
             const std = appState.students.find(s => s.id === id);
             if (std) {
                 appState.currentStudent = JSON.parse(JSON.stringify(std));
+                appState.evaluations = JSON.parse(JSON.stringify(std.evaluations || {}));
                 setView('addStudent');
             }
         }
@@ -878,6 +642,7 @@
         function startNewStudent() {
             appState.formError = '';
             appState.currentStudent = JSON.parse(JSON.stringify(defaultStudentState));
+            appState.evaluations = {};
             setView('addStudent');
         }
 
@@ -887,7 +652,7 @@
         }
 
         // ==========================================
-        // 5. RENDER FONKSİYONLARI (GÖRÜNÜMLER)
+        // 5. RENDER FONKSİYONLARI
         // ==========================================
 
         function renderAuth() {
@@ -897,33 +662,19 @@
                 <div class="w-full md:w-1/2 p-12 bg-blue-700 text-white flex flex-col justify-center">
                   <i data-lucide="book-open" class="mb-6 opacity-90 w-16 h-16"></i>
                   <h1 class="text-4xl font-bold mb-4">BEP Sistemi</h1>
-                  <p class="text-blue-100 text-lg">MEB RAM standartlarında, kaba değerlendirme tabanlı otomatik Bireyselleştirilmiş Eğitim Programı hazırlama aracı.</p>
+                  <p class="text-blue-100 text-lg">Açık kaynaklı, MEB RAM standartlarında kaba değerlendirme ve BEP hazırlama aracı.</p>
                 </div>
                 <div class="w-full md:w-1/2 p-12">
                   <h2 class="text-2xl font-bold text-slate-800 mb-6 flex items-center"><i data-lucide="lock" class="mr-2 w-6 h-6"></i> Giriş Yap</h2>
-                  
                   <div class="mb-6 bg-blue-50 border-l-4 border-blue-500 p-4 rounded text-sm text-blue-800 shadow-sm flex items-start">
                     <i data-lucide="info" class="mr-3 text-blue-500 flex-shrink-0 w-5 h-5"></i>
-                    <div>
-                      <strong>Demo Giriş Bilgileri:</strong><br/>
-                      E-posta: <em>demo@ornek.com</em><br/>
-                      Şifre: <em>demo</em>
-                    </div>
+                    <div><strong>Demo Giriş:</strong> demo@ornek.com / demo</div>
                   </div>
-
                   <form onsubmit="handleLogin(event)" class="space-y-4 mb-8">
                     <input name="identifier" value="demo@ornek.com" type="text" placeholder="E-posta / Telefon" required class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 outline-none" />
                     <input name="password" value="demo" type="password" placeholder="Şifre" required class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 outline-none" />
                     <button type="submit" class="w-full bg-blue-600 text-white py-2 rounded-lg hover:bg-blue-700 font-medium transition">Giriş Yap</button>
                   </form>
-                  <div class="border-t pt-6">
-                    <h3 class="text-lg font-bold text-slate-800 mb-4 flex items-center"><i data-lucide="user-plus" class="mr-2 w-5 h-5"></i> Kayıt Ol</h3>
-                    <form onsubmit="handleRegister(event)" class="space-y-4">
-                      <input name="reg_identifier" placeholder="Yeni E-posta/Telefon" type="text" required class="w-full px-4 py-2 border rounded-lg outline-none focus:ring-2 focus:ring-green-500" />
-                      <input name="reg_password" placeholder="Yeni Şifre" type="password" required class="w-full px-4 py-2 border rounded-lg outline-none focus:ring-2 focus:ring-green-500" />
-                      <button type="submit" class="w-full bg-green-600 text-white py-2 rounded-lg hover:bg-green-700 font-medium">Hesap Oluştur</button>
-                    </form>
-                  </div>
                 </div>
               </div>
             </div>`;
@@ -934,77 +685,31 @@
               <div class="bg-white rounded-xl shadow-sm p-16 text-center border border-slate-200">
                 <i data-lucide="users" class="mx-auto text-slate-300 mb-4 w-16 h-16"></i>
                 <h3 class="text-xl font-medium text-slate-600">Henüz öğrenci eklemediniz.</h3>
-                <p class="text-slate-400 mt-2">Öğrenci ekleyerek kaba değerlendirme ve BEP süreçlerini başlatabilirsiniz.</p>
               </div>` : `
               <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                 ${appState.students.map(std => `
                   <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-5 hover:shadow-md transition">
-                    <div class="flex justify-between items-start mb-2">
-                      <h3 class="text-lg font-bold text-slate-800">${std.firstName} ${std.lastName}</h3>
-                      <div class="flex space-x-2">
-                        <button onclick="editStudent(${std.id})" class="text-slate-400 hover:text-blue-600" title="Düzenle"><i data-lucide="edit" class="w-4 h-4"></i></button>
-                        <button onclick="deleteStudent(${std.id})" class="text-slate-400 hover:text-red-600" title="Sil"><i data-lucide="trash-2" class="w-4 h-4"></i></button>
-                      </div>
-                    </div>
-                    <p class="text-sm text-slate-500 mb-4">${std.tcNo} &bull; ${std.schoolNo} &bull; ${std.className}</p>
-                    <div class="bg-slate-50 rounded p-3 mb-4 text-sm border border-slate-100">
-                      <p><span class="font-semibold">Kademe:</span> ${std.level}</p>
-                      <p class="mt-1"><span class="font-semibold">Tanı:</span> ${std.disability}</p>
-                    </div>
+                    <h3 class="text-lg font-bold text-slate-800 mb-2">${std.firstName} ${std.lastName}</h3>
+                    <p class="text-sm text-slate-500 mb-4">${std.tcNo} &bull; ${std.level}</p>
                     <button onclick="appState.generatedBEP = appState.students.find(s=>s.id==${std.id}); setView('bepView');" class="w-full bg-blue-50 text-blue-700 hover:bg-blue-600 hover:text-white py-2 rounded-lg flex items-center justify-center font-medium transition">
                       <i data-lucide="file-text" class="mr-2 w-4 h-4"></i> BEP Dosyasını Aç
                     </button>
-                  </div>
-                `).join('')}
+                  </div>`).join('')}
               </div>`;
 
             return `
             <div class="min-h-screen bg-slate-100">
-              <nav class="bg-white shadow-sm border-b px-6 py-4 flex justify-between items-center">
-                <div class="flex items-center text-blue-800">
-                  <i data-lucide="book-open" class="mr-2 w-7 h-7"></i>
-                  <span class="text-xl font-bold">BEP Sistemi</span>
-                </div>
-                <div class="flex items-center space-x-6">
-                  <button onclick="setView('profile')" class="text-slate-600 font-medium flex items-center hover:text-blue-700 transition px-2 py-1 rounded hover:bg-blue-50">
-                    <i data-lucide="user" class="mr-2 w-4 h-4"></i> 
-                    ${appState.currentUser.firstName ? `${appState.currentUser.firstName} ${appState.currentUser.lastName}` : 'Profilim'}
-                  </button>
-                  <button onclick="logout()" class="text-red-500 hover:text-red-700 flex items-center text-sm font-medium">
-                    <i data-lucide="log-out" class="mr-1 w-4 h-4"></i> Çıkış
-                  </button>
-                </div>
+              <nav class="bg-white shadow-sm border-b px-6 py-4 flex justify-between items-center hide-on-print">
+                <span class="text-xl font-bold text-blue-800">BEP Sistemi</span>
+                <button onclick="logout()" class="text-red-500 font-medium">Çıkış</button>
               </nav>
               <main class="max-w-6xl mx-auto p-6 mt-4">
-                <div class="flex justify-between items-center mb-8">
-                  <h2 class="text-2xl font-bold text-slate-800">Kayıtlı Öğrenciler ve BEP'ler</h2>
-                  <button onclick="startNewStudent()" class="bg-blue-600 text-white px-5 py-2.5 rounded-lg flex items-center hover:bg-blue-700 transition shadow">
-                    <i data-lucide="user-plus" class="mr-2 w-5 h-5"></i> Yeni Öğrenci Ekle
-                  </button>
+                <div class="flex justify-between items-center mb-8 hide-on-print">
+                  <h2 class="text-2xl font-bold text-slate-800">Öğrenciler</h2>
+                  <button onclick="startNewStudent()" class="bg-blue-600 text-white px-5 py-2.5 rounded-lg">Yeni Ekle</button>
                 </div>
                 ${studentCards}
               </main>
-            </div>`;
-        }
-
-        function renderProfile() {
-            return `
-            <div class="min-h-screen bg-slate-100 p-6 py-10">
-              <div class="max-w-2xl mx-auto bg-white rounded-xl shadow-lg overflow-hidden">
-                <div class="bg-blue-800 p-6 text-white flex justify-between items-center">
-                  <h2 class="text-xl font-bold flex items-center"><i data-lucide="user" class="mr-2 w-5 h-5"></i> Profil Bilgilerim</h2>
-                  <button onclick="setView('dashboard')" class="text-blue-200 hover:text-white font-medium">İptal / Geri Dön</button>
-                </div>
-                <form onsubmit="handleProfileSave(event)" class="p-8 space-y-6">
-                  <div class="bg-blue-50 text-blue-800 p-4 rounded-lg text-sm mb-6 border border-blue-100">
-                    Buraya gireceğiniz Ad, Soyad ve Branş bilgileri oluşturduğunuz BEP dosyalarındaki Sorumlu Kişi ve İmza alanlarına otomatik olarak eklenecektir.
-                  </div>
-                  <div><label class="block text-sm font-medium text-slate-700 mb-1">Adınız</label><input name="firstName" value="${appState.currentUser.firstName}" required type="text" class="w-full px-3 py-2 border rounded-md" /></div>
-                  <div><label class="block text-sm font-medium text-slate-700 mb-1">Soyadınız</label><input name="lastName" value="${appState.currentUser.lastName}" required type="text" class="w-full px-3 py-2 border rounded-md" /></div>
-                  <div><label class="block text-sm font-medium text-slate-700 mb-1">Branşınız</label><input name="branch" value="${appState.currentUser.branch}" placeholder="Örn: Özel Eğitim Öğretmeni" required type="text" class="w-full px-3 py-2 border rounded-md" /></div>
-                  <div class="pt-4 border-t"><button type="submit" class="w-full bg-blue-600 text-white px-8 py-3 rounded-lg hover:bg-blue-700 font-bold shadow-md">Profilimi Kaydet</button></div>
-                </form>
-              </div>
             </div>`;
         }
 
@@ -1012,186 +717,79 @@
             const std = appState.currentStudent;
             const isPreschool = std.level === "Ana Sınıfı";
             const AVAILABLE_COURSES = isPreschool ? PRESCHOOL_COURSES : PRIMARY_COURSES;
-            const maxDate = new Date().toISOString().split('T')[0];
-
-            let supportRoomHtml = '';
-            if (std.decision === "Tam Zamanlı Kaynaştırma / Bütünleştirme") {
-                const coursesHtml = AVAILABLE_COURSES.map(course => `
-                    <label class="flex items-center text-sm cursor-pointer">
-                        <input type="checkbox" name="supportRoomCourses" value="${course}" class="mr-2 w-4 h-4 rounded text-blue-600" ${std.supportRoomCourses.includes(course) ? 'checked' : ''} />
-                        <span class="text-blue-900">${course}</span>
-                    </label>
-                `).join('');
-
-                const hoursHtml = [1,2,3,4,5,6,7,8,9,10].map(h => `<option value="${h}" ${std.supportRoomHours === h ? 'selected' : ''}>${h} Saat</option>`).join('');
-
-                supportRoomHtml = `
-                <div id="supportRoomPanel" class="md:col-span-2 bg-blue-50 p-4 rounded-md border border-blue-200 mt-2">
-                  <label class="block text-sm font-bold text-blue-800 mb-2">Destek eğitim odasından faydalanıyor mu?</label>
-                  <div class="flex space-x-6 mb-4">
-                    <label class="flex items-center cursor-pointer">
-                      <input type="radio" id="usesSupportRoomYes" name="usesSupportRoom" value="Evet" onchange="syncFormState(); toggleSupportRoomVisibility(); renderApp();" class="w-4 h-4 text-blue-600 mr-2" ${std.usesSupportRoom === 'Evet' ? 'checked' : ''} />
-                      <span class="font-medium text-blue-900">Evet</span>
-                    </label>
-                    <label class="flex items-center cursor-pointer">
-                      <input type="radio" name="usesSupportRoom" value="Hayır" onchange="syncFormState(); toggleSupportRoomVisibility(); renderApp();" class="w-4 h-4 text-blue-600 mr-2" ${std.usesSupportRoom === 'Hayır' ? 'checked' : ''} />
-                      <span class="font-medium text-blue-900">Hayır</span>
-                    </label>
-                  </div>
-                  
-                  <div id="supportRoomDetails" class="space-y-4 border-t border-blue-200 pt-4 ${std.usesSupportRoom === 'Evet' ? '' : 'hidden'}">
-                      <div>
-                        <label class="block text-sm font-bold text-blue-800 mb-2">Destek Eğitim Alacağı Dersler / Modüller:</label>
-                        <div class="grid grid-cols-2 md:grid-cols-3 gap-2">
-                          ${coursesHtml}
-                        </div>
-                      </div>
-                      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        <div>
-                          <label class="block text-sm font-bold text-blue-800 mb-2">Haftalık Toplam Destek Eğitim Saati:</label>
-                          <select name="supportRoomHours" class="px-3 py-2 border rounded-md border-blue-300 w-full focus:ring-blue-500 focus:border-blue-500">
-                              ${hoursHtml}
-                          </select>
-                        </div>
-                        <div>
-                          <label class="block text-sm font-bold text-blue-800 mb-2">Destek Eğitim Sorumlu Öğretmeni:</label>
-                          <input name="supportRoomTeacher" value="${std.supportRoomTeacher}" type="text" placeholder="Örn: Sınıf Öğretmeni, Ayşe Yılmaz" class="px-3 py-2 border rounded-md border-blue-300 w-full focus:ring-blue-500 focus:border-blue-500" />
-                        </div>
-                      </div>
-                  </div>
-                </div>`;
-            }
 
             return `
-            <div class="min-h-screen bg-slate-100 p-6 py-10 print:bg-white print:p-0">
-              <div class="max-w-4xl mx-auto bg-white rounded-xl shadow-lg overflow-hidden print:shadow-none print:max-w-none">
+            <div class="min-h-screen bg-slate-100 p-6 py-10">
+              <div class="max-w-4xl mx-auto bg-white rounded-xl shadow-lg overflow-hidden">
                 <div class="bg-blue-700 p-6 text-white flex justify-between items-center hide-on-print">
-                  <h2 class="text-xl font-bold flex items-center"><i data-lucide="user-plus" class="mr-2 w-5 h-5"></i> ${std.id ? "Öğrenciyi Düzenle" : "Aşama 1: Yeni Öğrenci Bilgileri"}</h2>
-                  <button type="button" onclick="setView('dashboard')" class="text-blue-200 hover:text-white font-medium">İptal</button>
+                  <h2 class="text-xl font-bold">Aşama 1: Öğrenci Bilgileri</h2>
+                  <button type="button" onclick="setView('dashboard')" class="text-blue-200">İptal</button>
                 </div>
-                
                 <form id="studentForm" onsubmit="handleStudentFormSubmit(event)" class="p-8 space-y-8">
-                  ${appState.formError ? `
-                    <div class="bg-red-50 border-l-4 border-red-500 p-4 rounded-md shadow-sm flex items-center">
-                      <i data-lucide="alert-circle" class="text-red-500 mr-3 w-6 h-6 flex-shrink-0"></i>
-                      <p class="text-sm font-bold text-red-700">${appState.formError}</p>
-                    </div>
-                  ` : ''}
-
-                  <!-- Kimlik ve Okul Bilgileri -->
-                  <section>
-                    <h3 class="text-sm uppercase font-bold text-slate-400 border-b pb-2 mb-4">Kimlik ve Okul Bilgileri</h3>
-                    <div class="grid grid-cols-1 md:grid-cols-3 gap-5">
-                      <div><label class="block text-sm font-medium text-slate-700 mb-1">TC Kimlik No</label><input name="tcNo" required value="${std.tcNo}" type="text" maxlength="11" class="w-full px-3 py-2 border rounded-md" /></div>
-                      <div><label class="block text-sm font-medium text-slate-700 mb-1">Adı</label><input name="firstName" required value="${std.firstName}" type="text" class="w-full px-3 py-2 border rounded-md" /></div>
-                      <div><label class="block text-sm font-medium text-slate-700 mb-1">Soyadı</label><input name="lastName" required value="${std.lastName}" type="text" class="w-full px-3 py-2 border rounded-md" /></div>
+                   ${appState.formError ? `<div class="bg-red-50 border-l-4 border-red-500 p-4 text-red-700 font-bold">${appState.formError}</div>` : ''}
+                   <div class="grid grid-cols-1 md:grid-cols-3 gap-5">
+                      <div><label class="block text-sm font-medium mb-1">TC Kimlik No</label><input name="tcNo" required value="${std.tcNo}" type="text" maxlength="11" class="w-full px-3 py-2 border rounded-md" /></div>
+                      <div><label class="block text-sm font-medium mb-1">Adı</label><input name="firstName" required value="${std.firstName}" type="text" class="w-full px-3 py-2 border rounded-md" /></div>
+                      <div><label class="block text-sm font-medium mb-1">Soyadı</label><input name="lastName" required value="${std.lastName}" type="text" class="w-full px-3 py-2 border rounded-md" /></div>
                       <div>
-                        <label class="block text-sm font-medium text-slate-700 mb-1">Cinsiyet</label>
-                        <select name="gender" required class="w-full px-3 py-2 border rounded-md">
-                            ${GENDER_TYPES.map(g => `<option value="${g}" ${std.gender === g ? 'selected' : ''}>${g}</option>`).join('')}
-                        </select>
-                      </div>
-                      <div><label class="block text-sm font-medium text-slate-700 mb-1">Doğum Tarihi</label><input name="birthDate" required max="${maxDate}" value="${std.birthDate}" type="date" class="w-full px-3 py-2 border rounded-md" /></div>
-                      <div>
-                        <label class="block text-sm font-medium text-slate-700 mb-1">Kademe</label>
-                        <select name="level" required onchange="syncFormState(); appState.currentStudent.level=this.value; renderApp();" class="w-full px-3 py-2 border rounded-md bg-blue-50 font-bold text-blue-700">
+                        <label class="block text-sm font-medium mb-1">Kademe</label>
+                        <select name="level" required onchange="syncFormState(); appState.currentStudent.level=this.value; renderApp();" class="w-full px-3 py-2 border rounded-md bg-blue-50">
                             ${LEVEL_TYPES.map(l => `<option value="${l}" ${std.level === l ? 'selected' : ''}>${l}</option>`).join('')}
                         </select>
                       </div>
-                      <div class="md:col-span-2"><label class="block text-sm font-medium text-slate-700 mb-1">Okul Adı</label><input name="schoolName" required value="${std.schoolName}" type="text" class="w-full px-3 py-2 border rounded-md" /></div>
-                      <div><label class="block text-sm font-medium text-slate-700 mb-1">Sınıfı</label><input name="className" required value="${std.className}" type="text" class="w-full px-3 py-2 border rounded-md" /></div>
-                      <div><label class="block text-sm font-medium text-slate-700 mb-1">Okul No</label><input name="schoolNo" required value="${std.schoolNo}" type="text" class="w-full px-3 py-2 border rounded-md" /></div>
-                    </div>
-                  </section>
+                      <div><label class="block text-sm font-medium mb-1">Doğum Tarihi</label><input name="birthDate" required value="${std.birthDate}" type="date" class="w-full px-3 py-2 border rounded-md" /></div>
+                      <div><label class="block text-sm font-medium mb-1">Cinsiyet</label><select name="gender" class="w-full px-3 py-2 border rounded-md">${GENDER_TYPES.map(g=>`<option ${std.gender===g?'selected':''}>${g}</option>`).join('')}</select></div>
+                   </div>
 
-                  <!-- Özel Eğitim Bilgileri -->
-                  <section>
-                    <h3 class="text-sm uppercase font-bold text-slate-400 border-b pb-2 mb-4">Özel Eğitim Bilgileri (Kurul Kararı)</h3>
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
-                      <div>
-                        <label class="block text-sm font-medium text-slate-700 mb-1">Tedbir Kararı</label>
-                        <select name="decision" required onchange="syncFormState(); appState.currentStudent.decision=this.value; renderApp();" class="w-full px-3 py-2 border rounded-md">
-                            ${DECISION_TYPES.map(d => `<option value="${d}" ${std.decision === d ? 'selected' : ''}>${d}</option>`).join('')}
-                        </select>
-                      </div>
-                      <div>
-                        <label class="block text-sm font-medium text-slate-700 mb-1">Eğitsel Tanı (Yetersizlik Türü)</label>
-                        <select name="disability" required class="w-full px-3 py-2 border rounded-md font-medium text-blue-700">
-                            ${DISABILITY_TYPES.map(d => `<option value="${d}" ${std.disability === d ? 'selected' : ''}>${d}</option>`).join('')}
-                        </select>
-                      </div>
-                      
-                      ${supportRoomHtml}
+                   <section class="border-t pt-6">
+                     <h3 class="font-bold mb-4">Özel Eğitim Bilgileri</h3>
+                     <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+                       <div><label class="block text-sm font-medium mb-1">Tedbir Kararı</label><select name="decision" onchange="syncFormState(); renderApp();" class="w-full px-3 py-2 border rounded-md">${DECISION_TYPES.map(d=>`<option ${std.decision===d?'selected':''}>${d}</option>`).join('')}</select></div>
+                       <div><label class="block text-sm font-medium mb-1">Tanı</label><select name="disability" class="w-full px-3 py-2 border rounded-md">${DISABILITY_TYPES.map(d=>`<option ${std.disability===d?'selected':''}>${d}</option>`).join('')}</select></div>
+                       
+                       ${std.decision.includes("Kaynaştırma") ? `
+                        <div class="md:col-span-2 bg-blue-50 p-4 rounded-md border">
+                          <label class="block font-bold mb-2">Destek Eğitim Odası Kullanıyor mu?</label>
+                          <input type="radio" name="usesSupportRoom" id="usesSupportRoomYes" value="Evet" onchange="syncFormState(); renderApp();" ${std.usesSupportRoom==='Evet'?'checked':''}> Evet
+                          <input type="radio" name="usesSupportRoom" value="Hayır" onchange="syncFormState(); renderApp();" ${std.usesSupportRoom==='Hayır'?'checked':''}> Hayır
+                          ${std.usesSupportRoom==='Evet' ? `
+                            <div class="mt-4 grid grid-cols-1 md:grid-cols-2 gap-4">
+                              <div><label class="block text-xs font-bold mb-1">Dersler:</label>
+                                ${AVAILABLE_COURSES.map(c=>`<label class="block text-xs"><input type="checkbox" name="supportRoomCourses" value="${c}" ${std.supportRoomCourses.includes(c)?'checked':''}> ${c}</label>`).join('')}
+                              </div>
+                              <div>
+                                <label class="block text-xs font-bold mb-1">Sorumlu Öğretmen:</label>
+                                <input name="supportRoomTeacher" value="${std.supportRoomTeacher}" class="w-full text-xs p-1 border rounded" />
+                              </div>
+                            </div>
+                          `:''}
+                        </div>` : ''}
+                       <div class="md:col-span-2"><label class="block text-sm font-medium mb-1">Eğitim Ortamı Düzenlemeleri</label><input name="environmentMods" value="${std.environmentMods}" placeholder="Sınıf içi oturma düzeni vb." class="w-full px-3 py-2 border rounded-md" /></div>
+                     </div>
+                   </section>
 
-                      <div class="md:col-span-2"><label class="block text-sm font-medium text-slate-700 mb-1">Daha önce aldığı Destek Eğitimler / Süresi</label><input name="supportEduHistory" value="${std.supportEduHistory}" type="text" placeholder="Örn: 2 Yıl Rehabilitasyon" class="w-full px-3 py-2 border rounded-md" /></div>
-                      <div class="md:col-span-2"><label class="block text-sm font-medium text-slate-700 mb-1">Sağlık Bilgileri (Alerji, İlaç vb.)</label><input name="healthInfo" value="${std.healthInfo}" type="text" placeholder="Örn: Fıstık alerjisi var." class="w-full px-3 py-2 border rounded-md border-red-200 bg-red-50" /></div>
-                      <div class="md:col-span-2"><label class="block text-sm font-medium text-slate-700 mb-1">Eğitim Ortamına İlişkin Düzenlemeler</label><input name="environmentMods" value="${std.environmentMods}" type="text" placeholder="Örn: Sınıf ön sıralarına oturtulacaktır. (Boş bırakabilirsiniz)" class="w-full px-3 py-2 border rounded-md" /></div>
-                    </div>
-                  </section>
+                   <section class="border-t pt-6">
+                     <h3 class="font-bold mb-4">Aile Bilgilendirme Süreci</h3>
+                     <div class="grid grid-cols-1 md:grid-cols-3 gap-5">
+                       <div><label class="block text-sm font-medium">Sıklık</label><select name="familyInfoFrequency" class="w-full p-2 border rounded"><option ${std.familyInfoFrequency==='Ayda Bir'?'selected':''}>Ayda Bir</option><option ${std.familyInfoFrequency==='Dönemde Bir'?'selected':''}>Dönemde Bir</option></select></div>
+                       <div><label class="block text-sm font-medium">Yöntem</label><select name="familyInfoMethod" class="w-full p-2 border rounded"><option ${std.familyInfoMethod==='Yüz Yüze Görüşme'?'selected':''}>Yüz Yüze Görüşme</option><option ${std.familyInfoMethod==='Telefon İletişimi'?'selected':''}>Telefon İletişimi</option></select></div>
+                       <div><label class="block text-sm font-medium">Aile Eğitimi</label><select name="familyEducation" class="w-full p-2 border rounded"><option value="Evet" ${std.familyEducation==='Evet'?'selected':''}>Evet</option><option value="Hayır" ${std.familyEducation==='Hayır'?'selected':''}>Hayır</option></select></div>
+                     </div>
+                   </section>
 
-                  <!-- Aile Bilgilendirme Süreci -->
-                  <section>
-                    <h3 class="text-sm uppercase font-bold text-slate-400 border-b pb-2 mb-4">Aile Bilgilendirme Süreci Kararları</h3>
-                    <div class="grid grid-cols-1 md:grid-cols-3 gap-5">
-                      <div>
-                        <label class="block text-sm font-medium text-slate-700 mb-1">Bilgilendirme Sıklığı</label>
-                        <select name="familyInfoFrequency" class="w-full px-3 py-2 border rounded-md bg-slate-50">
-                          <option value="Haftada Bir" ${std.familyInfoFrequency==='Haftada Bir'?'selected':''}>Haftada Bir</option>
-                          <option value="On Beş Günde Bir" ${std.familyInfoFrequency==='On Beş Günde Bir'?'selected':''}>On Beş Günde Bir</option>
-                          <option value="Ayda Bir" ${std.familyInfoFrequency==='Ayda Bir'?'selected':''}>Ayda Bir</option>
-                          <option value="Dönemde Bir" ${std.familyInfoFrequency==='Dönemde Bir'?'selected':''}>Dönemde Bir</option>
-                        </select>
-                      </div>
-                      <div>
-                        <label class="block text-sm font-medium text-slate-700 mb-1">Bilgilendirme Yöntemi</label>
-                        <select name="familyInfoMethod" class="w-full px-3 py-2 border rounded-md bg-slate-50">
-                          <option value="Yüz Yüze Görüşme" ${std.familyInfoMethod==='Yüz Yüze Görüşme'?'selected':''}>Yüz Yüze Görüşme</option>
-                          <option value="Telefon İletişimi" ${std.familyInfoMethod==='Telefon İletişimi'?'selected':''}>Telefon İletişimi</option>
-                          <option value="İletişim Defteri" ${std.familyInfoMethod==='İletişim Defteri'?'selected':''}>İletişim Defteri</option>
-                          <option value="Veli Toplantısı" ${std.familyInfoMethod==='Veli Toplantısı'?'selected':''}>Veli Toplantısı</option>
-                        </select>
-                      </div>
-                      <div>
-                        <label class="block text-sm font-medium text-slate-700 mb-1">Aile Eğitimi Yapılacak mı?</label>
-                        <select name="familyEducation" class="w-full px-3 py-2 border rounded-md bg-slate-50">
-                          <option value="Evet" ${std.familyEducation==='Evet'?'selected':''}>Evet, Yapılacak</option>
-                          <option value="Hayır" ${std.familyEducation==='Hayır'?'selected':''}>Hayır, Yapılmayacak</option>
-                        </select>
-                      </div>
-                    </div>
-                  </section>
+                   <section class="border-t pt-6">
+                     <h3 class="font-bold mb-4">Aile Bilgileri</h3>
+                     <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+                        <input name="motherName" required value="${std.motherName}" placeholder="Anne Adı" class="w-full p-2 border rounded" />
+                        <input name="fatherName" required value="${std.fatherName}" placeholder="Baba Adı" class="w-full p-2 border rounded" />
+                        <label class="flex items-center"><input type="radio" name="guardian" value="Anne" ${std.guardian==='Anne'?'checked':''}> Veli Anne</label>
+                        <label class="flex items-center"><input type="radio" name="guardian" value="Baba" ${std.guardian==='Baba'?'checked':''}> Veli Baba</label>
+                     </div>
+                   </section>
 
-                  <!-- Aile Bilgileri -->
-                  <section>
-                    <h3 class="text-sm uppercase font-bold text-slate-400 border-b pb-2 mb-4">Aile Bilgileri</h3>
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
-                      <div><label class="block text-sm font-medium text-slate-700 mb-1">Anne Adı</label><input name="motherName" required value="${std.motherName}" type="text" class="w-full px-3 py-2 border rounded-md" /></div>
-                      <div><label class="block text-sm font-medium text-slate-700 mb-1">Baba Adı</label><input name="fatherName" required value="${std.fatherName}" type="text" class="w-full px-3 py-2 border rounded-md" /></div>
-                      
-                      <div class="bg-amber-50 p-3 rounded-md border border-amber-200">
-                        <label class="block text-sm font-bold text-amber-800 mb-2">Öğrencinin Yasal Velisi Kim?</label>
-                        <div class="flex space-x-6">
-                          <label class="flex items-center cursor-pointer">
-                            <input type="radio" name="guardian" value="Anne" class="w-4 h-4 text-amber-600 mr-2" ${std.guardian === 'Anne' ? 'checked' : ''} />
-                            <span class="font-medium text-amber-900">Anne</span>
-                          </label>
-                          <label class="flex items-center cursor-pointer">
-                            <input type="radio" name="guardian" value="Baba" class="w-4 h-4 text-amber-600 mr-2" ${std.guardian === 'Baba' ? 'checked' : ''} />
-                            <span class="font-medium text-amber-900">Baba</span>
-                          </label>
-                        </div>
-                      </div>
-
-                      <div><label class="block text-sm font-medium text-slate-700 mb-1">Veli Telefonu</label><input name="parentPhone" value="${std.parentPhone}" type="text" class="w-full px-3 py-2 border rounded-md" /></div>
-                      <div class="md:col-span-2"><label class="block text-sm font-medium text-slate-700 mb-1">Ev Adresi</label><input name="parentAddress" value="${std.parentAddress}" type="text" class="w-full px-3 py-2 border rounded-md" /></div>
-                    </div>
-                  </section>
-
-                  <div class="flex justify-end pt-4 border-t hide-on-print">
-                    <button type="submit" class="bg-blue-600 text-white px-8 py-3 rounded-lg hover:bg-blue-700 flex items-center font-bold text-lg shadow-md">
-                      İleri: Ders Seçimi <i data-lucide="arrow-right" class="ml-2 w-5 h-5"></i>
-                    </button>
-                  </div>
+                   <div class="flex justify-end pt-4 border-t hide-on-print">
+                    <button type="submit" class="bg-blue-600 text-white px-8 py-3 rounded-lg font-bold">İleri: Ders Seçimi</button>
+                   </div>
                 </form>
               </div>
             </div>`;
@@ -1200,44 +798,20 @@
         function renderSelectCourses() {
             const isPreschool = appState.currentStudent.level === "Ana Sınıfı";
             const AVAILABLE_COURSES = isPreschool ? PRESCHOOL_COURSES : PRIMARY_COURSES;
-            const coursesString = AVAILABLE_COURSES.join(',');
-
             return `
             <div class="min-h-screen bg-slate-100 p-6 py-10">
-              <div class="max-w-4xl mx-auto bg-white rounded-xl shadow-lg overflow-hidden">
-                <div class="bg-teal-700 p-6 text-white flex items-center justify-between">
-                  <div>
-                    <h2 class="text-xl font-bold flex items-center"><i data-lucide="check-square" class="mr-2 w-5 h-5"></i> Aşama 2: Kaba Değerlendirme İçin Ders/Modül Seçimi</h2>
-                    <p class="text-teal-100 mt-1 text-sm">Öğrencinin kademesine (${appState.currentStudent.level}) uygun olarak değerlendirilecek dersleri seçiniz.</p>
-                  </div>
+              <div class="max-w-4xl mx-auto bg-white rounded-xl shadow-lg p-8">
+                <h2 class="text-xl font-bold mb-6">Aşama 2: Değerlendirilecek Dersleri Seçin</h2>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  ${AVAILABLE_COURSES.map(course => `
+                    <label class="flex items-center p-4 border rounded-lg cursor-pointer ${appState.selectedCourses.includes(course)?'bg-teal-50 border-teal-500':''}">
+                      <input type="checkbox" id="course_${course}" onchange="toggleCourse('${course}')" class="w-5 h-5 mr-3" ${appState.selectedCourses.includes(course)?'checked':''} />
+                      <span>${course}</span>
+                    </label>`).join('')}
                 </div>
-
-                <div class="p-8">
-                  <div class="flex justify-between items-center mb-4 border-b pb-2">
-                    <p class="font-bold text-slate-700">${isPreschool ? "Okul Öncesi Gelişim Modülleri" : "İlkokul Ders ve Modülleri"}</p>
-                    <button type="button" onclick="selectAllCourses('${coursesString}')" class="text-sm bg-teal-100 text-teal-800 px-4 py-1.5 rounded hover:bg-teal-200 font-bold transition shadow-sm">
-                      Tümünü Seç
-                    </button>
-                  </div>
-                  
-                  <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    ${AVAILABLE_COURSES.map(course => {
-                        const isChecked = appState.selectedCourses.includes(course);
-                        return `
-                        <label class="flex items-center p-4 border rounded-lg cursor-pointer transition ${isChecked ? 'bg-teal-50 border-teal-500 text-teal-800 font-medium' : 'bg-slate-50 border-slate-200 hover:border-teal-300 text-slate-700 font-medium'}">
-                          <input type="checkbox" id="course_${course}" onchange="toggleCourse('${course}')" class="w-5 h-5 text-teal-600 rounded mr-3" ${isChecked ? 'checked' : ''} />
-                          <span>${course}</span>
-                        </label>
-                        `;
-                    }).join('')}
-                  </div>
-
-                  <div class="mt-10 flex justify-between items-center border-t pt-6">
-                    <button onclick="setView('addStudent')" class="text-slate-500 hover:text-slate-800 font-medium px-4 py-2">Geri Dön</button>
-                    <button onclick="handleCourseSelectionSubmit()" class="bg-teal-600 text-white px-8 py-3 rounded-lg hover:bg-teal-700 flex items-center font-bold shadow-md">
-                      İleri: Değerlendirme Formları <i data-lucide="chevron-right" class="ml-2 w-5 h-5"></i>
-                    </button>
-                  </div>
+                <div class="mt-10 flex justify-between items-center border-t pt-6">
+                  <button onclick="setView('addStudent')" class="text-slate-500">Geri Dön</button>
+                  <button onclick="handleCourseSelectionSubmit()" class="bg-teal-600 text-white px-8 py-3 rounded-lg font-bold">Değerlendir</button>
                 </div>
               </div>
             </div>`;
@@ -1245,403 +819,251 @@
 
         function renderAssessment() {
             const isPreschool = appState.currentStudent.level === "Ana Sınıfı";
-            const CURRENT_DATABASE = isPreschool ? PRESCHOOL_DATABASE : PRIMARY_DATABASE;
-
+            const db = isPreschool ? PRESCHOOL_DATABASE : PRIMARY_DATABASE;
             const coursesHtml = appState.selectedCourses.map(course => {
-                const courseData = CURRENT_DATABASE[course] || { uda: `${course} Becerileri`, kdaList: ["Varsayılan Beceri 1", "Varsayılan Beceri 2"] };
+                const data = db[course] || { kdaList: [] };
                 const evals = appState.evaluations[course] || {};
-                const safeCourseId = course.replace(/\s+/g, ''); // For name attributes
-
-                const rows = courseData.kdaList.map((kda, idx) => `
-                    <tr class="border-b hover:bg-slate-50 transition">
-                      <td class="p-3 text-center text-slate-400">${idx + 1}</td>
-                      <td class="p-3 text-slate-800">${kda}</td>
-                      <td class="p-3 text-center bg-green-50/30 border-l">
-                        <input type="radio" name="eval_${safeCourseId}_${idx}" value="Evet" class="w-5 h-5 text-green-600 cursor-pointer" ${evals[idx] === "Evet" ? 'checked' : ''} onchange="handleEvalChange('${course}', ${idx}, 'Evet')" />
-                      </td>
-                      <td class="p-3 text-center bg-red-50/30 border-l">
-                        <input type="radio" name="eval_${safeCourseId}_${idx}" value="Hayır" class="w-5 h-5 text-red-600 cursor-pointer" ${evals[idx] === "Hayır" ? 'checked' : ''} onchange="handleEvalChange('${course}', ${idx}, 'Hayır')" />
-                      </td>
-                      <td class="p-3 text-center bg-slate-50 border-l border-r">
-                        <input type="radio" name="eval_${safeCourseId}_${idx}" value="Gözlem Yapılamadı" class="w-5 h-5 text-slate-500 cursor-pointer" ${evals[idx] === "Gözlem Yapılamadı" ? 'checked' : ''} onchange="handleEvalChange('${course}', ${idx}, 'Gözlem Yapılamadı')" />
-                      </td>
-                    </tr>
-                `).join('');
+                const rows = data.kdaList.map((kda, idx) => `
+                    <tr>
+                      <td>${idx + 1}</td>
+                      <td>${kda}</td>
+                      <td class="text-center"><input type="radio" name="eval_${course.replace(/\s/g,'')}_${idx}" value="Evet" ${evals[idx]==='Evet'?'checked':''} onchange="handleEvalChange('${course}', ${idx}, 'Evet')" /></td>
+                      <td class="text-center"><input type="radio" name="eval_${course.replace(/\s/g,'')}_${idx}" value="Hayır" ${evals[idx]==='Hayır'?'checked':''} onchange="handleEvalChange('${course}', ${idx}, 'Hayır')" /></td>
+                      <td class="text-center"><input type="radio" name="eval_${course.replace(/\s/g,'')}_${idx}" value="Gözlem Yapılamadı" ${evals[idx]==='Gözlem Yapılamadı'?'checked':''} onchange="handleEvalChange('${course}', ${idx}, 'Gözlem Yapılamadı')" /></td>
+                    </tr>`).join('');
 
                 return `
-                <div class="border border-slate-300 rounded-lg overflow-hidden shadow-sm no-break mb-10">
-                  <div class="bg-slate-200 p-4 border-b border-slate-300 flex flex-col md:flex-row justify-between items-start md:items-center gap-2 hide-on-print">
-                    <h3 class="text-lg font-bold text-slate-800">${course} ${isPreschool ? "Alan" : "Dersi"}</h3>
-                    <div class="flex space-x-2">
-                      <button type="button" onclick="setAllEvals('${course}', 'Evet')" class="bg-green-100 text-green-700 hover:bg-green-200 px-4 py-1.5 rounded text-sm font-bold flex items-center transition shadow-sm">
-                        <i data-lucide="check-circle" class="mr-1 w-4 h-4"></i> Tümünü "Evet"
-                      </button>
-                      <button type="button" onclick="setAllEvals('${course}', 'Hayır')" class="bg-red-100 text-red-700 hover:bg-red-200 px-4 py-1.5 rounded text-sm font-bold flex items-center transition shadow-sm">
-                        <i data-lucide="check-circle" class="mr-1 w-4 h-4"></i> Tümünü "Hayır"
-                      </button>
-                    </div>
+                <div class="mb-10 no-break">
+                  <div class="bg-slate-200 p-4 font-bold flex justify-between items-center hide-on-print">
+                    <span>${course}</span>
+                    <button type="button" onclick="setAllEvals('${course}', 'Hayır')" class="bg-red-500 text-white px-2 py-1 text-xs rounded">Tümünü Hayır Yap</button>
                   </div>
-                  <div class="overflow-x-auto">
-                      <table class="w-full text-sm text-left min-w-[600px]">
-                        <thead class="bg-slate-50 border-b">
-                          <tr>
-                            <th colspan="5" class="p-3 text-center bg-slate-800 text-white font-bold hidden print:table-cell">${course.toUpperCase()} KABA DEĞERLENDİRME FORMU</th>
-                          </tr>
-                          <tr>
-                            <th class="p-3 w-12 text-center text-slate-500">No</th>
-                            <th class="p-3 text-slate-700">Kazanım / Hedef Davranış</th>
-                            <th class="p-3 w-20 text-center font-bold text-green-700 bg-green-50 border-l">Evet</th>
-                            <th class="p-3 w-20 text-center font-bold text-red-700 bg-red-50 border-l">Hayır</th>
-                            <th class="p-3 w-28 text-center font-bold text-slate-600 bg-slate-100 border-l border-r">Gözlem Yapılamadı</th>
-                          </tr>
-                        </thead>
-                        <tbody>${rows}</tbody>
-                      </table>
-                  </div>
+                  <h3 class="hidden print:block text-center font-bold mb-2">${course.toUpperCase()} KABA DEĞERLENDİRME FORMU</h3>
+                  <table>
+                    <thead class="bg-slate-50"><tr><th>No</th><th>Hedef Davranış</th><th class="w-16">Evet</th><th class="w-16">Hayır</th><th class="w-16">Gözlem</th></tr></thead>
+                    <tbody>${rows}</tbody>
+                  </table>
                 </div>`;
             }).join('');
 
             return `
             <div class="min-h-screen bg-slate-100 p-6 py-10 print:bg-white print:p-0">
-              
-              <div class="w-full max-w-5xl mx-auto mb-4 flex justify-between items-center hide-on-print bg-white p-4 rounded-lg shadow-sm">
-                <button onclick="setView('dashboard')" class="text-blue-600 hover:text-blue-800 font-bold flex items-center">
-                  <i data-lucide="arrow-left" class="mr-2 w-4 h-4"></i> Panele Dön
-                </button>
-                <button onclick="window.print()" class="bg-slate-800 text-white px-6 py-2 rounded-lg flex items-center hover:bg-slate-900 font-bold">
-                  <i data-lucide="printer" class="mr-2 w-4 h-4"></i> Yazdır / PDF Al
-                </button>
-              </div>
-
-              <div id="assessment-document" class="max-w-5xl mx-auto bg-white rounded-xl shadow-lg overflow-hidden print:shadow-none print:w-full print:max-w-none print-container">
-                <div class="bg-indigo-700 p-6 text-white flex items-center justify-between hide-on-print">
-                  <div>
-                    <h2 class="text-xl font-bold flex items-center"><i data-lucide="list-checks" class="mr-2 w-5 h-5"></i> Aşama 3: Kaba Değerlendirme</h2>
-                    <p class="text-indigo-200 mt-1 text-sm">Her beceri için öğrencinin durumunu seçiniz.</p>
-                  </div>
-                </div>
-                
-                <!-- Print Header -->
-                <div class="hidden print:block text-center mb-8 border-b-2 border-black pb-4">
-                  <h1 class="text-xl font-bold">KABA DEĞERLENDİRME FORMU</h1>
-                  <p class="mt-2 text-sm"><strong>Öğrenci:</strong> ${appState.currentStudent.firstName} ${appState.currentStudent.lastName} &nbsp;|&nbsp; <strong>Sınıf:</strong> ${appState.currentStudent.level} - ${appState.currentStudent.className}</p>
-                </div>
-
-                <div class="p-8 space-y-10 print:p-0">
-                  ${coursesHtml}
-                  
-                  <div class="mt-10 flex justify-between items-center border-t pt-6 hide-on-print">
-                    <button onclick="setView('selectCourses')" class="text-slate-500 hover:text-slate-800 font-medium px-4 py-2">Geri Dön</button>
-                    <button onclick="handleAssessmentSubmit()" class="bg-indigo-600 text-white px-8 py-3 rounded-lg hover:bg-indigo-700 flex items-center font-bold shadow-md">
-                      İleri: BEP Amaçlarını Seç <i data-lucide="chevron-right" class="ml-2 w-5 h-5"></i>
-                    </button>
-                  </div>
+              <div class="max-w-5xl mx-auto mb-4 flex justify-between items-center hide-on-print bg-white p-4 rounded-lg shadow-sm">
+                <button onclick="setView('selectCourses')" class="text-blue-600 font-bold">Geri Dön</button>
+                <div class="flex gap-2">
+                  <button onclick="window.print()" class="bg-slate-700 text-white px-4 py-2 rounded">Yazdır / PDF</button>
+                  <button onclick="handleAssessmentSubmit()" class="bg-indigo-600 text-white px-4 py-2 rounded">BEP Amaçlarını Seç</button>
                 </div>
               </div>
+              <div class="max-w-5xl mx-auto bg-white rounded-xl shadow-lg p-8 print:p-0 print:shadow-none print-container">${coursesHtml}</div>
             </div>`;
         }
 
         function renderGoalSelection() {
+            let html = '';
             const isPreschool = appState.currentStudent.level === "Ana Sınıfı";
-            const CURRENT_DATABASE = isPreschool ? PRESCHOOL_DATABASE : PRIMARY_DATABASE;
+            const db = isPreschool ? PRESCHOOL_DATABASE : PRIMARY_DATABASE;
 
-            let coursesHtml = '';
             Object.keys(appState.evaluations).forEach(course => {
-                const courseEvals = appState.evaluations[course];
-                const hayirIndices = Object.keys(courseEvals).filter(idx => courseEvals[idx] === "Hayır").map(Number);
-                
-                if (hayirIndices.length === 0) return;
-                const courseData = CURRENT_DATABASE[course] || DEFAULT_AREAS[0];
+                const evals = appState.evaluations[course];
+                const hIndices = Object.keys(evals).filter(idx => evals[idx] === "Hayır").map(Number);
+                if (hIndices.length === 0) return;
+                const data = db[course] || { kdaList: [] };
 
-                const itemsHtml = hayirIndices.map(idx => {
-                    const isSelected = (appState.selectedBEPGoals[course] || []).includes(idx);
-                    return `
-                    <label class="flex items-start p-3 border rounded-md cursor-pointer transition ${isSelected ? 'bg-emerald-100 border-emerald-400 font-medium text-emerald-900' : 'hover:bg-slate-50 border-slate-200 text-slate-700'}">
-                        <input type="checkbox" class="mt-0.5 mr-3 w-5 h-5 text-emerald-600 rounded" ${isSelected ? 'checked' : ''} onchange="toggleBEPGoal('${course}', ${idx}, this)" />
-                        <span>${courseData.kdaList[idx]}</span>
-                    </label>`;
-                }).join('');
-
-                coursesHtml += `
-                <div class="border border-emerald-200 rounded-lg overflow-hidden">
-                  <div class="bg-emerald-50 p-3 border-b border-emerald-200 font-bold text-emerald-800">
-                    ${course} (BEP'e Alınması Önerilenler)
-                  </div>
-                  <div class="p-4 space-y-3">
-                    ${itemsHtml}
+                html += `
+                <div class="border rounded-lg mb-6 overflow-hidden">
+                  <div class="bg-emerald-50 p-3 font-bold">${course} - BEP'e Alınacakları Seçin</div>
+                  <div class="p-4 space-y-2">
+                    ${hIndices.map(idx => `
+                      <label class="flex items-start p-2 border rounded hover:bg-slate-50 cursor-pointer">
+                        <input type="checkbox" class="mt-1 mr-3" onchange="toggleBEPGoal('${course}', ${idx}, this)" />
+                        <span>${data.kdaList[idx]}</span>
+                      </label>`).join('')}
                   </div>
                 </div>`;
             });
 
             return `
             <div class="min-h-screen bg-slate-100 p-6 py-10">
-              <div class="max-w-4xl mx-auto bg-white rounded-xl shadow-lg overflow-hidden">
-                <div class="bg-emerald-600 p-6 text-white flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
-                  <div>
-                    <h2 class="text-xl font-bold flex items-center"><i data-lucide="check-square" class="mr-2 w-5 h-5"></i> Aşama 4: BEP'e Alınacak Amaçların Seçimi</h2>
-                    <p class="text-emerald-100 mt-1 text-sm">Kaba değerlendirmede <b>"Hayır"</b> olarak işaretlediğiniz beceriler aşağıdadır. Bu eğitim öğretim yılında <b>BEP'e alınacakları</b> seçin.</p>
-                  </div>
-                  <button onclick="selectAllListedGoals()" class="bg-emerald-100 text-emerald-800 hover:bg-emerald-200 px-4 py-2 rounded font-bold flex items-center transition shadow-sm text-sm whitespace-nowrap">
-                    <i data-lucide="check-square" class="mr-2 w-4 h-4"></i> Listelenen Tüm Amaçları Seç
-                  </button>
+              <div class="max-w-4xl mx-auto bg-white rounded-xl shadow-lg p-8">
+                <div class="flex justify-between items-center mb-6">
+                  <h2 class="text-xl font-bold">Aşama 4: BEP Amaçlarını Onayla</h2>
+                  <button onclick="selectAllListedGoals()" class="bg-emerald-100 text-emerald-800 px-3 py-1 rounded text-sm font-bold">Tümünü Seç</button>
                 </div>
-                <div class="p-8">
-                  <div class="space-y-8">
-                    ${coursesHtml}
-                  </div>
-                  <div class="mt-10 flex justify-between items-center border-t pt-6">
-                    <button onclick="setView('assessment')" class="text-slate-500 hover:text-slate-800 font-medium px-4 py-2">Geri Dön</button>
-                    <button onclick="handleGoalSelectionSubmit()" class="bg-emerald-600 text-white px-8 py-3 rounded-lg hover:bg-emerald-700 flex items-center font-bold shadow-md">
-                      BEP Dosyasını Oluştur <i data-lucide="check-circle-2" class="ml-2 w-5 h-5"></i>
-                    </button>
-                  </div>
+                ${html || '<p class="text-center p-10 text-slate-400">BEP\'e alınacak beceri bulunamadı (Tüm değerlendirmeler Evet işaretlenmiş).</p>'}
+                <div class="mt-8 flex justify-between border-t pt-6">
+                  <button onclick="setView('assessment')" class="text-slate-500">Geri Dön</button>
+                  <button onclick="handleGoalSelectionSubmit()" class="bg-emerald-600 text-white px-8 py-3 rounded-lg font-bold">BEP Dosyasını Oluştur</button>
                 </div>
               </div>
             </div>`;
         }
 
-        function buildSingleBEPHtml(studentData, type) {
-            const { startDate, endDate } = getSchoolDates();
-            const veliAdiSoyadi = studentData.guardian === "Anne" ? studentData.motherName : studentData.fatherName;
-            const isDestek = type === "DESTEK";
+        // ==========================================
+        // 6. ÖBÖA VE DEĞERLENDİRME FORMLARI MANTIĞI
+        // ==========================================
 
-            const bepList = isDestek 
-                ? studentData.bep.filter(a => studentData.supportRoomCourses.includes(a.area))
-                : studentData.bep;
+        function buildEvaluationFormsHtml(studentData) {
+            const teacher = `${appState.currentUser.firstName} ${appState.currentUser.lastName}`;
 
-            const teacherName = appState.currentUser.firstName ? `${appState.currentUser.firstName} ${appState.currentUser.lastName}` : "Öğretmen";
-            const teacherBranch = appState.currentUser.branch || "Özel Eğitim Öğretmeni";
-
-            const title = isDestek ? "DESTEK EĞİTİM ODASI BİREYSELLEŞTİRİLMİŞ EĞİTİM PROGRAMI (BEP) DOSYASI" : "BİREYSELLEŞTİRİLMİŞ EĞİTİM PROGRAMI (BEP) DOSYASI";
-            const subtitle = isDestek ? `<p class="text-sm font-bold text-slate-600 mt-2">Planlanan Destek Eğitim Saati: Haftalık ${studentData.supportRoomHours} Saat</p>` : '';
-
-            const perfRows = bepList.length === 0 
-                ? `<tr><td colspan="2" class="text-center py-4">Bu programa dâhil edilen bir hedef bulunmamaktadır.</td></tr>`
-                : bepList.map(area => `
+            const forms = studentData.bep.map(area => {
+                const rows = area.kdaList.map(kda => `
                     <tr>
-                        <td class="font-bold">${area.area}</td>
-                        <td>Öğrenci bu derste/alanda "${area.uda}" amacını gerçekleştirmede bağımsız değildir. Desteklenmesi gerekmektedir.</td>
-                    </tr>
-                  `).join('');
-
-            const planTables = bepList.map(area => {
-                const rows = area.kdaList.map((kda, kIdx) => {
-                    const rowSpanStr = kIdx === 0 ? `rowspan="${area.kdaList.length}"` : '';
-                    const firstCols = kIdx === 0 ? `<td ${rowSpanStr} class="font-medium align-middle">${area.uda}</td>` : '';
-                    const methodCols = kIdx === 0 ? `<td ${rowSpanStr}>${area.methods}</td><td ${rowSpanStr}>${area.materials}</td>` : '';
-                    
-                    return `
-                    <tr>
-                        ${firstCols}
-                        <td>${kda.description}</td>
-                        <td class="text-center">3/4<br/>(%80)</td>
-                        ${methodCols}
-                        <td class="text-center text-[10px]">${kda.startDate}<br/>${kda.endDate}</td>
-                        <td class="text-[10px]">
-                            <div><strong>Ynt:</strong> Gözlem/Kontrol L.</div>
-                            <div class="mt-1 border-b border-gray-300 pb-1"><strong>Trh:</strong> ${kda.endDate}</div>
-                            <div class="mt-1"><strong>Perf:</strong> Yeterli(+)/Geliş.(-)</div>
-                        </td>
-                    </tr>`;
-                }).join('');
+                      <td class="text-sm">${kda.description}</td>
+                      <td class="text-center text-xs">3/4 (%80)</td>
+                      <td class="text-center border-l-2"></td><td class="text-center"></td><td class="text-center"></td><td class="text-center"></td><td class="text-center border-r-2"></td>
+                    </tr>`).join('');
 
                 return `
-                <div class="mb-8 no-break">
-                  <div class="bg-slate-800 text-white p-2 font-bold mb-1">GELİŞİM ALANI / DERS ADI: ${area.area.toUpperCase()}</div>
+                <div class="no-break mb-12">
+                  <div class="text-center mb-4 border-b-2 border-black pb-2">
+                    <h2 class="text-lg font-bold">${area.area.toUpperCase()} ÖLÇÜT BAĞIMLI ÖLÇÜ ARACI</h2>
+                  </div>
+                  
+                  <div class="grid grid-cols-2 gap-4 text-xs mb-4">
+                    <div><strong>Öğrenci:</strong> ${studentData.firstName} ${studentData.lastName}</div>
+                    <div><strong>Uygulayıcı:</strong> ${teacher}</div>
+                  </div>
+
+                  <p class="bg-slate-100 p-2 text-xs font-bold mb-1">UDA: ${area.uda}</p>
+                  
                   <table>
                     <thead>
                       <tr>
-                        <th class="w-[15%]">Uzun Dönemli Amaçlar</th>
-                        <th class="w-[20%]">Kısa Dönemli Amaçlar</th>
-                        <th class="w-[8%] text-center">Ölçüt</th>
-                        <th class="w-[15%]">Yöntem ve Teknik</th>
-                        <th class="w-[12%]">Kullanılacak Materyaller</th>
-                        <th class="w-[12%] text-center">Başlama ve Bitiş T.</th>
-                        <th class="w-[18%]">Ölçme-Değerlendirme (Yöntem/Tarih/Performans)</th>
+                        <th rowspan="2" class="text-left">Kısa Dönemli Amaçlar (KDA) / Alt Basamaklar</th>
+                        <th rowspan="2" class="w-16 text-center">Ölçüt</th>
+                        <th colspan="5" class="text-center">Değerlendirme Tarihleri</th>
+                      </tr>
+                      <tr>
+                        <th class="w-20 text-center text-[8px]">.../.../20...</th>
+                        <th class="w-20 text-center text-[8px]">.../.../20...</th>
+                        <th class="w-20 text-center text-[8px]">.../.../20...</th>
+                        <th class="w-20 text-center text-[8px]">.../.../20...</th>
+                        <th class="w-20 text-center text-[8px]">.../.../20...</th>
                       </tr>
                     </thead>
                     <tbody>${rows}</tbody>
                   </table>
+                  
+                  <div class="mt-2 text-[10px] italic text-slate-600">
+                    * Kısaltmalar: B (Bağımsız), Sİ (Sözel İpucu), MY (Model Olma), FY (Fiziksel Yardım)
+                  </div>
                 </div>`;
             }).join('');
 
-            const supportRow = (studentData.usesSupportRoom === "Evet" && studentData.supportRoomCourses.length > 0)
-                ? `<tr>
-                     <td>Destek Eğitim Odası</td>
-                     <td>${studentData.supportRoomCourses.join(", ")}</td>
-                     <td>Haftada ${studentData.supportRoomHours} Ders Saati</td>
-                     <td>${studentData.supportRoomTeacher || "-"}</td>
-                   </tr>`
-                : `<tr><td colspan="4" class="text-center py-2">Destek eğitim hizmeti planlanmamıştır.</td></tr>`;
+            return `
+            <div class="w-full bg-white mx-auto print-container">
+              <div class="text-center mb-10 hide-on-print">
+                <span class="bg-indigo-100 text-indigo-800 px-4 py-1 rounded-full text-sm font-bold">Öğrenci İzleme ve Değerlendirme Formları</span>
+              </div>
+              ${forms}
+            </div>`;
+        }
+
+        function buildSingleBEPHtml(studentData, type) {
+            const { startDate, endDate } = getSchoolDates();
+            const veli = studentData.guardian === "Anne" ? studentData.motherName : studentData.fatherName;
+            const isDestek = type === "DESTEK";
+            const bepList = isDestek ? studentData.bep.filter(a => studentData.supportRoomCourses.includes(a.area)) : studentData.bep;
+
+            const teacher = `${appState.currentUser.firstName} ${appState.currentUser.lastName} (${appState.currentUser.branch})`;
 
             return `
-            <div class="w-full bg-white shadow-lg p-[15mm] border border-slate-300 mx-auto print-container print:shadow-none print:border-none print:p-0">
+            <div class="w-full bg-white mx-auto print-container print:p-0">
               <div class="text-center mb-6 border-b-2 border-black pb-4">
-                <h1 class="text-lg font-bold">${title}</h1>
-                ${subtitle}
+                <h1 class="text-lg font-bold">${isDestek ? "DESTEK EĞİTİM ODASI " : ""}BİREYSELLEŞTİRİLMİŞ EĞİTİM PROGRAMI (BEP) DOSYASI</h1>
               </div>
 
               <h2 class="font-bold bg-slate-200 p-1 mb-2">Öğrenci Bilgileri</h2>
               <table>
                 <tbody>
                   <tr><td class="w-1/3 font-bold">Adı-Soyadı</td><td class="w-2/3">${studentData.firstName} ${studentData.lastName}</td></tr>
-                  <tr><td class="font-bold">Sınıfı</td><td>${studentData.level} - ${studentData.className}</td></tr>
-                  <tr><td class="font-bold">Okul Numarası</td><td>${studentData.schoolNo}</td></tr>
-                  <tr><td class="font-bold">Doğum Tarihi</td><td>${new Date(studentData.birthDate).toLocaleDateString('tr-TR')}</td></tr>
-                  <tr><td class="font-bold">İl/İlçe Özel Eğitim Yerleştirme Kararı</td><td>${studentData.decision}</td></tr>
-                  <tr><td class="font-bold">Özel Eğitim İhtiyacına Yönelik Tanı</td><td>${studentData.disability}</td></tr>
-                  <tr><td class="font-bold">Daha önce aldığı destek eğitimleri ve süresi</td><td>${studentData.supportEduHistory || "-"}</td></tr>
-                  <tr><td class="font-bold">Kullandığı destek materyalleri/cihazlar</td><td>${studentData.devices || "-"}</td></tr>
-                  <tr><td class="font-bold">Önemli sağlık bilgileri (alerji, ilaç vb.)</td><td>${studentData.healthInfo || "-"}</td></tr>
-                  <tr><td class="font-bold">Eğitim ortamına ilişkin düzenlemeler</td><td>${studentData.environmentMods || "-"}</td></tr>
-                  <tr><td class="font-bold">BEP Başlangıç Tarihi</td><td>${startDate.toLocaleDateString('tr-TR')}</td></tr>
-                  <tr><td class="font-bold">BEP Bitiş Tarihi</td><td>${endDate.toLocaleDateString('tr-TR')}</td></tr>
+                  <tr><td class="font-bold">Tanı / Karar</td><td>${studentData.disability} / ${studentData.decision}</td></tr>
+                  <tr><td class="font-bold">Eğitim Ortamı Düzenlemeleri</td><td>${studentData.environmentMods || "-"}</td></tr>
+                  <tr><td class="font-bold">BEP Dönemi</td><td>${startDate.toLocaleDateString('tr-TR')} - ${endDate.toLocaleDateString('tr-TR')}</td></tr>
                 </tbody>
               </table>
 
-              <h2 class="font-bold bg-slate-200 p-1 mb-2 mt-4">Aile İle İlgili Bilgiler</h2>
-              <table>
-                <thead>
-                  <tr>
-                    <th class="w-1/4"></th>
-                    <th class="w-1/4">Anne</th>
-                    <th class="w-1/4">Baba</th>
-                    <th class="w-1/4">Veli/Vasi (${studentData.guardian})</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  <tr><td class="font-bold">Adı-Soyadı</td><td>${studentData.motherName}</td><td>${studentData.fatherName}</td><td class="font-bold">${veliAdiSoyadi}</td></tr>
-                  <tr><td class="font-bold">Telefon</td><td colspan="3" class="text-center">${studentData.parentPhone || "-"}</td></tr>
-                  <tr><td class="font-bold">Ev Adresi</td><td colspan="3" class="text-center">${studentData.parentAddress || "-"}</td></tr>
-                </tbody>
-              </table>
-
-              <h2 class="font-bold bg-slate-200 p-1 mb-2 mt-4 print-break">Eğitsel Performans Formu</h2>
-              <table>
-                <thead>
-                  <tr><th class="w-1/3">Gelişim Alanları/Dersler</th><th>Performans Düzeyi (Kaba Değerlendirme Sonucu)</th></tr>
-                </thead>
-                <tbody>
-                  ${perfRows}
-                </tbody>
-              </table>
-
-              <div class="print-break mt-8">
-                <h2 class="font-bold bg-slate-200 p-2 mb-4 text-center text-[14px]">BİREYSELLEŞTİRİLMİŞ EĞİTİM PLANI</h2>
-                ${planTables}
-              </div>
+              <h2 class="font-bold bg-slate-200 p-1 mb-2 mt-4 print-break">BİREYSELLEŞTİRİLMİŞ EĞİTİM PLANI (KAZANIMLAR)</h2>
+              ${bepList.map(area => `
+                <div class="no-break mb-8">
+                  <div class="bg-slate-800 text-white p-2 font-bold mb-1">${area.area.toUpperCase()}</div>
+                  <table>
+                    <thead>
+                      <tr>
+                        <th class="w-[20%]">UDA</th><th class="w-[25%]">KDA</th><th class="w-[10%]">Ölçüt</th><th class="w-[15%]">Yöntem/Teknik</th><th class="w-[15%]">Materyaller</th><th class="w-[15%]">Tarih</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      ${area.kdaList.map((kda, kIdx) => `
+                        <tr>
+                          ${kIdx===0?`<td rowspan="${area.kdaList.length}">${area.uda}</td>`:''}
+                          <td>${kda.description}</td>
+                          <td class="text-center">%80</td>
+                          ${kIdx===0?`<td rowspan="${area.kdaList.length}">${area.methods}</td><td rowspan="${area.kdaList.length}">${area.materials}</td>`:''}
+                          <td class="text-center text-[10px]">${kda.startDate}<br/>${kda.endDate}</td>
+                        </tr>`).join('')}
+                    </tbody>
+                  </table>
+                </div>`).join('')}
 
               <div class="print-break mt-4">
                  <h2 class="font-bold bg-slate-200 p-1 mb-2">BEP Geliştirme Birim Kararları</h2>
-                 
-                 <h3 class="font-bold text-[11px] mb-1">A. Öğrencinin Alacağı Okul İçi Diğer Eğitim Hizmetleri</h3>
-                 <table class="mb-4">
-                   <thead><tr><th>Hizmet Türü</th><th>Gelişim Alanı/Ders</th><th>Haftalık Süre</th><th>Sorumlu Kişi(ler)</th></tr></thead>
-                   <tbody>${supportRow}</tbody>
-                 </table>
-
-                 <h3 class="font-bold text-[11px] mb-1">B. Aile Bilgilendirme Süreci</h3>
-                 <table class="mb-4">
+                 <table>
+                   <thead><tr><th>Hizmet Türü</th><th>Ders</th><th>Haftalık Süre</th><th>Sorumlu</th></tr></thead>
                    <tbody>
-                     <tr><td class="w-3/4">Aile öğrencinin gelişimi ile ilgili hangi sıklıkla bilgilendirilecek?</td><td class="font-bold">${studentData.familyInfoFrequency}</td></tr>
-                     <tr><td>Aile öğrencinin gelişimi ile ilgili hangi yolla bilgilendirilecek?</td><td class="font-bold">${studentData.familyInfoMethod}</td></tr>
-                     <tr><td>Aile eğitimi yapılacak mı?</td><td class="font-bold">${studentData.familyEducation === "Evet" ? "Evet (X) Hayır ( )" : "Evet ( ) Hayır (X)"}</td></tr>
+                     ${studentData.usesSupportRoom === "Evet" ? `<tr><td>Destek Eğitim</td><td>${studentData.supportRoomCourses.join(", ")}</td><td>${studentData.supportRoomHours} Saat</td><td>${studentData.supportRoomTeacher || "-"}</td></tr>` : '<tr><td colspan="4" class="text-center">Planlanmamıştır.</td></tr>'}
                    </tbody>
                  </table>
-
-                 <div class="mb-6 border p-2 min-h-[60px]">
-                    <strong>C. Diğer Kararlar:</strong><br/>
-                    1. Öğrencinin ilgisini çekecek pekiştireçler kullanılacaktır.<br/>
-                    2. Bir sonraki toplantı tarihi: ${endDate.toLocaleDateString('tr-TR')}
-                 </div>
-
-                 <div class="text-center mb-6">
-                    <h3 class="font-bold text-[14px]">BEP GELİŞTİRME BİRİM ÜYELERİ</h3>
-                 </div>
-
-                 <table class="text-center">
-                   <thead>
-                     <tr><th class="w-[30%]">Unvanı</th><th class="w-[40%]">Adı Soyadı</th><th class="w-[30%]">İmza</th></tr>
-                   </thead>
-                   <tbody>
-                     <tr class="h-10">
-                       <td class="align-middle">Müdür / Müdür Yrd. (Başkan)</td><td></td><td></td>
-                     </tr>
-                     <tr class="h-10">
-                       <td class="align-middle">Öğrencinin Velisi</td><td class="align-middle font-bold">${veliAdiSoyadi}</td><td></td>
-                     </tr>
-                     <tr class="h-10">
-                       <td class="align-middle">Sınıf Öğretmeni / Özel Eğt. Öğrt.</td>
-                       <td class="align-middle">
-                         <span class="font-bold">${teacherName}</span><br/>
-                         <span class="text-[10px] text-gray-700">${teacherBranch}</span>
-                       </td>
-                       <td></td>
-                     </tr>
-                     <tr class="h-10">
-                       <td class="align-middle">Rehber Öğretmen</td><td></td><td></td>
-                     </tr>
-                     <tr class="h-10">
-                       <td class="align-middle">Alan Öğretmenleri (Varsa)</td><td></td><td></td>
-                     </tr>
-                   </tbody>
-                 </table>
-
-                 <div class="text-right mt-12 pr-12 font-bold">
-                   <p>Uygundur</p>
-                   <p>..... / ..... / 20...</p>
-                   <p>Okul Müdürü</p>
+                 <p class="text-sm"><strong>Aile Bilgilendirme:</strong> ${studentData.familyInfoFrequency} / ${studentData.familyInfoMethod} / Eğitim: ${studentData.familyEducation}</p>
+                 <div class="text-center mt-12">
+                    <h3 class="font-bold">İMZALAR</h3>
+                    <div class="grid grid-cols-3 gap-8 mt-10 text-xs">
+                      <div>Müdür Yard.<br/>(Başkan)</div><div>Öğrenci Velisi<br/>(${veli})</div><div>Sınıf Öğretmeni<br/>(${teacher})</div>
+                    </div>
                  </div>
               </div>
             </div>`;
         }
 
         function renderBEP() {
-            if (!appState.generatedBEP) return '';
             const std = appState.generatedBEP;
-            
-            let destekHtml = '';
-            if (std.usesSupportRoom === "Evet" && std.supportRoomCourses.length > 0) {
-                destekHtml = `
-                <div class="print-break w-full mt-8 hide-on-print" style="border-top: 4px dashed #94a3b8; padding-top: 2rem;">
-                  <div class="text-center text-slate-500 font-bold mb-4 uppercase">
-                    --- AŞAĞIDAKİ BÖLÜM "DESTEK EĞİTİM ODASI" İÇİN AYRI BİR DOSYADIR (YAZDIRIRKEN YENİ SAYFADA ÇIKAR) ---
-                  </div>
-                  ${buildSingleBEPHtml(std, "DESTEK")}
-                </div>`;
-            }
+            if (!std) return '';
+            let destek = (std.usesSupportRoom === "Evet" && std.supportRoomCourses.length > 0) ? `<div class="print-break mt-10 pt-10 border-t-4 border-dashed border-slate-300">${buildSingleBEPHtml(std, "DESTEK")}</div>` : '';
 
             return `
-            <div class="min-h-screen bg-slate-200 p-8 print:p-0 print:bg-white flex flex-col items-center text-[12px] font-sans">
-              
-              <div class="w-full max-w-[210mm] mb-4 flex justify-between items-center hide-on-print bg-white p-4 rounded-lg shadow-sm">
-                <button onclick="setView('dashboard')" class="text-blue-600 hover:text-blue-800 font-bold flex items-center">
-                  <i data-lucide="arrow-left" class="mr-2 w-4 h-4"></i> Panele Dön
-                </button>
-                <div class="flex space-x-3">
-                  <button onclick="exportHTMLToWord('bep-wrapper', 'BEP_Dosyasi.doc')" class="bg-blue-800 text-white px-6 py-2 rounded-lg flex items-center hover:bg-blue-900 font-bold">
-                    <i data-lucide="file-text" class="mr-2 w-4 h-4"></i> Word'e Aktar
-                  </button>
-                  <button onclick="window.print()" class="bg-slate-800 text-white px-6 py-2 rounded-lg flex items-center hover:bg-slate-900 font-bold">
-                    <i data-lucide="printer" class="mr-2 w-4 h-4"></i> Yazdır / PDF Al
-                  </button>
+            <div class="min-h-screen bg-slate-200 p-8 print:p-0 print:bg-white flex flex-col items-center text-[12px]">
+              <div class="w-full max-w-[210mm] mb-4 flex justify-between hide-on-print bg-white p-4 rounded-lg shadow-sm">
+                <button onclick="setView('dashboard')" class="text-blue-600 font-bold flex items-center"><i data-lucide="arrow-left" class="mr-1 w-4 h-4"></i> Panele Dön</button>
+                <div class="flex gap-2">
+                  <button onclick="setView('evalFormsView')" class="bg-indigo-100 text-indigo-700 px-4 py-2 rounded font-bold hover:bg-indigo-200">Değerlendirme Formları</button>
+                  <button onclick="exportHTMLToWord('bep-wrapper')" class="bg-blue-800 text-white px-4 py-2 rounded">Word'e Aktar</button>
+                  <button onclick="window.print()" class="bg-slate-800 text-white px-4 py-2 rounded">Yazdır / PDF Al</button>
                 </div>
               </div>
-
-              <div id="bep-wrapper" class="w-full print:p-0">
-                ${buildSingleBEPHtml(std, "ANA")}
-                ${destekHtml}
-              </div>
+              <div id="bep-wrapper" class="w-full print:p-0">${buildSingleBEPHtml(std, "ANA")}${destek}</div>
             </div>`;
         }
 
-        // ==========================================
-        // 6. ANA RENDER DÖNGÜSÜ
-        // ==========================================
+        function renderEvalForms() {
+            const std = appState.generatedBEP;
+            if (!std) return '';
+
+            return `
+            <div class="min-h-screen bg-slate-200 p-8 print:p-0 print:bg-white flex flex-col items-center text-[12px]">
+              <div class="w-full max-w-[210mm] mb-4 flex justify-between hide-on-print bg-white p-4 rounded-lg shadow-sm">
+                <button onclick="setView('bepView')" class="text-blue-600 font-bold flex items-center"><i data-lucide="arrow-left" class="mr-1 w-4 h-4"></i> BEP'e Dön</button>
+                <div class="flex gap-2">
+                  <button onclick="exportHTMLToWord('eval-wrapper', 'Degerlendirme_Formlari.doc')" class="bg-blue-800 text-white px-4 py-2 rounded">Word'e Aktar</button>
+                  <button onclick="window.print()" class="bg-slate-800 text-white px-4 py-2 rounded">Yazdır / PDF Al</button>
+                </div>
+              </div>
+              <div id="eval-wrapper" class="w-full print:p-0">${buildEvaluationFormsHtml(std)}</div>
+            </div>`;
+        }
 
         function renderApp() {
             const root = document.getElementById('root');
-            
             switch(appState.view) {
                 case 'auth': root.innerHTML = renderAuth(); break;
                 case 'dashboard': root.innerHTML = renderDashboard(); break;
@@ -1651,18 +1073,12 @@
                 case 'assessment': root.innerHTML = renderAssessment(); break;
                 case 'selectGoals': root.innerHTML = renderGoalSelection(); break;
                 case 'bepView': root.innerHTML = renderBEP(); break;
-                default: root.innerHTML = renderAuth();
+                case 'evalFormsView': root.innerHTML = renderEvalForms(); break;
             }
-
-            // Lucide ikonlarını yeniden oluştur
             lucide.createIcons();
         }
 
-        // Başlangıç render'ı
-        window.onload = function() {
-            renderApp();
-        };
-
+        window.onload = renderApp;
     </script>
 </body>
 </html>
