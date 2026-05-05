@@ -12,24 +12,34 @@
     <script src="https://unpkg.com/lucide@latest"></script>
 
     <style>
-        /* Yazdırma (PDF) Ayarları */
+        /* Yazdırma (PDF) Ayarları - TAM SAYFA VE YATAY (LANDSCAPE) YAPI */
         @media print {
-            @page { margin: 10mm; size: A4 portrait; }
+            @page { 
+                size: A4 landscape; /* Sayfayı yatay yapar */
+                margin: 5mm; /* Tarayıcının varsayılan Tarih/URL header-footer'larını gizler */
+            }
             body { 
                 -webkit-print-color-adjust: exact !important; 
                 print-color-adjust: exact !important; 
                 background-color: white !important;
+                margin: 0;
+                padding: 0;
             }
             .print-break { page-break-before: always; }
             .no-break { page-break-inside: avoid; }
-            table { page-break-inside: auto; }
+            table { page-break-inside: auto; width: 100%; border-collapse: collapse; }
             tr { page-break-inside: avoid; page-break-after: auto; }
-            .shadow-lg { box-shadow: none !important; }
+            .shadow-lg { box-shadow: none !important; border: none !important; }
             .hide-on-print { display: none !important; }
             #root { background-color: white !important; }
+            /* Çıktıda margin sıfırlandığı için içeriğin kenarlara yapışmaması için iç boşluk (padding) veriyoruz */
+            .print-container { padding: 10mm !important; max-width: 100% !important; width: 100% !important; }
+            
+            /* Tablo çizgilerinin çıktıda net görünmesi için */
+            table, th, td { border: 1px solid black !important; }
         }
         
-        /* BEP Tablo Stilleri */
+        /* Ekran Tablo Stilleri */
         table { width: 100%; border-collapse: collapse; margin-bottom: 20px; }
         th, td { border: 1px solid #000; padding: 6px; text-align: left; vertical-align: top; }
         th { background-color: #f1f5f9; font-weight: bold; }
@@ -508,6 +518,40 @@
             return true;
         };
 
+        // Word export function
+        function exportHTMLToWord(elementId, filename = 'BEP_Dosyasi.doc') {
+            const element = document.getElementById(elementId);
+            if(!element) return;
+            
+            const style = `
+                <style>
+                    table { border-collapse: collapse; width: 100%; margin-bottom: 20px; font-size: 10pt; } 
+                    th, td { border: 1px solid black; padding: 6px; text-align: left; vertical-align: top;} 
+                    th { background-color: #f1f5f9; font-weight: bold; }
+                    h1, h2, h3 { font-family: Arial, sans-serif; text-align: center; } 
+                    body { font-family: Arial, sans-serif; }
+                    .print-break { page-break-before: always; }
+                    .hide-on-print { display: none; }
+                </style>
+            `;
+            
+            const html = `
+                <html xmlns:o='urn:schemas-microsoft-com:office:office' xmlns:w='urn:schemas-microsoft-com:office:word' xmlns='http://www.w3.org/TR/REC-html40'>
+                <head><meta charset='utf-8'><title>BEP Dosyasi</title>${style}</head>
+                <body>${element.innerHTML}</body>
+                </html>
+            `;
+
+            const blob = new Blob(['\ufeff', html], { type: 'application/msword' });
+            const url = URL.createObjectURL(blob);
+            const link = document.createElement('a');
+            link.href = url;
+            link.download = filename;
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        }
+
         // ==========================================
         // 3. UYGULAMA DURUMU (STATE)
         // ==========================================
@@ -587,6 +631,43 @@
             setView('dashboard');
         }
 
+        // Forma girilen güncel değerleri anlık olarak state'e kaydeder
+        function syncFormState() {
+            const form = document.getElementById('studentForm');
+            if(!form) return;
+            const fd = new FormData(form);
+            
+            appState.currentStudent = {
+                ...appState.currentStudent,
+                tcNo: fd.get('tcNo') || '',
+                firstName: fd.get('firstName') || '',
+                lastName: fd.get('lastName') || '',
+                gender: fd.get('gender') || GENDER_TYPES[0],
+                birthDate: fd.get('birthDate') || '',
+                level: fd.get('level') || LEVEL_TYPES[1],
+                schoolName: fd.get('schoolName') || '',
+                className: fd.get('className') || '',
+                schoolNo: fd.get('schoolNo') || '',
+                decision: fd.get('decision') || DECISION_TYPES[0],
+                disability: fd.get('disability') || DISABILITY_TYPES[0],
+                usesSupportRoom: fd.get('usesSupportRoom') || 'Hayır',
+                supportRoomHours: parseInt(fd.get('supportRoomHours') || 2),
+                supportRoomTeacher: fd.get('supportRoomTeacher') || '',
+                supportEduHistory: fd.get('supportEduHistory') || '',
+                healthInfo: fd.get('healthInfo') || '',
+                environmentMods: fd.get('environmentMods') || '',
+                motherName: fd.get('motherName') || '',
+                fatherName: fd.get('fatherName') || '',
+                guardian: fd.get('guardian') || GUARDIAN_TYPES[0],
+                parentPhone: fd.get('parentPhone') || '',
+                parentAddress: fd.get('parentAddress') || '',
+                familyInfoFrequency: fd.get('familyInfoFrequency') || 'Ayda Bir',
+                familyInfoMethod: fd.get('familyInfoMethod') || 'Yüz Yüze Görüşme',
+                familyEducation: fd.get('familyEducation') || 'Hayır',
+            };
+            appState.currentStudent.supportRoomCourses = fd.getAll('supportRoomCourses');
+        }
+
         function toggleSupportRoomVisibility() {
             const decisionSelect = document.querySelector('select[name="decision"]');
             const supportRoomPanel = document.getElementById('supportRoomPanel');
@@ -612,31 +693,12 @@
 
         function handleStudentFormSubmit(event) {
             event.preventDefault();
-            const fd = new FormData(event.target);
-            
-            appState.currentStudent = {
-                ...appState.currentStudent,
-                tcNo: fd.get('tcNo'), firstName: fd.get('firstName'), lastName: fd.get('lastName'),
-                gender: fd.get('gender'), birthDate: fd.get('birthDate'), level: fd.get('level'),
-                schoolName: fd.get('schoolName'), className: fd.get('className'), schoolNo: fd.get('schoolNo'),
-                decision: fd.get('decision'), disability: fd.get('disability'),
-                usesSupportRoom: fd.get('usesSupportRoom') || 'Hayır',
-                supportRoomHours: parseInt(fd.get('supportRoomHours') || 2),
-                supportRoomTeacher: fd.get('supportRoomTeacher') || '',
-                supportEduHistory: fd.get('supportEduHistory') || '',
-                healthInfo: fd.get('healthInfo') || '',
-                environmentMods: fd.get('environmentMods') || '',
-                motherName: fd.get('motherName'), fatherName: fd.get('fatherName'),
-                guardian: fd.get('guardian'), parentPhone: fd.get('parentPhone') || '', parentAddress: fd.get('parentAddress') || '',
-                familyInfoFrequency: fd.get('familyInfoFrequency'), familyInfoMethod: fd.get('familyInfoMethod'), familyEducation: fd.get('familyEducation')
-            };
-
-            appState.currentStudent.supportRoomCourses = fd.getAll('supportRoomCourses');
+            syncFormState(); // Her ihtimale karşı güncel durumu al
 
             appState.formError = '';
             if (!validateTC(appState.currentStudent.tcNo)) {
                 appState.formError = "Girdiğiniz TC Kimlik Numarası sistem tarafından doğrulanamadı. Lütfen 11 haneli ve doğru bir TC numarası girdiğinizden emin olunuz.";
-                renderApp(); // Update UI to show error
+                renderApp(); 
                 return;
             }
             
@@ -653,7 +715,6 @@
             } else {
                 appState.selectedCourses.push(course);
             }
-            // Update checkbox state visually
             const cb = document.getElementById(`course_${course}`);
             if(cb) cb.parentElement.className = `flex items-center p-4 border rounded-lg cursor-pointer transition ${cb.checked ? 'bg-teal-50 border-teal-500 text-teal-800 font-medium' : 'bg-slate-50 border-slate-200 hover:border-teal-300 text-slate-700 font-medium'}`;
         }
@@ -732,7 +793,7 @@
                 }
             });
             appState.selectedBEPGoals = newSelections;
-            renderApp(); // Checkboxes'ı görsel olarak da işaretlemek için yeniden çizdir
+            renderApp(); // Checkboxes görsel işaretleme
         }
 
         function handleGoalSelectionSubmit() {
@@ -747,6 +808,7 @@
             const bepAreas = [];
             const isPreschool = appState.currentStudent.level === "Ana Sınıfı";
             const db = isPreschool ? PRESCHOOL_DATABASE : PRIMARY_DATABASE;
+            const academicCourses = ["Türkçe", "Matematik", "Hayat Bilgisi", "Fen ve Teknoloji", "Sosyal Bilgiler", "Din Kültürü ve Ahlak Bilgisi"];
 
             Object.keys(appState.selectedBEPGoals).forEach(course => {
                 const selectedIndices = appState.selectedBEPGoals[course];
@@ -762,11 +824,17 @@
                     endDate: dates[index].end
                 }));
 
+                // Ders Kitabı Eklemesi
+                let materialsStr = courseData.materials || "Ders materyalleri";
+                if (academicCourses.includes(course) && !materialsStr.toLowerCase().includes("ders kitabı")) {
+                    materialsStr = "Ders kitabı, " + materialsStr;
+                }
+
                 bepAreas.push({
                     area: course,
                     uda: courseData.uda,
                     methods: courseData.methods || "Doğrudan Öğretim",
-                    materials: courseData.materials || "Ders materyalleri",
+                    materials: materialsStr,
                     kdaList: kdaWithDates
                 });
             });
@@ -817,7 +885,6 @@
             appState.currentUser = null;
             setView('auth');
         }
-
 
         // ==========================================
         // 5. RENDER FONKSİYONLARI (GÖRÜNÜMLER)
@@ -963,11 +1030,11 @@
                   <label class="block text-sm font-bold text-blue-800 mb-2">Destek eğitim odasından faydalanıyor mu?</label>
                   <div class="flex space-x-6 mb-4">
                     <label class="flex items-center cursor-pointer">
-                      <input type="radio" id="usesSupportRoomYes" name="usesSupportRoom" value="Evet" onchange="toggleSupportRoomVisibility()" class="w-4 h-4 text-blue-600 mr-2" ${std.usesSupportRoom === 'Evet' ? 'checked' : ''} />
+                      <input type="radio" id="usesSupportRoomYes" name="usesSupportRoom" value="Evet" onchange="syncFormState(); toggleSupportRoomVisibility(); renderApp();" class="w-4 h-4 text-blue-600 mr-2" ${std.usesSupportRoom === 'Evet' ? 'checked' : ''} />
                       <span class="font-medium text-blue-900">Evet</span>
                     </label>
                     <label class="flex items-center cursor-pointer">
-                      <input type="radio" name="usesSupportRoom" value="Hayır" onchange="toggleSupportRoomVisibility()" class="w-4 h-4 text-blue-600 mr-2" ${std.usesSupportRoom === 'Hayır' ? 'checked' : ''} />
+                      <input type="radio" name="usesSupportRoom" value="Hayır" onchange="syncFormState(); toggleSupportRoomVisibility(); renderApp();" class="w-4 h-4 text-blue-600 mr-2" ${std.usesSupportRoom === 'Hayır' ? 'checked' : ''} />
                       <span class="font-medium text-blue-900">Hayır</span>
                     </label>
                   </div>
@@ -996,14 +1063,14 @@
             }
 
             return `
-            <div class="min-h-screen bg-slate-100 p-6 py-10">
-              <div class="max-w-4xl mx-auto bg-white rounded-xl shadow-lg overflow-hidden">
-                <div class="bg-blue-700 p-6 text-white flex justify-between items-center">
+            <div class="min-h-screen bg-slate-100 p-6 py-10 print:bg-white print:p-0">
+              <div class="max-w-4xl mx-auto bg-white rounded-xl shadow-lg overflow-hidden print:shadow-none print:max-w-none">
+                <div class="bg-blue-700 p-6 text-white flex justify-between items-center hide-on-print">
                   <h2 class="text-xl font-bold flex items-center"><i data-lucide="user-plus" class="mr-2 w-5 h-5"></i> ${std.id ? "Öğrenciyi Düzenle" : "Aşama 1: Yeni Öğrenci Bilgileri"}</h2>
                   <button type="button" onclick="setView('dashboard')" class="text-blue-200 hover:text-white font-medium">İptal</button>
                 </div>
                 
-                <form onsubmit="handleStudentFormSubmit(event)" class="p-8 space-y-8">
+                <form id="studentForm" onsubmit="handleStudentFormSubmit(event)" class="p-8 space-y-8">
                   ${appState.formError ? `
                     <div class="bg-red-50 border-l-4 border-red-500 p-4 rounded-md shadow-sm flex items-center">
                       <i data-lucide="alert-circle" class="text-red-500 mr-3 w-6 h-6 flex-shrink-0"></i>
@@ -1027,8 +1094,7 @@
                       <div><label class="block text-sm font-medium text-slate-700 mb-1">Doğum Tarihi</label><input name="birthDate" required max="${maxDate}" value="${std.birthDate}" type="date" class="w-full px-3 py-2 border rounded-md" /></div>
                       <div>
                         <label class="block text-sm font-medium text-slate-700 mb-1">Kademe</label>
-                        <!-- Change on level triggers full render to update available courses for support room -->
-                        <select name="level" required onchange="appState.currentStudent.level=this.value; renderApp();" class="w-full px-3 py-2 border rounded-md bg-blue-50 font-bold text-blue-700">
+                        <select name="level" required onchange="syncFormState(); appState.currentStudent.level=this.value; renderApp();" class="w-full px-3 py-2 border rounded-md bg-blue-50 font-bold text-blue-700">
                             ${LEVEL_TYPES.map(l => `<option value="${l}" ${std.level === l ? 'selected' : ''}>${l}</option>`).join('')}
                         </select>
                       </div>
@@ -1044,8 +1110,7 @@
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
                       <div>
                         <label class="block text-sm font-medium text-slate-700 mb-1">Tedbir Kararı</label>
-                        <!-- Change triggers UI update for Support Room -->
-                        <select name="decision" required onchange="toggleSupportRoomVisibility(); appState.currentStudent.decision=this.value; renderApp();" class="w-full px-3 py-2 border rounded-md">
+                        <select name="decision" required onchange="syncFormState(); appState.currentStudent.decision=this.value; renderApp();" class="w-full px-3 py-2 border rounded-md">
                             ${DECISION_TYPES.map(d => `<option value="${d}" ${std.decision === d ? 'selected' : ''}>${d}</option>`).join('')}
                         </select>
                       </div>
@@ -1122,7 +1187,7 @@
                     </div>
                   </section>
 
-                  <div class="flex justify-end pt-4 border-t">
+                  <div class="flex justify-end pt-4 border-t hide-on-print">
                     <button type="submit" class="bg-blue-600 text-white px-8 py-3 rounded-lg hover:bg-blue-700 flex items-center font-bold text-lg shadow-md">
                       İleri: Ders Seçimi <i data-lucide="arrow-right" class="ml-2 w-5 h-5"></i>
                     </button>
@@ -1204,8 +1269,8 @@
                 `).join('');
 
                 return `
-                <div class="border border-slate-300 rounded-lg overflow-hidden shadow-sm">
-                  <div class="bg-slate-200 p-4 border-b border-slate-300 flex flex-col md:flex-row justify-between items-start md:items-center gap-2">
+                <div class="border border-slate-300 rounded-lg overflow-hidden shadow-sm no-break mb-10">
+                  <div class="bg-slate-200 p-4 border-b border-slate-300 flex flex-col md:flex-row justify-between items-start md:items-center gap-2 hide-on-print">
                     <h3 class="text-lg font-bold text-slate-800">${course} ${isPreschool ? "Alan" : "Dersi"}</h3>
                     <div class="flex space-x-2">
                       <button type="button" onclick="setAllEvals('${course}', 'Evet')" class="bg-green-100 text-green-700 hover:bg-green-200 px-4 py-1.5 rounded text-sm font-bold flex items-center transition shadow-sm">
@@ -1219,6 +1284,9 @@
                   <div class="overflow-x-auto">
                       <table class="w-full text-sm text-left min-w-[600px]">
                         <thead class="bg-slate-50 border-b">
+                          <tr>
+                            <th colspan="5" class="p-3 text-center bg-slate-800 text-white font-bold hidden print:table-cell">${course.toUpperCase()} KABA DEĞERLENDİRME FORMU</th>
+                          </tr>
                           <tr>
                             <th class="p-3 w-12 text-center text-slate-500">No</th>
                             <th class="p-3 text-slate-700">Kazanım / Hedef Davranış</th>
@@ -1234,17 +1302,35 @@
             }).join('');
 
             return `
-            <div class="min-h-screen bg-slate-100 p-6 py-10">
-              <div class="max-w-5xl mx-auto bg-white rounded-xl shadow-lg overflow-hidden">
-                <div class="bg-indigo-700 p-6 text-white flex items-center justify-between">
+            <div class="min-h-screen bg-slate-100 p-6 py-10 print:bg-white print:p-0">
+              
+              <div class="w-full max-w-5xl mx-auto mb-4 flex justify-between items-center hide-on-print bg-white p-4 rounded-lg shadow-sm">
+                <button onclick="setView('dashboard')" class="text-blue-600 hover:text-blue-800 font-bold flex items-center">
+                  <i data-lucide="arrow-left" class="mr-2 w-4 h-4"></i> Panele Dön
+                </button>
+                <button onclick="window.print()" class="bg-slate-800 text-white px-6 py-2 rounded-lg flex items-center hover:bg-slate-900 font-bold">
+                  <i data-lucide="printer" class="mr-2 w-4 h-4"></i> Yazdır / PDF Al
+                </button>
+              </div>
+
+              <div id="assessment-document" class="max-w-5xl mx-auto bg-white rounded-xl shadow-lg overflow-hidden print:shadow-none print:w-full print:max-w-none print-container">
+                <div class="bg-indigo-700 p-6 text-white flex items-center justify-between hide-on-print">
                   <div>
                     <h2 class="text-xl font-bold flex items-center"><i data-lucide="list-checks" class="mr-2 w-5 h-5"></i> Aşama 3: Kaba Değerlendirme</h2>
                     <p class="text-indigo-200 mt-1 text-sm">Her beceri için öğrencinin durumunu seçiniz.</p>
                   </div>
                 </div>
-                <div class="p-8 space-y-10">
+                
+                <!-- Print Header -->
+                <div class="hidden print:block text-center mb-8 border-b-2 border-black pb-4">
+                  <h1 class="text-xl font-bold">KABA DEĞERLENDİRME FORMU</h1>
+                  <p class="mt-2 text-sm"><strong>Öğrenci:</strong> ${appState.currentStudent.firstName} ${appState.currentStudent.lastName} &nbsp;|&nbsp; <strong>Sınıf:</strong> ${appState.currentStudent.level} - ${appState.currentStudent.className}</p>
+                </div>
+
+                <div class="p-8 space-y-10 print:p-0">
                   ${coursesHtml}
-                  <div class="mt-10 flex justify-between items-center border-t pt-6">
+                  
+                  <div class="mt-10 flex justify-between items-center border-t pt-6 hide-on-print">
                     <button onclick="setView('selectCourses')" class="text-slate-500 hover:text-slate-800 font-medium px-4 py-2">Geri Dön</button>
                     <button onclick="handleAssessmentSubmit()" class="bg-indigo-600 text-white px-8 py-3 rounded-lg hover:bg-indigo-700 flex items-center font-bold shadow-md">
                       İleri: BEP Amaçlarını Seç <i data-lucide="chevron-right" class="ml-2 w-5 h-5"></i>
@@ -1389,7 +1475,7 @@
                 : `<tr><td colspan="4" class="text-center py-2">Destek eğitim hizmeti planlanmamıştır.</td></tr>`;
 
             return `
-            <div class="w-full max-w-[210mm] bg-white shadow-lg p-[15mm] border border-slate-300 mx-auto">
+            <div class="w-full bg-white shadow-lg p-[15mm] border border-slate-300 mx-auto print-container print:shadow-none print:border-none print:p-0">
               <div class="text-center mb-6 border-b-2 border-black pb-4">
                 <h1 class="text-lg font-bold">${title}</h1>
                 ${subtitle}
@@ -1430,7 +1516,7 @@
                 </tbody>
               </table>
 
-              <h2 class="font-bold bg-slate-200 p-1 mb-2 mt-4">Eğitsel Performans Formu</h2>
+              <h2 class="font-bold bg-slate-200 p-1 mb-2 mt-4 print-break">Eğitsel Performans Formu</h2>
               <table>
                 <thead>
                   <tr><th class="w-1/3">Gelişim Alanları/Dersler</th><th>Performans Düzeyi (Kaba Değerlendirme Sonucu)</th></tr>
@@ -1517,7 +1603,7 @@
             let destekHtml = '';
             if (std.usesSupportRoom === "Evet" && std.supportRoomCourses.length > 0) {
                 destekHtml = `
-                <div class="print-break w-full max-w-[210mm] mt-8 hide-on-print" style="border-top: 4px dashed #94a3b8; padding-top: 2rem; page-break-before: always;">
+                <div class="print-break w-full mt-8 hide-on-print" style="border-top: 4px dashed #94a3b8; padding-top: 2rem;">
                   <div class="text-center text-slate-500 font-bold mb-4 uppercase">
                     --- AŞAĞIDAKİ BÖLÜM "DESTEK EĞİTİM ODASI" İÇİN AYRI BİR DOSYADIR (YAZDIRIRKEN YENİ SAYFADA ÇIKAR) ---
                   </div>
@@ -1527,17 +1613,25 @@
 
             return `
             <div class="min-h-screen bg-slate-200 p-8 print:p-0 print:bg-white flex flex-col items-center text-[12px] font-sans">
+              
               <div class="w-full max-w-[210mm] mb-4 flex justify-between items-center hide-on-print bg-white p-4 rounded-lg shadow-sm">
                 <button onclick="setView('dashboard')" class="text-blue-600 hover:text-blue-800 font-bold flex items-center">
                   <i data-lucide="arrow-left" class="mr-2 w-4 h-4"></i> Panele Dön
                 </button>
-                <button onclick="window.print()" class="bg-slate-800 text-white px-6 py-2 rounded-lg flex items-center hover:bg-slate-900 font-bold">
-                  <i data-lucide="printer" class="mr-2 w-4 h-4"></i> Yazdır (PDF Olarak Kaydet)
-                </button>
+                <div class="flex space-x-3">
+                  <button onclick="exportHTMLToWord('bep-wrapper', 'BEP_Dosyasi.doc')" class="bg-blue-800 text-white px-6 py-2 rounded-lg flex items-center hover:bg-blue-900 font-bold">
+                    <i data-lucide="file-text" class="mr-2 w-4 h-4"></i> Word'e Aktar
+                  </button>
+                  <button onclick="window.print()" class="bg-slate-800 text-white px-6 py-2 rounded-lg flex items-center hover:bg-slate-900 font-bold">
+                    <i data-lucide="printer" class="mr-2 w-4 h-4"></i> Yazdır / PDF Al
+                  </button>
+                </div>
               </div>
 
-              ${buildSingleBEPHtml(std, "ANA")}
-              ${destekHtml}
+              <div id="bep-wrapper" class="w-full print:p-0">
+                ${buildSingleBEPHtml(std, "ANA")}
+                ${destekHtml}
+              </div>
             </div>`;
         }
 
