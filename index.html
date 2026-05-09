@@ -12,41 +12,49 @@
     <script src="https://unpkg.com/lucide@latest"></script>
 
     <style>
-        /* Yazdırma (PDF) Ayarları - TAM SAYFA VE YATAY (LANDSCAPE) YAPI */
+        /* YAZDIRMA (PDF) AYARLARI */
         @media print {
+            /* Varsayılan sayfa yapısı: Dikey (Portrait) ve margin 0 ile tarayıcı başlıklarını (tarih, url vb.) gizler */
             @page { 
-                size: A4 landscape; /* Sayfayı yatay yapar */
-                margin: 0mm; /* Tarayıcının varsayılan Tarih/URL header-footer'larını gizler */
+                size: A4 portrait; 
+                margin: 10mm; 
             }
+            
+            /* Sadece BEP tablosunun olduğu sayfaları Yatay (Landscape) yapar */
+            @page landscape-page { 
+                size: A4 landscape; 
+                margin: 10mm;
+            }
+            .page-landscape { 
+                page: landscape-page; 
+                width: 100%;
+            }
+
             body { 
                 -webkit-print-color-adjust: exact !important; 
                 print-color-adjust: exact !important; 
                 background-color: white !important;
-                margin: 0;
-                padding: 0;
+                font-family: 'Times New Roman', Times, serif !important;
             }
-            .print-break { page-break-before: always; }
-            .no-break { page-break-inside: avoid; }
+
+            .print-break { page-break-before: always !important; }
+            .no-break { page-break-inside: avoid !important; }
             table { page-break-inside: auto; width: 100%; border-collapse: collapse; }
             tr { page-break-inside: avoid; page-break-after: auto; }
-            .shadow-lg { box-shadow: none !important; border: none !important; }
+            td, th { page-break-inside: avoid; }
+            
+            .shadow-lg, .shadow-sm, .shadow-md { box-shadow: none !important; border: none !important; }
             .hide-on-print { display: none !important; }
             #root { background-color: white !important; }
             
-            /* Çıktıda içeriğin kenarlara yapışmaması için iç boşluk */
-            .print-container { 
-                padding: 15mm !important; 
-                max-width: 100% !important; 
-                width: 100% !important; 
-            }
-            
-            table, th, td { border: 1px solid black !important; }
+            table, th, td { border: 1px solid black !important; color: black !important; }
+            th { background-color: #d1d5db !important; } /* Gri arka plan yazdırmada görünsün */
         }
         
         /* Ekran Tablo Stilleri */
-        table { width: 100%; border-collapse: collapse; margin-bottom: 20px; }
-        th, td { border: 1px solid #000; padding: 6px; text-align: left; vertical-align: top; }
-        th { background-color: #f1f5f9; font-weight: bold; }
+        table { width: 100%; border-collapse: collapse; margin-bottom: 20px; font-size: 13px; }
+        th, td { border: 1px solid #000; padding: 6px; text-align: left; vertical-align: middle; }
+        th { background-color: #e2e8f0; font-weight: bold; }
 
         /* Scrollbar Gizleme */
         ::-webkit-scrollbar { width: 8px; }
@@ -89,14 +97,14 @@
             "Kaba Motor Becerileri", "İnce Motor Becerileri", "Sosyal-Duygusal Gelişim", "Uyumsal Beceriler"
         ];
 
-        // Akademik dersler listesi (Materyal eklemesi için)
         const ACADEMIC_COURSES = ["Türkçe", "Matematik", "Hayat Bilgisi", "Fen ve Teknoloji", "Sosyal Bilgiler", "Din Kültürü ve Ahlak Bilgisi"];
 
+        // MEB Kaba Değerlendirme Hedef Havuzu (İlkokul/Ortaokul)
         const PRIMARY_DATABASE = {
             "Türkçe": {
                 uda: "Türkçe dersi dinleme, konuşma, okuma ve yazma becerilerini kurallarına uygun olarak kullanır.",
                 methods: "Ses Temelli Cümle Yöntemi, Açık Anlatım, Çoklu Duyu Yöntemi, Soru-Cevap, Dikte",
-                materials: "Okuma fişleri, hece/kelime tabloları, hikaye kitapları, görsel materyaller",
+                materials: "Okuma fişleri, hece/kelime tabloları, hikaye kitapları",
                 kdaList: [
                     "Dinleme kurallarına uyar.", "Görgü kurallarına uyarak konuşur.", "Dinlediği/izlediği metnin konusunu belirler.",
                     "Dinlediklerine/izlediklerine yönelik sorulara cevap verir.", "Harfleri kuralına uygun yazar ve okur.",
@@ -183,7 +191,7 @@
             "Beden Eğitimi": {
                 uda: "Beden Eğitimi dersinde psikomotor becerileri sergiler ve kurallara uyar.",
                 methods: "Gösterip Yaptırma, Model Olma, Fiziksel Yardım",
-                materials: "Top, atlama ipi, minder, cheri",
+                materials: "Top, atlama ipi, minder, çember",
                 kdaList: [
                     "Vücudunu tanır ve temel duruşları sergiler.", "Yürüme, koşma ve sıçrama koordinasyonunu geliştirir.",
                     "Atma ve tutma becerilerini sergiler.", "Jimnastik ve denge hareketlerini yapar.",
@@ -299,10 +307,6 @@
             }
         };
 
-        const DEFAULT_AREAS = [
-            { area: "Genel Beceriler", uda: "Temel becerilerini sergiler.", kdaList: ["Beceri 1", "Beceri 2"] }
-        ];
-
         // ==========================================
         // 2. YARDIMCI FONKSİYONLAR
         // ==========================================
@@ -326,22 +330,49 @@
             return { startDate: secondMonday, endDate: thirdFriday };
         };
 
-        const distributeDates = (kdaCount) => {
-            if (kdaCount === 0) return [];
-            const { startDate, endDate } = getSchoolDates();
-            const totalDurationMs = endDate.getTime() - startDate.getTime();
-            const chunkMs = totalDurationMs / kdaCount;
+        const distributeDates = (kdaCount, startDateStr, endDateStr) => {
+            if (kdaCount === 0 || !startDateStr || !endDateStr) return [];
+            
+            let start = new Date(startDateStr);
+            let end = new Date(endDateStr);
+            
+            let workingDays = [];
+            let current = new Date(start);
+            while (current <= end) {
+                let day = current.getDay();
+                if (day !== 0 && day !== 6) { // Hafta sonunu dahil etme
+                    workingDays.push(new Date(current));
+                }
+                current.setDate(current.getDate() + 1);
+            }
+            
+            if (workingDays.length === 0) {
+                workingDays.push(start);
+                workingDays.push(end);
+            }
+
             const dates = [];
-            let currentStart = new Date(startDate);
+            const chunkSize = Math.floor(workingDays.length / kdaCount);
+            let remainder = workingDays.length % kdaCount;
+            
+            let currentIndex = 0;
             for (let i = 0; i < kdaCount; i++) {
-                let currentEnd = new Date(currentStart.getTime() + chunkMs);
-                if (i === kdaCount - 1) currentEnd = endDate;
+                let currentChunk = chunkSize + (i < remainder ? 1 : 0);
+                if (currentChunk === 0) currentChunk = 1; 
+                
+                let startIdx = currentIndex;
+                let endIdx = currentIndex + currentChunk - 1;
+                
+                if (endIdx >= workingDays.length) endIdx = workingDays.length - 1;
+                if (i === kdaCount - 1) endIdx = workingDays.length - 1; 
+                
                 dates.push({
-                    start: currentStart.toLocaleDateString('tr-TR'),
-                    end: currentEnd.toLocaleDateString('tr-TR')
+                    start: workingDays[startIdx].toLocaleDateString('tr-TR'),
+                    end: workingDays[endIdx].toLocaleDateString('tr-TR')
                 });
-                currentStart = new Date(currentEnd);
-                currentStart.setDate(currentStart.getDate() + 1);
+                
+                currentIndex = endIdx + 1;
+                if (currentIndex >= workingDays.length) currentIndex = workingDays.length - 1;
             }
             return dates;
         };
@@ -359,30 +390,67 @@
             return true;
         };
 
-        function exportHTMLToWord(elementId, filename = 'BEP_Dosyasi.doc') {
+        // --- EXPORT TO WORD ---
+        function exportHTMLToWord(elementId, filename = 'BEP_Dosyasi.docx') {
             const element = document.getElementById(elementId);
             if(!element) return;
             
-            const style = `
-                <style>
-                    table { border-collapse: collapse; width: 100%; margin-bottom: 20px; font-size: 10pt; } 
-                    th, td { border: 1px solid black; padding: 6px; text-align: left; vertical-align: top;} 
-                    th { background-color: #f1f5f9; font-weight: bold; }
-                    h1, h2, h3 { font-family: Arial, sans-serif; text-align: center; } 
-                    body { font-family: Arial, sans-serif; }
-                    .print-break { page-break-before: always; }
-                    .hide-on-print { display: none; }
-                </style>
-            `;
-            
             const html = `
                 <html xmlns:o='urn:schemas-microsoft-com:office:office' xmlns:w='urn:schemas-microsoft-com:office:word' xmlns='http://www.w3.org/TR/REC-html40'>
-                <head><meta charset='utf-8'><title>BEP Dosyası</title>${style}</head>
-                <body>${element.innerHTML}</body>
+                <head>
+                    <meta charset='utf-8'>
+                    <title>BEP Dosyası</title>
+                    <style>
+                        table { border-collapse: collapse; width: 100%; margin-bottom: 20px; font-size: 10pt; font-family: Arial, sans-serif; } 
+                        th, td { border: 1px solid black; padding: 6px; text-align: left; vertical-align: top;} 
+                        th { background-color: #f1f5f9; font-weight: bold; }
+                        h1, h2, h3 { font-family: Arial, sans-serif; text-align: center; } 
+                        body { font-family: Arial, sans-serif; }
+                        .print-break { page-break-before: always; }
+                        .hide-on-print { display: none !important; }
+                        
+                        /* Word için Özel Bölüm Yönlendirmeleri */
+                        @page WordSection1 { size: 595.3pt 841.9pt; margin: 1cm; }
+                        div.WordSection1 { page: WordSection1; }
+                        @page WordSection2 { size: 841.9pt 595.3pt; mso-page-orientation: landscape; margin: 1cm; }
+                        div.WordSection2 { page: WordSection2; }
+                    </style>
+                </head>
+                <body>
+                    ${element.innerHTML}
+                </body>
                 </html>
             `;
 
-            const blob = new Blob(['\ufeff', html], { type: 'application/msword' });
+            const blob = new Blob(['\ufeff', html], { type: 'application/msword;charset=utf-8' });
+            const url = URL.createObjectURL(blob);
+            const link = document.createElement('a');
+            link.href = url;
+            link.download = filename;
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        }
+
+        // --- EXPORT TO EXCEL ---
+        function exportHTMLToExcel(elementId, filename = 'BEP_Dosyasi.xls') {
+            const element = document.getElementById(elementId);
+            if(!element) return;
+            
+            const html = `
+                <html xmlns:x="urn:schemas-microsoft-com:office:excel">
+                <head>
+                    <meta charset="utf-8">
+                    <style>
+                        table { border-collapse: collapse; width: 100%; } 
+                        th, td { border: 1px solid black; padding: 5px; } 
+                        th { background-color: #f1f5f9; font-weight: bold; }
+                    </style>
+                </head>
+                <body>${element.innerHTML}</body>
+                </html>
+            `;
+            const blob = new Blob(['\ufeff', html], { type: 'application/vnd.ms-excel;charset=utf-8' });
             const url = URL.createObjectURL(blob);
             const link = document.createElement('a');
             link.href = url;
@@ -396,25 +464,27 @@
         // 3. UYGULAMA DURUMU (STATE)
         // ==========================================
 
+        const todayStr = new Date().toISOString().split('T')[0];
+        let futureDate = new Date();
+        futureDate.setMonth(futureDate.getMonth() + 9);
+        const futureDateStr = futureDate.toISOString().split('T')[0];
+
         const defaultStudentState = {
             id: null, tcNo: '', firstName: '', lastName: '', gender: GENDER_TYPES[0], level: LEVEL_TYPES[1], 
             birthDate: '', schoolName: '', schoolNo: '', className: '', motherName: '', fatherName: '', 
+            motherSurname: '', fatherSurname: '',
+            bepStartDate: todayStr, bepEndDate: futureDateStr,
             guardian: GUARDIAN_TYPES[0], decision: DECISION_TYPES[0], disability: DISABILITY_TYPES[0],
             supportEduHistory: '', currentSupportEdu: '', devices: '', healthInfo: '', environmentMods: '',
             parentPhone: '', parentAddress: '', parentWorkAddress: '',
-            usesSupportRoom: 'Hayır',
-            supportRoomCourses: [],
-            supportRoomHours: 2,
-            supportRoomTeacher: '', 
-            familyInfoFrequency: 'Ayda Bir',
-            familyInfoMethod: 'Yüz Yüze Görüşme',
-            familyEducation: 'Hayır',
+            usesSupportRoom: 'Hayır', supportRoomCourses: [], supportRoomHours: 2, supportRoomTeacher: '', 
+            familyInfoFrequency: 'Ayda Bir', familyInfoMethod: 'Yüz Yüze Görüşme', familyEducation: 'Hayır',
         };
 
         const appState = {
             users: [{ username: 'demo@ornek.com', password: 'demo', firstName: 'Örnek', lastName: 'Öğretmen', branch: 'Özel Eğitim Öğretmeni' }],
             currentUser: null,
-            view: 'auth', // auth, dashboard, profile, addStudent, selectCourses, assessment, selectGoals, bepView, evalFormsView
+            view: 'auth', 
             students: [],
             currentStudent: JSON.parse(JSON.stringify(defaultStudentState)),
             formError: '',
@@ -468,27 +538,19 @@
             
             appState.currentStudent = {
                 ...appState.currentStudent,
-                tcNo: fd.get('tcNo') || '',
-                firstName: fd.get('firstName') || '',
-                lastName: fd.get('lastName') || '',
-                gender: fd.get('gender') || GENDER_TYPES[0],
-                birthDate: fd.get('birthDate') || '',
-                level: fd.get('level') || LEVEL_TYPES[1],
-                schoolName: fd.get('schoolName') || '',
-                className: fd.get('className') || '',
-                schoolNo: fd.get('schoolNo') || '',
-                decision: fd.get('decision') || DECISION_TYPES[0],
-                disability: fd.get('disability') || DISABILITY_TYPES[0],
+                tcNo: fd.get('tcNo') || '', firstName: fd.get('firstName') || '', lastName: fd.get('lastName') || '',
+                gender: fd.get('gender') || GENDER_TYPES[0], birthDate: fd.get('birthDate') || '',
+                level: fd.get('level') || LEVEL_TYPES[1], schoolName: fd.get('schoolName') || '',
+                className: fd.get('className') || '', schoolNo: fd.get('schoolNo') || '',
+                decision: fd.get('decision') || DECISION_TYPES[0], disability: fd.get('disability') || DISABILITY_TYPES[0],
+                bepStartDate: fd.get('bepStartDate') || todayStr, bepEndDate: fd.get('bepEndDate') || futureDateStr,
                 usesSupportRoom: fd.get('usesSupportRoom') || 'Hayır',
-                supportRoomHours: parseInt(fd.get('supportRoomHours') || 2),
-                supportRoomTeacher: fd.get('supportRoomTeacher') || '',
-                supportEduHistory: fd.get('supportEduHistory') || '',
-                healthInfo: fd.get('healthInfo') || '',
+                supportRoomHours: parseInt(fd.get('supportRoomHours') || 2), supportRoomTeacher: fd.get('supportRoomTeacher') || '',
+                supportEduHistory: fd.get('supportEduHistory') || '', healthInfo: fd.get('healthInfo') || '',
                 environmentMods: fd.get('environmentMods') || '',
-                motherName: fd.get('motherName') || '',
-                fatherName: fd.get('fatherName') || '',
-                guardian: fd.get('guardian') || GUARDIAN_TYPES[0],
-                parentPhone: fd.get('parentPhone') || '',
+                motherName: fd.get('motherName') || '', motherSurname: fd.get('motherSurname') || '',
+                fatherName: fd.get('fatherName') || '', fatherSurname: fd.get('fatherSurname') || '',
+                guardian: fd.get('guardian') || GUARDIAN_TYPES[0], parentPhone: fd.get('parentPhone') || '',
                 parentAddress: fd.get('parentAddress') || '',
                 familyInfoFrequency: fd.get('familyInfoFrequency') || 'Ayda Bir',
                 familyInfoMethod: fd.get('familyInfoMethod') || 'Yüz Yüze Görüşme',
@@ -508,23 +570,33 @@
                 return;
             }
             
-            appState.selectedCourses = [];
-            appState.evaluations = {};
-            appState.selectedBEPGoals = {};
+            if(appState.selectedCourses.length === 0){
+                appState.selectedCourses = [];
+                appState.evaluations = {};
+                appState.selectedBEPGoals = {};
+            }
             setView('selectCourses');
         }
 
         function toggleCourse(course) {
             const index = appState.selectedCourses.indexOf(course);
             if (index > -1) { appState.selectedCourses.splice(index, 1); } else { appState.selectedCourses.push(course); }
-            const cb = document.getElementById(`course_${course}`);
+            const cb = document.getElementById(`course_${course.replace(/\s+/g, '_')}`);
             if(cb) cb.parentElement.className = `flex items-center p-4 border rounded-lg cursor-pointer transition ${cb.checked ? 'bg-teal-50 border-teal-500 text-teal-800 font-medium' : 'bg-slate-50 border-slate-200 hover:border-teal-300 text-slate-700 font-medium'}`;
+        }
+
+        function selectAllCourses(coursesStr) {
+            const courses = coursesStr.split(',');
+            appState.selectedCourses = [...courses];
+            renderApp();
         }
 
         function handleCourseSelectionSubmit() {
             if (appState.selectedCourses.length === 0) { alert("Lütfen değerlendirme yapmak için en az bir ders/modül seçiniz."); return; }
-            appState.evaluations = {};
-            appState.selectedCourses.forEach(c => { appState.evaluations[c] = {}; });
+            
+            appState.selectedCourses.forEach(c => { 
+                if(!appState.evaluations[c]) appState.evaluations[c] = {}; 
+            });
             setView('assessment');
         }
 
@@ -540,9 +612,27 @@
             if (!appState.evaluations[course]) appState.evaluations[course] = {};
             kdaList.forEach((_, idx) => {
                 appState.evaluations[course][idx] = value;
-                const radio = document.querySelector(`input[name="eval_${course.replace(/\s+/g, '')}_${idx}"][value="${value}"]`);
-                if(radio) radio.checked = true;
             });
+            renderApp();
+        }
+
+        function handleAssessmentSubmit() {
+            let hasHayir = false;
+            Object.keys(appState.evaluations).forEach(course => {
+                Object.values(appState.evaluations[course]).forEach(val => {
+                    if (val === "Hayır") hasHayir = true;
+                });
+            });
+
+            if (!hasHayir) {
+                alert("BEP oluşturabilmek için en az bir kazanımı 'Hayır' olarak işaretlemeniz gerekmektedir.");
+                return;
+            }
+
+            if(Object.keys(appState.selectedBEPGoals).length === 0) {
+               appState.selectedBEPGoals = {};
+            }
+            setView('selectGoals');
         }
 
         function toggleBEPGoal(course, idx, checkbox) {
@@ -576,11 +666,18 @@
             let selectedAny = false;
             Object.values(appState.selectedBEPGoals).forEach(arr => { if (arr.length > 0) selectedAny = true; });
             
-            if (!selectedAny) { alert('Lütfen bu yılın BEP programına eklenecek en az bir amaç seçin.'); return; }
+            if (!selectedAny) { alert('Lütfen plana dahil edilecek en az bir amaç seçin.'); return; }
 
             const bepAreas = [];
             const isPreschool = appState.currentStudent.level === "Ana Sınıfı";
             const db = isPreschool ? PRESCHOOL_DATABASE : PRIMARY_DATABASE;
+            const startD = appState.currentStudent.bepStartDate;
+            const endD = appState.currentStudent.bepEndDate;
+
+            if(!startD || !endD) {
+                alert("Lütfen öğrenci bilgileri ekranından BEP başlangıç ve bitiş tarihlerini belirleyiniz.");
+                return;
+            }
 
             Object.keys(appState.selectedBEPGoals).forEach(course => {
                 const selectedIndices = appState.selectedBEPGoals[course];
@@ -588,9 +685,11 @@
 
                 const courseData = db[course] || { uda: "Genel Beceriler", kdaList: [], methods: "", materials: "" };
                 const selectedKdas = selectedIndices.map(idx => courseData.kdaList[idx]);
-                const dates = distributeDates(selectedKdas.length);
+                
+                const dates = distributeDates(selectedKdas.length, startD, endD);
+                
                 const kdaWithDates = selectedKdas.map((kdaStr, index) => ({
-                    description: kdaStr, startDate: dates[index].start, endDate: dates[index].end
+                    description: kdaStr, startDate: dates[index]?.start || "-", endDate: dates[index]?.end || "-"
                 }));
 
                 let materialsStr = courseData.materials || "Ders materyalleri";
@@ -609,7 +708,9 @@
                 ...appState.currentStudent, 
                 id: isExisting ? appState.currentStudent.id : Date.now(),
                 bep: bepAreas, 
-                evaluations: JSON.parse(JSON.stringify(appState.evaluations)), // Değerlendirmeleri sakla
+                evaluations: JSON.parse(JSON.stringify(appState.evaluations)), 
+                selectedBEPGoals: JSON.parse(JSON.stringify(appState.selectedBEPGoals)),
+                selectedCourses: JSON.parse(JSON.stringify(appState.selectedCourses)),
                 createdAt: isExisting ? appState.currentStudent.createdAt : new Date().toLocaleDateString('tr-TR')
             };
 
@@ -622,12 +723,23 @@
             setView('bepView');
         }
 
+        function startNewStudent() {
+            appState.formError = '';
+            appState.currentStudent = JSON.parse(JSON.stringify(defaultStudentState));
+            appState.evaluations = {};
+            appState.selectedBEPGoals = {};
+            appState.selectedCourses = [];
+            setView('addStudent');
+        }
+
         function editStudent(id) {
             appState.formError = '';
             const std = appState.students.find(s => s.id === id);
             if (std) {
                 appState.currentStudent = JSON.parse(JSON.stringify(std));
                 appState.evaluations = JSON.parse(JSON.stringify(std.evaluations || {}));
+                appState.selectedBEPGoals = JSON.parse(JSON.stringify(std.selectedBEPGoals || {}));
+                appState.selectedCourses = JSON.parse(JSON.stringify(std.selectedCourses || []));
                 setView('addStudent');
             }
         }
@@ -639,11 +751,12 @@
             }
         }
 
-        function startNewStudent() {
-            appState.formError = '';
-            appState.currentStudent = JSON.parse(JSON.stringify(defaultStudentState));
-            appState.evaluations = {};
-            setView('addStudent');
+        function deleteStudentAndGoHome(id) {
+            if(window.confirm('Bu öğrenciyi ve BEP kaydını silmek istediğinize emin misiniz?')) {
+                appState.students = appState.students.filter(s => s.id !== id);
+                appState.generatedBEP = null;
+                setView('dashboard');
+            }
         }
 
         function logout() {
@@ -652,7 +765,178 @@
         }
 
         // ==========================================
-        // 5. RENDER FONKSİYONLARI
+        // 5. HTML YAPI OLUŞTURUCULARI (MEB PDF BİREBİR)
+        // ==========================================
+
+        function buildSingleBEPHtml(studentData, type) {
+            const veli = `${studentData.guardian === "Anne" ? studentData.motherName : studentData.fatherName} ${studentData.guardian === "Anne" ? studentData.motherSurname : studentData.fatherSurname}`;
+            const isDestek = type === "DESTEK";
+            const bepList = isDestek ? studentData.bep.filter(a => studentData.supportRoomCourses.includes(a.area)) : studentData.bep;
+
+            const teacher = `${appState.currentUser.firstName} ${appState.currentUser.lastName} (${appState.currentUser.branch})`;
+
+            return `
+            <div class="WordSection1 w-full bg-white mx-auto print-container print:p-0">
+              
+              <!-- KAPAK / DİKEY BÖLÜM -->
+              <div class="page-portrait">
+                  <div class="text-center mb-6 border-b-2 border-black pb-4 no-break">
+                    <h1 class="text-xl font-bold">${isDestek ? "DESTEK EĞİTİM ODASI " : ""}BİREYSELLEŞTİRİLMİŞ EĞİTİM PROGRAMI (BEP) DOSYASI</h1>
+                    <div class="mt-4 text-left p-4 bg-slate-50 border border-slate-300 rounded shadow-sm inline-block min-w-[300px]">
+                      <p><strong>ÖĞRENCİNİN ADI SOYADI:</strong> ${studentData.firstName} ${studentData.lastName}</p>
+                      <p><strong>OKULU:</strong> ${studentData.schoolName}</p>
+                      <p><strong>NUMARASI:</strong> ${studentData.schoolNo}</p>
+                    </div>
+                  </div>
+
+                  <div class="no-break mt-6">
+                      <h2 class="font-bold bg-slate-200 p-2 border border-black mb-0">I- Öğrenci Bilgileri</h2>
+                      <table>
+                        <tbody>
+                          <tr><td class="w-[35%] font-bold">Adı-Soyadı</td><td class="w-[65%]">${studentData.firstName} ${studentData.lastName}</td></tr>
+                          <tr><td class="font-bold">Sınıfı</td><td>${studentData.level} - ${studentData.className}</td></tr>
+                          <tr><td class="font-bold">Okul Numarası</td><td>${studentData.schoolNo}</td></tr>
+                          <tr><td class="font-bold">Doğum Tarihi</td><td>${new Date(studentData.birthDate).toLocaleDateString('tr-TR')}</td></tr>
+                          <tr><td class="font-bold">İl/İlçe Özel Eğitim Yerleştirme Kararı</td><td>${studentData.decision}</td></tr>
+                          <tr><td class="font-bold">Özel Eğitim İhtiyacına Yönelik Tanı</td><td>${studentData.disability}</td></tr>
+                          <tr><td class="font-bold">Daha önce aldığı destek eğitimleri ve süresi</td><td>${studentData.supportEduHistory || "-"}</td></tr>
+                          <tr><td class="font-bold">Kullandığı destek materyalleri/cihazlar</td><td>${studentData.devices || "-"}</td></tr>
+                          <tr><td class="font-bold">Önemli sağlık bilgileri (alerji, ilaç vb.)</td><td>${studentData.healthInfo || "-"}</td></tr>
+                          <tr><td class="font-bold">Eğitim ortamına ilişkin düzenlemeler</td><td>${studentData.environmentMods || "-"}</td></tr>
+                          <tr><td class="font-bold">BEP Başlangıç Tarihi</td><td>${new Date(studentData.bepStartDate).toLocaleDateString('tr-TR')}</td></tr>
+                          <tr><td class="font-bold">BEP Bitiş Tarihi</td><td>${new Date(studentData.bepEndDate).toLocaleDateString('tr-TR')}</td></tr>
+                        </tbody>
+                      </table>
+                  </div>
+
+                  <div class="no-break mt-6">
+                      <h2 class="font-bold bg-slate-200 p-2 border border-black mb-0">Aile ile İlgili Bilgiler</h2>
+                      <table>
+                        <thead>
+                          <tr>
+                            <th class="w-1/4 bg-white"></th>
+                            <th class="w-1/4">Anne</th>
+                            <th class="w-1/4">Baba</th>
+                            <th class="w-1/4">Veli/Vasi (${studentData.guardian})</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          <tr><td class="font-bold">Adı-Soyadı</td><td>${studentData.motherName} ${studentData.motherSurname}</td><td>${studentData.fatherName} ${studentData.fatherSurname}</td><td class="font-bold">${veli}</td></tr>
+                          <tr><td class="font-bold">Telefon</td><td colspan="3" class="text-center">${studentData.parentPhone || "-"}</td></tr>
+                          <tr><td class="font-bold">Ev Adresi</td><td colspan="3" class="text-center">${studentData.parentAddress || "-"}</td></tr>
+                        </tbody>
+                      </table>
+                  </div>
+
+                  <div class="print-break mt-8">
+                      <h2 class="font-bold bg-slate-200 p-2 border border-black mb-0">II- Eğitsel Performans Formu</h2>
+                      <table>
+                        <thead>
+                          <tr><th class="w-1/3">Gelişim Alanları/Dersler</th><th>Performans Düzeyi (Kaba Değerlendirme Sonucu)</th></tr>
+                        </thead>
+                        <tbody>
+                          ${bepList.length === 0 ? `<tr><td colspan="2" class="text-center py-4">Bu programa dâhil edilen bir hedef bulunmamaktadır.</td></tr>` : bepList.map(area => `
+                            <tr>
+                              <td class="font-bold">${area.area}</td>
+                              <td>Öğrenci bu derste/alanda "${area.uda}" amacını gerçekleştirmede bağımsız değildir. Desteklenmesi gerekmektedir.</td>
+                            </tr>`).join('')}
+                        </tbody>
+                      </table>
+                  </div>
+              </div>
+
+              <!-- BEP PLANI / YATAY BÖLÜM (WordSection2 classı Word'de landscape yapacak, @page css'i tarayıcıda yapacak) -->
+              <div class="WordSection2 page-landscape print-break mt-12">
+                  <h2 class="font-bold bg-slate-200 p-2 border border-black mb-4 text-center">III- BİREYSELLEŞTİRİLMİŞ EĞİTİM PLANI</h2>
+                  ${bepList.map(area => `
+                    <div class="no-break mb-8">
+                      <div class="bg-slate-800 text-white p-2 font-bold mb-0 border border-black">${area.area.toUpperCase()}</div>
+                      <table>
+                        <thead>
+                          <tr>
+                            <th rowspan="2" class="w-[15%]">Uzun Dönemli Amaçlar</th>
+                            <th rowspan="2" class="w-[20%]">Kısa Dönemli Amaçlar</th>
+                            <th rowspan="2" class="w-[8%] text-center">Ölçüt</th>
+                            <th rowspan="2" class="w-[13%]">Yöntem ve Teknik</th>
+                            <th rowspan="2" class="w-[12%]">Kullanılacak Materyaller</th>
+                            <th rowspan="2" class="w-[12%] text-center">Başlama ve Bitiş T.</th>
+                            <th colspan="3" class="w-[20%] text-center">Ölçme-Değerlendirme</th>
+                          </tr>
+                          <tr>
+                            <th class="text-[10px] text-center">Yöntem</th>
+                            <th class="text-[10px] text-center">Tarih</th>
+                            <th class="text-[10px] text-center">Performans</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          ${area.kdaList.map((kda, kIdx) => `
+                            <tr>
+                              ${kIdx===0?`<td rowspan="${area.kdaList.length}" class="align-middle">${area.uda}</td>`:''}
+                              <td>${kda.description}</td>
+                              <td class="text-center align-middle">4/5 (%80)</td>
+                              ${kIdx===0?`<td rowspan="${area.kdaList.length}" class="align-middle">${area.methods}</td><td rowspan="${area.kdaList.length}" class="align-middle">${area.materials}</td>`:''}
+                              <td class="text-center text-[10px] align-middle">${kda.startDate}<br/>-<br/>${kda.endDate}</td>
+                              <td class="text-[10px] text-center align-middle">Gözlem</td>
+                              <td class="text-[10px] text-center align-middle">${kda.endDate}</td>
+                              <td class="text-[10px] text-center align-middle">(+) / (-)</td>
+                            </tr>`).join('')}
+                        </tbody>
+                      </table>
+                    </div>`).join('')}
+              </div>
+
+              <!-- KARARLAR VE İMZALAR / DİKEY BÖLÜM (WordSection1 classı Word'de tekrar dikey yapacak) -->
+              <div class="WordSection1 page-portrait print-break mt-8">
+                 <h2 class="font-bold bg-slate-200 p-2 border border-black mb-4">IV- BEP Geliştirme Birim Kararları</h2>
+                 
+                 <p class="font-bold text-sm mb-1">A. Öğrencinin alacağı okul içi diğer eğitim hizmetleri</p>
+                 <table>
+                   <thead><tr><th>Hizmet Türü</th><th>Gelişim Alanı/Ders</th><th>Haftalık Süre</th><th>Sorumlu Kişi(ler)</th></tr></thead>
+                   <tbody>
+                     ${studentData.usesSupportRoom === "Evet" ? `<tr><td>Destek Eğitim Odası</td><td>${studentData.supportRoomCourses.join(", ")}</td><td>${studentData.supportRoomHours} Saat</td><td>${studentData.supportRoomTeacher || "-"}</td></tr>` : '<tr><td colspan="4" class="text-center py-4">Planlanmamıştır.</td></tr>'}
+                   </tbody>
+                 </table>
+                 
+                 <p class="font-bold text-sm mb-1 mt-6">B. Aile bilgilendirme süreci</p>
+                 <table>
+                   <tbody>
+                     <tr><td class="w-2/3">Aile öğrencinin gelişimi ile ilgili hangi sıklıkla bilgilendirilecek?</td><td class="font-bold">${studentData.familyInfoFrequency}</td></tr>
+                     <tr><td>Aile öğrencinin gelişimi ile ilgili hangi yolla bilgilendirilecek?</td><td class="font-bold">${studentData.familyInfoMethod}</td></tr>
+                     <tr><td>Aile eğitimi yapılacak mı?</td><td class="font-bold">${studentData.familyEducation === "Evet" ? "Evet (X) Hayır ( )" : "Evet ( ) Hayır (X)"}</td></tr>
+                   </tbody>
+                 </table>
+                 
+                 <p class="font-bold text-sm mb-1 mt-6">C. Diğer Kararlar</p>
+                 <div class="mb-6 border border-black p-4 min-h-[80px]">
+                    1. Öğrencinin ilgisini çekecek pekiştireçler kullanılacaktır.<br/>
+                    2. Bir sonraki toplantı tarihi: ${new Date(studentData.bepEndDate).toLocaleDateString('tr-TR')}
+                 </div>
+
+                 <h2 class="font-bold bg-slate-200 p-2 border border-black mb-4 mt-8">V- BEP GELİŞTİRME BİRİM ÜYELERİ</h2>
+                 <table>
+                   <thead>
+                     <tr><th class="w-[30%]">Unvanı</th><th class="w-[40%]">Adı Soyadı</th><th class="w-[30%] text-center">İmza</th></tr>
+                   </thead>
+                   <tbody>
+                     <tr><td class="align-middle py-3">Müdür / Müdür Yrd. (Başkan)</td><td></td><td></td></tr>
+                     <tr><td class="align-middle py-3">Öğrencinin Velisi</td><td class="align-middle font-bold">${veli}</td><td></td></tr>
+                     <tr><td class="align-middle py-3">Sınıf Öğretmeni / BEP Sorumlusu</td><td class="align-middle font-bold">${teacher}</td><td></td></tr>
+                     <tr><td class="align-middle py-3">Rehber Öğretmen / Psikolojik Danışman</td><td></td><td></td></tr>
+                     <tr><td class="align-middle py-3">Alan Öğretmenleri (Varsa)</td><td></td><td></td></tr>
+                   </tbody>
+                 </table>
+
+                 <div class="text-right mt-12 pr-12 font-bold">
+                   <p>Uygundur</p>
+                   <p>..... / ..... / 20...</p>
+                   <p>Okul Müdürü</p>
+                 </div>
+              </div>
+            </div>`;
+        }
+
+        // ==========================================
+        // 6. GÖRÜNÜM RENDER FONKSİYONLARI
         // ==========================================
 
         function renderAuth() {
@@ -690,7 +974,7 @@
                 ${appState.students.map(std => `
                   <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-5 hover:shadow-md transition">
                     <h3 class="text-lg font-bold text-slate-800 mb-2">${std.firstName} ${std.lastName}</h3>
-                    <p class="text-sm text-slate-500 mb-4">${std.tcNo} &bull; ${std.level}</p>
+                    <p class="text-sm text-slate-500 mb-4">${std.tcNo} &bull; Sınıf: ${std.level}-${std.className}</p>
                     <button onclick="appState.generatedBEP = appState.students.find(s=>s.id==${std.id}); setView('bepView');" class="w-full bg-blue-50 text-blue-700 hover:bg-blue-600 hover:text-white py-2 rounded-lg flex items-center justify-center font-medium transition">
                       <i data-lucide="file-text" class="mr-2 w-4 h-4"></i> BEP Dosyasını Aç
                     </button>
@@ -713,6 +997,24 @@
             </div>`;
         }
 
+        function renderProfile() {
+            return `
+            <div class="min-h-screen bg-slate-100 p-6 py-10">
+              <div class="max-w-2xl mx-auto bg-white rounded-xl shadow-lg overflow-hidden">
+                <div class="bg-blue-800 p-6 text-white flex justify-between items-center">
+                  <h2 class="text-xl font-bold flex items-center"><i data-lucide="user" class="mr-2 w-5 h-5"></i> Profil Bilgilerim</h2>
+                  <button onclick="setView('dashboard')" class="text-blue-200 hover:text-white font-medium">İptal / Geri Dön</button>
+                </div>
+                <form onsubmit="handleProfileSave(event)" class="p-8 space-y-6">
+                  <div><label class="block text-sm font-medium text-slate-700 mb-1">Adınız</label><input name="firstName" value="${appState.currentUser.firstName}" required type="text" class="w-full px-3 py-2 border rounded-md" /></div>
+                  <div><label class="block text-sm font-medium text-slate-700 mb-1">Soyadınız</label><input name="lastName" value="${appState.currentUser.lastName}" required type="text" class="w-full px-3 py-2 border rounded-md" /></div>
+                  <div><label class="block text-sm font-medium text-slate-700 mb-1">Branşınız</label><input name="branch" value="${appState.currentUser.branch}" placeholder="Örn: Özel Eğitim Öğretmeni" required type="text" class="w-full px-3 py-2 border rounded-md" /></div>
+                  <div class="pt-4 border-t"><button type="submit" class="w-full bg-blue-600 text-white px-8 py-3 rounded-lg font-bold shadow-md">Profilimi Kaydet</button></div>
+                </form>
+              </div>
+            </div>`;
+        }
+
         function renderAddStudent() {
             const std = appState.currentStudent;
             const isPreschool = std.level === "Ana Sınıfı";
@@ -728,18 +1030,29 @@
                 <form id="studentForm" onsubmit="handleStudentFormSubmit(event)" class="p-8 space-y-8">
                    ${appState.formError ? `<div class="bg-red-50 border-l-4 border-red-500 p-4 text-red-700 font-bold">${appState.formError}</div>` : ''}
                    <div class="grid grid-cols-1 md:grid-cols-3 gap-5">
-                      <div><label class="block text-sm font-medium mb-1">TC Kimlik No</label><input name="tcNo" required value="${std.tcNo}" type="text" maxlength="11" class="w-full px-3 py-2 border rounded-md" /></div>
-                      <div><label class="block text-sm font-medium mb-1">Adı</label><input name="firstName" required value="${std.firstName}" type="text" class="w-full px-3 py-2 border rounded-md" /></div>
-                      <div><label class="block text-sm font-medium mb-1">Soyadı</label><input name="lastName" required value="${std.lastName}" type="text" class="w-full px-3 py-2 border rounded-md" /></div>
+                      <div><label class="block text-sm font-medium mb-1">TC Kimlik No</label><input name="tcNo" required value="${std.tcNo}" type="text" maxlength="11" oninput="this.value = this.value.replace(/[^0-9]/g, '')" class="w-full px-3 py-2 border rounded-md" /></div>
+                      <div><label class="block text-sm font-medium mb-1">Öğrenci Adı</label><input name="firstName" required value="${std.firstName}" type="text" class="w-full px-3 py-2 border rounded-md" /></div>
+                      <div><label class="block text-sm font-medium mb-1">Öğrenci Soyadı</label><input name="lastName" required value="${std.lastName}" type="text" class="w-full px-3 py-2 border rounded-md" /></div>
                       <div>
                         <label class="block text-sm font-medium mb-1">Kademe</label>
-                        <select name="level" required onchange="syncFormState(); appState.currentStudent.level=this.value; renderApp();" class="w-full px-3 py-2 border rounded-md bg-blue-50">
+                        <select name="level" required onchange="syncFormState(); appState.currentStudent.level=this.value; renderApp();" class="w-full px-3 py-2 border rounded-md bg-blue-50 font-bold text-blue-700">
                             ${LEVEL_TYPES.map(l => `<option value="${l}" ${std.level === l ? 'selected' : ''}>${l}</option>`).join('')}
                         </select>
                       </div>
                       <div><label class="block text-sm font-medium mb-1">Doğum Tarihi</label><input name="birthDate" required value="${std.birthDate}" type="date" class="w-full px-3 py-2 border rounded-md" /></div>
                       <div><label class="block text-sm font-medium mb-1">Cinsiyet</label><select name="gender" class="w-full px-3 py-2 border rounded-md">${GENDER_TYPES.map(g=>`<option ${std.gender===g?'selected':''}>${g}</option>`).join('')}</select></div>
+                      <div class="md:col-span-2"><label class="block text-sm font-medium mb-1">Okul Adı</label><input name="schoolName" required value="${std.schoolName}" type="text" class="w-full px-3 py-2 border rounded-md" /></div>
+                      <div><label class="block text-sm font-medium mb-1">Sınıfı</label><input name="className" required value="${std.className}" type="text" class="w-full px-3 py-2 border rounded-md" /></div>
+                      <div><label class="block text-sm font-medium mb-1">Okul No</label><input name="schoolNo" required value="${std.schoolNo}" type="text" oninput="this.value = this.value.replace(/[^0-9]/g, '')" class="w-full px-3 py-2 border rounded-md" /></div>
                    </div>
+
+                   <section class="border-t pt-6 bg-slate-50 p-4 rounded border">
+                     <h3 class="font-bold mb-4 text-blue-900">BEP Takvimi (Cumartesi ve Pazar Günleri Hariç Dağıtılacaktır)</h3>
+                     <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+                       <div><label class="block text-sm font-medium mb-1">BEP Başlangıç Tarihi</label><input name="bepStartDate" required value="${std.bepStartDate}" type="date" class="w-full px-3 py-2 border rounded-md border-blue-300" /></div>
+                       <div><label class="block text-sm font-medium mb-1">BEP Bitiş Tarihi</label><input name="bepEndDate" required value="${std.bepEndDate}" type="date" class="w-full px-3 py-2 border rounded-md border-blue-300" /></div>
+                     </div>
+                   </section>
 
                    <section class="border-t pt-6">
                      <h3 class="font-bold mb-4">Özel Eğitim Bilgileri</h3>
@@ -757,9 +1070,9 @@
                               <div><label class="block text-xs font-bold mb-1">Dersler:</label>
                                 ${AVAILABLE_COURSES.map(c=>`<label class="block text-xs"><input type="checkbox" name="supportRoomCourses" value="${c}" ${std.supportRoomCourses.includes(c)?'checked':''}> ${c}</label>`).join('')}
                               </div>
-                              <div>
-                                <label class="block text-xs font-bold mb-1">Sorumlu Öğretmen:</label>
-                                <input name="supportRoomTeacher" value="${std.supportRoomTeacher}" class="w-full text-xs p-1 border rounded" />
+                              <div class="space-y-3">
+                                <div><label class="block text-xs font-bold mb-1">Haftalık Saat:</label><select name="supportRoomHours" class="w-full p-1 border rounded text-xs">${[1,2,3,4,5,6,7,8,9,10].map(h=>`<option value="${h}" ${std.supportRoomHours==h?'selected':''}>${h} Saat</option>`).join('')}</select></div>
+                                <div><label class="block text-xs font-bold mb-1">Sorumlu Öğretmen:</label><input name="supportRoomTeacher" value="${std.supportRoomTeacher}" class="w-full text-xs p-1 border rounded" /></div>
                               </div>
                             </div>
                           `:''}
@@ -771,7 +1084,7 @@
                    <section class="border-t pt-6">
                      <h3 class="font-bold mb-4">Aile Bilgilendirme Süreci</h3>
                      <div class="grid grid-cols-1 md:grid-cols-3 gap-5">
-                       <div><label class="block text-sm font-medium">Sıklık</label><select name="familyInfoFrequency" class="w-full p-2 border rounded"><option ${std.familyInfoFrequency==='Ayda Bir'?'selected':''}>Ayda Bir</option><option ${std.familyInfoFrequency==='Dönemde Bir'?'selected':''}>Dönemde Bir</option></select></div>
+                       <div><label class="block text-sm font-medium">Sıklık</label><select name="familyInfoFrequency" class="w-full p-2 border rounded"><option ${std.familyInfoFrequency==='Ayda Bir'?'selected':''}>Ayda Bir</option><option ${std.familyInfoFrequency==='Dönemde Bir'?'selected':''}>Dönemde Bir</option><option ${std.familyInfoFrequency==='Haftada Bir'?'selected':''}>Haftada Bir</option></select></div>
                        <div><label class="block text-sm font-medium">Yöntem</label><select name="familyInfoMethod" class="w-full p-2 border rounded"><option ${std.familyInfoMethod==='Yüz Yüze Görüşme'?'selected':''}>Yüz Yüze Görüşme</option><option ${std.familyInfoMethod==='Telefon İletişimi'?'selected':''}>Telefon İletişimi</option></select></div>
                        <div><label class="block text-sm font-medium">Aile Eğitimi</label><select name="familyEducation" class="w-full p-2 border rounded"><option value="Evet" ${std.familyEducation==='Evet'?'selected':''}>Evet</option><option value="Hayır" ${std.familyEducation==='Hayır'?'selected':''}>Hayır</option></select></div>
                      </div>
@@ -780,8 +1093,8 @@
                    <section class="border-t pt-6">
                      <h3 class="font-bold mb-4">Aile Bilgileri</h3>
                      <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
-                        <input name="motherName" required value="${std.motherName}" placeholder="Anne Adı" class="w-full p-2 border rounded" />
-                        <input name="fatherName" required value="${std.fatherName}" placeholder="Baba Adı" class="w-full p-2 border rounded" />
+                        <div class="flex gap-2"><input name="motherName" required value="${std.motherName}" placeholder="Anne Adı" class="w-1/2 p-2 border rounded" /><input name="motherSurname" required value="${std.motherSurname}" placeholder="Soyadı" class="w-1/2 p-2 border rounded" /></div>
+                        <div class="flex gap-2"><input name="fatherName" required value="${std.fatherName}" placeholder="Baba Adı" class="w-1/2 p-2 border rounded" /><input name="fatherSurname" required value="${std.fatherSurname}" placeholder="Soyadı" class="w-1/2 p-2 border rounded" /></div>
                         <label class="flex items-center"><input type="radio" name="guardian" value="Anne" ${std.guardian==='Anne'?'checked':''}> Veli Anne</label>
                         <label class="flex items-center"><input type="radio" name="guardian" value="Baba" ${std.guardian==='Baba'?'checked':''}> Veli Baba</label>
                      </div>
@@ -798,20 +1111,24 @@
         function renderSelectCourses() {
             const isPreschool = appState.currentStudent.level === "Ana Sınıfı";
             const AVAILABLE_COURSES = isPreschool ? PRESCHOOL_COURSES : PRIMARY_COURSES;
+            const coursesString = AVAILABLE_COURSES.join(',');
             return `
             <div class="min-h-screen bg-slate-100 p-6 py-10">
               <div class="max-w-4xl mx-auto bg-white rounded-xl shadow-lg p-8">
-                <h2 class="text-xl font-bold mb-6">Aşama 2: Değerlendirilecek Dersleri Seçin</h2>
+                <div class="flex justify-between items-center mb-6">
+                  <h2 class="text-xl font-bold">Aşama 2: Değerlendirilecek Dersleri Seçin</h2>
+                  <button onclick="selectAllCourses('${coursesString}')" class="bg-teal-100 text-teal-800 px-3 py-1 rounded font-bold text-sm">Hepsini Seç</button>
+                </div>
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                   ${AVAILABLE_COURSES.map(course => `
                     <label class="flex items-center p-4 border rounded-lg cursor-pointer ${appState.selectedCourses.includes(course)?'bg-teal-50 border-teal-500':''}">
-                      <input type="checkbox" id="course_${course}" onchange="toggleCourse('${course}')" class="w-5 h-5 mr-3" ${appState.selectedCourses.includes(course)?'checked':''} />
+                      <input type="checkbox" id="course_${course.replace(/\s+/g, '_')}" onchange="toggleCourse('${course}')" class="w-5 h-5 mr-3" ${appState.selectedCourses.includes(course)?'checked':''} />
                       <span>${course}</span>
                     </label>`).join('')}
                 </div>
                 <div class="mt-10 flex justify-between items-center border-t pt-6">
-                  <button onclick="setView('addStudent')" class="text-slate-500">Geri Dön</button>
-                  <button onclick="handleCourseSelectionSubmit()" class="bg-teal-600 text-white px-8 py-3 rounded-lg font-bold">Değerlendir</button>
+                  <button onclick="setView('addStudent')" class="text-slate-500 font-bold">Geri Dön</button>
+                  <button onclick="handleCourseSelectionSubmit()" class="bg-teal-600 text-white px-8 py-3 rounded-lg font-bold shadow-md">Değerlendirmeye Başla</button>
                 </div>
               </div>
             </div>`;
@@ -824,35 +1141,40 @@
                 const data = db[course] || { kdaList: [] };
                 const evals = appState.evaluations[course] || {};
                 const rows = data.kdaList.map((kda, idx) => `
-                    <tr>
+                    <tr class="hover:bg-slate-50">
                       <td>${idx + 1}</td>
                       <td>${kda}</td>
-                      <td class="text-center"><input type="radio" name="eval_${course.replace(/\s/g,'')}_${idx}" value="Evet" ${evals[idx]==='Evet'?'checked':''} onchange="handleEvalChange('${course}', ${idx}, 'Evet')" /></td>
-                      <td class="text-center"><input type="radio" name="eval_${course.replace(/\s/g,'')}_${idx}" value="Hayır" ${evals[idx]==='Hayır'?'checked':''} onchange="handleEvalChange('${course}', ${idx}, 'Hayır')" /></td>
-                      <td class="text-center"><input type="radio" name="eval_${course.replace(/\s/g,'')}_${idx}" value="Gözlem Yapılamadı" ${evals[idx]==='Gözlem Yapılamadı'?'checked':''} onchange="handleEvalChange('${course}', ${idx}, 'Gözlem Yapılamadı')" /></td>
+                      <td class="text-center bg-green-50/20"><input type="radio" name="eval_${course.replace(/\s+/g,'')}_${idx}" value="Evet" ${evals[idx]==='Evet'?'checked':''} onchange="handleEvalChange('${course}', ${idx}, 'Evet')" /></td>
+                      <td class="text-center bg-red-50/20"><input type="radio" name="eval_${course.replace(/\s+/g,'')}_${idx}" value="Hayır" ${evals[idx]==='Hayır'?'checked':''} onchange="handleEvalChange('${course}', ${idx}, 'Hayır')" /></td>
+                      <td class="text-center bg-slate-50"><input type="radio" name="eval_${course.replace(/\s+/g,'')}_${idx}" value="Gözlem Yapılamadı" ${evals[idx]==='Gözlem Yapılamadı'?'checked':''} onchange="handleEvalChange('${course}', ${idx}, 'Gözlem Yapılamadı')" /></td>
                     </tr>`).join('');
 
                 return `
                 <div class="mb-10 no-break">
-                  <div class="bg-slate-200 p-4 font-bold flex justify-between items-center hide-on-print">
-                    <span>${course}</span>
-                    <button type="button" onclick="setAllEvals('${course}', 'Hayır')" class="bg-red-500 text-white px-2 py-1 text-xs rounded">Tümünü Hayır Yap</button>
+                  <div class="bg-slate-200 p-4 font-bold flex flex-col md:flex-row justify-between items-start md:items-center gap-2 hide-on-print">
+                    <span class="text-lg">${course}</span>
+                    <div class="flex gap-2">
+                      <button type="button" onclick="setAllEvals('${course}', 'Evet')" class="bg-green-600 text-white px-3 py-1 text-xs rounded font-bold">Tümünü Evet Seç</button>
+                      <button type="button" onclick="setAllEvals('${course}', 'Hayır')" class="bg-red-600 text-white px-3 py-1 text-xs rounded font-bold">Tümünü Hayır Seç</button>
+                    </div>
                   </div>
                   <h3 class="hidden print:block text-center font-bold mb-2">${course.toUpperCase()} KABA DEĞERLENDİRME FORMU</h3>
-                  <table>
-                    <thead class="bg-slate-50"><tr><th>No</th><th>Hedef Davranış</th><th class="w-16">Evet</th><th class="w-16">Hayır</th><th class="w-16">Gözlem</th></tr></thead>
-                    <tbody>${rows}</tbody>
-                  </table>
+                  <div class="overflow-x-auto">
+                    <table>
+                      <thead class="bg-slate-50"><tr><th class="w-12">No</th><th>Hedef Davranış</th><th class="w-16">Evet</th><th class="w-16">Hayır</th><th class="w-28 text-xs">Gözlem Yapılamadı</th></tr></thead>
+                      <tbody>${rows}</tbody>
+                    </table>
+                  </div>
                 </div>`;
             }).join('');
 
             return `
             <div class="min-h-screen bg-slate-100 p-6 py-10 print:bg-white print:p-0">
-              <div class="max-w-5xl mx-auto mb-4 flex justify-between items-center hide-on-print bg-white p-4 rounded-lg shadow-sm">
-                <button onclick="setView('selectCourses')" class="text-blue-600 font-bold">Geri Dön</button>
+              <div class="max-w-5xl mx-auto mb-4 flex justify-between items-center hide-on-print bg-white p-4 rounded-lg shadow-sm border border-slate-200">
+                <button onclick="setView('selectCourses')" class="text-blue-600 font-bold flex items-center"><i data-lucide="arrow-left" class="mr-1 w-4 h-4"></i> Geri Dön</button>
                 <div class="flex gap-2">
-                  <button onclick="window.print()" class="bg-slate-700 text-white px-4 py-2 rounded">Yazdır / PDF</button>
-                  <button onclick="handleAssessmentSubmit()" class="bg-indigo-600 text-white px-4 py-2 rounded">BEP Amaçlarını Seç</button>
+                  <button onclick="window.print()" class="bg-slate-700 text-white px-4 py-2 rounded font-bold shadow-sm">Yazdır / PDF</button>
+                  <button onclick="handleAssessmentSubmit()" class="bg-indigo-600 text-white px-6 py-2 rounded font-bold shadow-md hover:bg-indigo-700">Bep İçin Amaç Seç</button>
                 </div>
               </div>
               <div class="max-w-5xl mx-auto bg-white rounded-xl shadow-lg p-8 print:p-0 print:shadow-none print-container">${coursesHtml}</div>
@@ -872,36 +1194,37 @@
 
                 html += `
                 <div class="border rounded-lg mb-6 overflow-hidden">
-                  <div class="bg-emerald-50 p-3 font-bold">${course} - BEP'e Alınacakları Seçin</div>
+                  <div class="bg-emerald-50 p-3 font-bold border-b border-emerald-100">${course} - BEP'e Dahil Edilecekler</div>
                   <div class="p-4 space-y-2">
                     ${hIndices.map(idx => `
-                      <label class="flex items-start p-2 border rounded hover:bg-slate-50 cursor-pointer">
-                        <input type="checkbox" class="mt-1 mr-3" onchange="toggleBEPGoal('${course}', ${idx}, this)" />
-                        <span>${data.kdaList[idx]}</span>
+                      <label class="flex items-start p-3 border border-slate-100 rounded hover:bg-slate-50 cursor-pointer transition">
+                        <input type="checkbox" class="mt-1 mr-4 w-5 h-5 text-emerald-600 rounded" ${ (appState.selectedBEPGoals[course]||[]).includes(idx) ? 'checked' : '' } onchange="toggleBEPGoal('${course}', ${idx}, this)" />
+                        <span class="text-slate-700">${data.kdaList[idx]}</span>
                       </label>`).join('')}
                   </div>
                 </div>`;
             });
 
+            const emptyMsg = '<div class="text-center p-20 bg-slate-50 rounded-lg border-2 border-dashed"><p class="text-slate-400 font-medium">BEP\'e alınacak beceri bulunamadı.<br/>Lütfen kaba değerlendirmede öğrencinin yapamadığı kazanımları işaretleyiniz.</p></div>';
+
             return `
             <div class="min-h-screen bg-slate-100 p-6 py-10">
-              <div class="max-w-4xl mx-auto bg-white rounded-xl shadow-lg p-8">
-                <div class="flex justify-between items-center mb-6">
-                  <h2 class="text-xl font-bold">Aşama 4: BEP Amaçlarını Onayla</h2>
-                  <button onclick="selectAllListedGoals()" class="bg-emerald-100 text-emerald-800 px-3 py-1 rounded text-sm font-bold">Tümünü Seç</button>
+              <div class="max-w-4xl mx-auto bg-white rounded-xl shadow-lg p-8 border border-slate-200">
+                <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-8 gap-4">
+                  <div>
+                    <h2 class="text-2xl font-bold text-slate-800">Aşama 4: BEP'i Tamamla</h2>
+                    <p class="text-slate-500 text-sm">Hayır işaretli kazanımlardan hangilerinin plana ekleneceğini onaylayın.</p>
+                  </div>
+                  <button onclick="selectAllListedGoals()" class="bg-emerald-100 text-emerald-800 px-4 py-2 rounded font-bold hover:bg-emerald-200 transition">Hepsini Seç</button>
                 </div>
-                ${html || '<p class="text-center p-10 text-slate-400">BEP\'e alınacak beceri bulunamadı (Tüm değerlendirmeler Evet işaretlenmiş).</p>'}
-                <div class="mt-8 flex justify-between border-t pt-6">
-                  <button onclick="setView('assessment')" class="text-slate-500">Geri Dön</button>
-                  <button onclick="handleGoalSelectionSubmit()" class="bg-emerald-600 text-white px-8 py-3 rounded-lg font-bold">BEP Dosyasını Oluştur</button>
+                ${html || emptyMsg}
+                <div class="mt-10 flex justify-between items-center border-t pt-8">
+                  <button onclick="setView('assessment')" class="text-slate-500 font-bold">Değerlendirmeye Dön</button>
+                  <button onclick="handleGoalSelectionSubmit()" class="bg-emerald-600 text-white px-10 py-4 rounded-xl font-bold text-lg shadow-xl hover:bg-emerald-700 transition transform hover:scale-105">BEP OLUŞTUR</button>
                 </div>
               </div>
             </div>`;
         }
-
-        // ==========================================
-        // 6. ÖBÖA VE DEĞERLENDİRME FORMLARI MANTIĞI
-        // ==========================================
 
         function buildEvaluationFormsHtml(studentData) {
             const teacher = `${appState.currentUser.firstName} ${appState.currentUser.lastName}`;
@@ -909,153 +1232,254 @@
             const forms = studentData.bep.map(area => {
                 const rows = area.kdaList.map(kda => `
                     <tr>
-                      <td class="text-sm">${kda.description}</td>
+                      <td class="text-sm p-3">${kda.description}</td>
                       <td class="text-center text-xs">3/4 (%80)</td>
-                      <td class="text-center border-l-2"></td><td class="text-center"></td><td class="text-center"></td><td class="text-center"></td><td class="text-center border-r-2"></td>
+                      <td class="border-l-2"></td><td></td><td></td><td></td><td class="border-r-2"></td>
                     </tr>`).join('');
 
                 return `
-                <div class="no-break mb-12">
-                  <div class="text-center mb-4 border-b-2 border-black pb-2">
-                    <h2 class="text-lg font-bold">${area.area.toUpperCase()} ÖLÇÜT BAĞIMLI ÖLÇÜ ARACI</h2>
+                <div class="print-break mb-12">
+                  <div class="text-center mb-6 border-b-2 border-black pb-4">
+                    <h2 class="text-xl font-bold">${area.area.toUpperCase()} ÖLÇÜT BAĞIMLI ÖLÇÜ ARACI (ÖBÖA)</h2>
+                    <p class="text-sm text-slate-600">Öğrenci İzleme ve Gelişim Formu</p>
                   </div>
                   
-                  <div class="grid grid-cols-2 gap-4 text-xs mb-4">
+                  <div class="grid grid-cols-2 gap-8 text-sm mb-6 border p-4 rounded bg-slate-50 no-break">
                     <div><strong>Öğrenci:</strong> ${studentData.firstName} ${studentData.lastName}</div>
+                    <div><strong>Sınıfı / No:</strong> ${studentData.level} - ${studentData.className} / ${studentData.schoolNo}</div>
                     <div><strong>Uygulayıcı:</strong> ${teacher}</div>
+                    <div><strong>BEP Dönemi:</strong> ${new Date(studentData.bepStartDate).toLocaleDateString('tr-TR')} - ${new Date(studentData.bepEndDate).toLocaleDateString('tr-TR')}</div>
                   </div>
 
-                  <p class="bg-slate-100 p-2 text-xs font-bold mb-1">UDA: ${area.uda}</p>
+                  <p class="bg-slate-800 text-white p-3 font-bold mb-1 no-break">UDA: ${area.uda}</p>
                   
                   <table>
                     <thead>
                       <tr>
-                        <th rowspan="2" class="text-left">Kısa Dönemli Amaçlar (KDA) / Alt Basamaklar</th>
-                        <th rowspan="2" class="w-16 text-center">Ölçüt</th>
-                        <th colspan="5" class="text-center">Değerlendirme Tarihleri</th>
+                        <th rowspan="2" class="text-left bg-slate-200">Kısa Dönemli Amaçlar (KDA)</th>
+                        <th rowspan="2" class="w-20 text-center bg-slate-200">Ölçüt</th>
+                        <th colspan="5" class="text-center bg-slate-300">Değerlendirme Tarihleri</th>
                       </tr>
-                      <tr>
-                        <th class="w-20 text-center text-[8px]">.../.../20...</th>
-                        <th class="w-20 text-center text-[8px]">.../.../20...</th>
-                        <th class="w-20 text-center text-[8px]">.../.../20...</th>
-                        <th class="w-20 text-center text-[8px]">.../.../20...</th>
-                        <th class="w-20 text-center text-[8px]">.../.../20...</th>
+                      <tr class="bg-slate-100">
+                        <th class="w-24 text-center text-[10px]">.../.../20...</th>
+                        <th class="w-24 text-center text-[10px]">.../.../20...</th>
+                        <th class="w-24 text-center text-[10px]">.../.../20...</th>
+                        <th class="w-24 text-center text-[10px]">.../.../20...</th>
+                        <th class="w-24 text-center text-[10px]">.../.../20...</th>
                       </tr>
                     </thead>
                     <tbody>${rows}</tbody>
                   </table>
                   
-                  <div class="mt-2 text-[10px] italic text-slate-600">
-                    * Kısaltmalar: B (Bağımsız), Sİ (Sözel İpucu), MY (Model Olma), FY (Fiziksel Yardım)
+                  <div class="mt-4 p-4 border rounded bg-indigo-50 text-[11px] text-indigo-900 leading-relaxed no-break">
+                    <strong>Puanlama Anahtarı:</strong> Değerlendirme sırasında kazanılan beceri basamağına <strong>(+)</strong>, henüz kazanılamayanlara <strong>(-)</strong> yazınız.<br/>
+                    <strong>İpucu Kısaltmaları:</strong> B (Bağımsız), Sİ (Sözel İpucu), MY (Model Olma), FY (Fiziksel Yardım)
                   </div>
                 </div>`;
             }).join('');
 
-            return `
-            <div class="w-full bg-white mx-auto print-container">
-              <div class="text-center mb-10 hide-on-print">
-                <span class="bg-indigo-100 text-indigo-800 px-4 py-1 rounded-full text-sm font-bold">Öğrenci İzleme ve Değerlendirme Formları</span>
-              </div>
-              ${forms}
-            </div>`;
-        }
-
-        function buildSingleBEPHtml(studentData, type) {
-            const { startDate, endDate } = getSchoolDates();
-            const veli = studentData.guardian === "Anne" ? studentData.motherName : studentData.fatherName;
-            const isDestek = type === "DESTEK";
-            const bepList = isDestek ? studentData.bep.filter(a => studentData.supportRoomCourses.includes(a.area)) : studentData.bep;
-
-            const teacher = `${appState.currentUser.firstName} ${appState.currentUser.lastName} (${appState.currentUser.branch})`;
-
-            return `
-            <div class="w-full bg-white mx-auto print-container print:p-0">
-              <div class="text-center mb-6 border-b-2 border-black pb-4">
-                <h1 class="text-lg font-bold">${isDestek ? "DESTEK EĞİTİM ODASI " : ""}BİREYSELLEŞTİRİLMİŞ EĞİTİM PROGRAMI (BEP) DOSYASI</h1>
-              </div>
-
-              <h2 class="font-bold bg-slate-200 p-1 mb-2">Öğrenci Bilgileri</h2>
-              <table>
-                <tbody>
-                  <tr><td class="w-1/3 font-bold">Adı-Soyadı</td><td class="w-2/3">${studentData.firstName} ${studentData.lastName}</td></tr>
-                  <tr><td class="font-bold">Tanı / Karar</td><td>${studentData.disability} / ${studentData.decision}</td></tr>
-                  <tr><td class="font-bold">Eğitim Ortamı Düzenlemeleri</td><td>${studentData.environmentMods || "-"}</td></tr>
-                  <tr><td class="font-bold">BEP Dönemi</td><td>${startDate.toLocaleDateString('tr-TR')} - ${endDate.toLocaleDateString('tr-TR')}</td></tr>
-                </tbody>
-              </table>
-
-              <h2 class="font-bold bg-slate-200 p-1 mb-2 mt-4 print-break">BİREYSELLEŞTİRİLMİŞ EĞİTİM PLANI (KAZANIMLAR)</h2>
-              ${bepList.map(area => `
-                <div class="no-break mb-8">
-                  <div class="bg-slate-800 text-white p-2 font-bold mb-1">${area.area.toUpperCase()}</div>
-                  <table>
-                    <thead>
-                      <tr>
-                        <th class="w-[20%]">UDA</th><th class="w-[25%]">KDA</th><th class="w-[10%]">Ölçüt</th><th class="w-[15%]">Yöntem/Teknik</th><th class="w-[15%]">Materyaller</th><th class="w-[15%]">Tarih</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      ${area.kdaList.map((kda, kIdx) => `
-                        <tr>
-                          ${kIdx===0?`<td rowspan="${area.kdaList.length}">${area.uda}</td>`:''}
-                          <td>${kda.description}</td>
-                          <td class="text-center">%80</td>
-                          ${kIdx===0?`<td rowspan="${area.kdaList.length}">${area.methods}</td><td rowspan="${area.kdaList.length}">${area.materials}</td>`:''}
-                          <td class="text-center text-[10px]">${kda.startDate}<br/>${kda.endDate}</td>
-                        </tr>`).join('')}
-                    </tbody>
-                  </table>
-                </div>`).join('')}
-
-              <div class="print-break mt-4">
-                 <h2 class="font-bold bg-slate-200 p-1 mb-2">BEP Geliştirme Birim Kararları</h2>
-                 <table>
-                   <thead><tr><th>Hizmet Türü</th><th>Ders</th><th>Haftalık Süre</th><th>Sorumlu</th></tr></thead>
-                   <tbody>
-                     ${studentData.usesSupportRoom === "Evet" ? `<tr><td>Destek Eğitim</td><td>${studentData.supportRoomCourses.join(", ")}</td><td>${studentData.supportRoomHours} Saat</td><td>${studentData.supportRoomTeacher || "-"}</td></tr>` : '<tr><td colspan="4" class="text-center">Planlanmamıştır.</td></tr>'}
-                   </tbody>
-                 </table>
-                 <p class="text-sm"><strong>Aile Bilgilendirme:</strong> ${studentData.familyInfoFrequency} / ${studentData.familyInfoMethod} / Eğitim: ${studentData.familyEducation}</p>
-                 <div class="text-center mt-12">
-                    <h3 class="font-bold">İMZALAR</h3>
-                    <div class="grid grid-cols-3 gap-8 mt-10 text-xs">
-                      <div>Müdür Yard.<br/>(Başkan)</div><div>Öğrenci Velisi<br/>(${veli})</div><div>Sınıf Öğretmeni<br/>(${teacher})</div>
-                    </div>
-                 </div>
-              </div>
-            </div>`;
+            return `<div class="w-full bg-white mx-auto print-container">${forms}</div>`;
         }
 
         function renderBEP() {
             const std = appState.generatedBEP;
             if (!std) return '';
-            let destek = (std.usesSupportRoom === "Evet" && std.supportRoomCourses.length > 0) ? `<div class="print-break mt-10 pt-10 border-t-4 border-dashed border-slate-300">${buildSingleBEPHtml(std, "DESTEK")}</div>` : '';
+            
+            const veli = `${std.guardian === "Anne" ? std.motherName : std.fatherName} ${std.guardian === "Anne" ? std.motherSurname : std.fatherSurname}`;
+            const teacher = `${appState.currentUser.firstName} ${appState.currentUser.lastName} (${appState.currentUser.branch})`;
+
+            const renderBEPPart = (bepList, titleSuffix) => {
+                if (bepList.length === 0) return '';
+                return `
+                <div class="w-full bg-white mx-auto print-container print:p-0">
+                  
+                  <!-- DİKEY BÖLÜM (Kapak ve Performans) -->
+                  <div class="page-portrait">
+                      <div class="text-center mb-6 border-b-2 border-black pb-4 no-break">
+                        <h1 class="text-xl font-bold">${titleSuffix}BİREYSELLEŞTİRİLMİŞ EĞİTİM PROGRAMI (BEP) DOSYASI</h1>
+                      </div>
+
+                      <div class="no-break">
+                          <h2 class="font-bold bg-slate-200 p-2 border border-black mb-0">I- Öğrenci Bilgileri</h2>
+                          <table class="!border-collapse !border-black">
+                            <tbody>
+                              <tr><td class="w-[30%] font-bold">Adı-Soyadı</td><td class="w-[70%]">${std.firstName} ${std.lastName}</td></tr>
+                              <tr><td class="font-bold">Okul / No / Sınıf</td><td>${std.schoolName} / ${std.schoolNo} / ${std.level} - ${std.className}</td></tr>
+                              <tr><td class="font-bold">Doğum Tarihi</td><td>${new Date(std.birthDate).toLocaleDateString('tr-TR')}</td></tr>
+                              <tr><td class="font-bold">Tanı / Karar</td><td>${std.disability} / ${std.decision}</td></tr>
+                              <tr><td class="font-bold">Eğitim Ortamı Düzenlemeleri</td><td>${std.environmentMods || "-"}</td></tr>
+                              <tr><td class="font-bold">BEP Dönemi</td><td>${new Date(std.bepStartDate).toLocaleDateString('tr-TR')} - ${new Date(std.bepEndDate).toLocaleDateString('tr-TR')}</td></tr>
+                            </tbody>
+                          </table>
+                      </div>
+
+                      <div class="no-break mt-4">
+                          <h2 class="font-bold bg-slate-200 p-2 border border-black mb-0">Aile İle İlgili Bilgiler</h2>
+                          <table class="!border-collapse !border-black">
+                            <thead>
+                              <tr>
+                                <th class="w-1/4"></th><th class="w-1/4">Anne</th><th class="w-1/4">Baba</th><th class="w-1/4">Veli/Vasi (${std.guardian})</th>
+                              </tr>
+                            </thead>
+                            <tbody>
+                              <tr><td class="font-bold">Adı-Soyadı</td><td>${std.motherName} ${std.motherSurname}</td><td>${std.fatherName} ${std.fatherSurname}</td><td class="font-bold">${veli}</td></tr>
+                              <tr><td class="font-bold">Telefon</td><td colspan="3" class="text-center">${std.parentPhone || "-"}</td></tr>
+                              <tr><td class="font-bold">Ev Adresi</td><td colspan="3" class="text-center">${std.parentAddress || "-"}</td></tr>
+                            </tbody>
+                          </table>
+                      </div>
+
+                      <div class="print-break mt-4">
+                          <h2 class="font-bold bg-slate-200 p-2 border border-black mb-0">II- Eğitsel Performans Formu</h2>
+                          <table class="!border-collapse !border-black">
+                            <thead>
+                              <tr><th class="w-1/3">Gelişim Alanları/Dersler</th><th>Performans Düzeyi (Kaba Değerlendirme Sonucu)</th></tr>
+                            </thead>
+                            <tbody>
+                              ${bepList.map(area => `
+                                <tr>
+                                  <td class="font-bold">${area.area}</td>
+                                  <td>Öğrenci bu derste/alanda "${area.uda}" amacını gerçekleştirmede bağımsız değildir. Desteklenmesi gerekmektedir.</td>
+                                </tr>`).join('')}
+                            </tbody>
+                          </table>
+                      </div>
+                  </div>
+
+                  <!-- YATAY BÖLÜM (BEP Planı) -->
+                  <div class="WordSection2 page-landscape print-break mt-8">
+                      <h2 class="font-bold bg-slate-200 p-2 border border-black mb-4 text-center">III- BİREYSELLEŞTİRİLMİŞ EĞİTİM PLANI</h2>
+                      ${bepList.map(area => `
+                        <div class="no-break mb-8">
+                          <div class="bg-slate-800 text-white p-2 font-bold border border-black border-b-0">${area.area.toUpperCase()}</div>
+                          <table class="!border-collapse !border-black">
+                            <thead>
+                              <tr>
+                                <th rowspan="2" class="w-[15%]">Uzun Dönemli Amaçlar</th>
+                                <th rowspan="2" class="w-[20%]">Kısa Dönemli Amaçlar</th>
+                                <th rowspan="2" class="w-[8%] text-center">Ölçüt</th>
+                                <th rowspan="2" class="w-[15%]">Yöntem ve Teknik</th>
+                                <th rowspan="2" class="w-[15%]">Kullanılacak Materyaller</th>
+                                <th rowspan="2" class="w-[12%] text-center">Başlama ve Bitiş Trh.</th>
+                                <th colspan="3" class="w-[15%] text-center">Ölçme-Değerlendirme</th>
+                              </tr>
+                              <tr>
+                                <th class="text-[10px] text-center">Yöntem</th><th class="text-[10px] text-center">Tarih</th><th class="text-[10px] text-center">Perf.</th>
+                              </tr>
+                            </thead>
+                            <tbody>
+                              ${area.kdaList.map((kda, kIdx) => `
+                                <tr>
+                                  ${kIdx===0?`<td rowspan="${area.kdaList.length}" class="align-middle">${area.uda}</td>`:''}
+                                  <td>${kda.description}</td>
+                                  <td class="text-center align-middle">4/5 (%80)</td>
+                                  ${kIdx===0?`<td rowspan="${area.kdaList.length}" class="align-middle">${area.methods}</td><td rowspan="${area.kdaList.length}" class="align-middle">${area.materials}</td>`:''}
+                                  <td class="text-center text-[10px] align-middle">${kda.startDate}<br/>-<br/>${kda.endDate}</td>
+                                  <td class="text-[10px] text-center align-middle">Gözlem</td><td class="text-[10px] text-center align-middle">${kda.endDate}</td><td class="text-[10px] text-center align-middle">(+) / (-)</td>
+                                </tr>`).join('')}
+                            </tbody>
+                          </table>
+                        </div>`).join('')}
+                  </div>
+
+                  <!-- DİKEY BÖLÜM 2 (Kararlar ve İmzalar) -->
+                  <div class="WordSection1 page-portrait print-break mt-8">
+                     <h2 class="font-bold bg-slate-200 p-2 border border-black mb-4">IV- BEP Geliştirme Birim Kararları</h2>
+                     
+                     <p class="font-bold text-sm mb-1">A. Öğrencinin alacağı okul içi diğer eğitim hizmetleri</p>
+                     <table class="!border-collapse !border-black">
+                       <thead><tr><th>Hizmet Türü</th><th>Ders / Alan</th><th>Haftalık Süre</th><th>Sorumlu Kişi</th></tr></thead>
+                       <tbody>
+                         ${std.usesSupportRoom === "Evet" ? `<tr><td>Destek Eğitim Odası</td><td>${std.supportRoomCourses.join(", ")}</td><td>${std.supportRoomHours} Saat</td><td>${std.supportRoomTeacher || "-"}</td></tr>` : '<tr><td colspan="4" class="text-center py-4">Planlanmamıştır.</td></tr>'}
+                       </tbody>
+                     </table>
+                     
+                     <p class="font-bold text-sm mb-1 mt-6">B. Aile bilgilendirme süreci</p>
+                     <table class="!border-collapse !border-black">
+                       <tbody>
+                         <tr><td class="w-2/3">Aile öğrencinin gelişimi ile ilgili hangi sıklıkla bilgilendirilecek?</td><td class="font-bold">${std.familyInfoFrequency}</td></tr>
+                         <tr><td>Aile öğrencinin gelişimi ile ilgili hangi yolla bilgilendirilecek?</td><td class="font-bold">${std.familyInfoMethod}</td></tr>
+                         <tr><td>Aile eğitimi yapılacak mı?</td><td class="font-bold">${std.familyEducation === "Evet" ? "Evet (X) Hayır ( )" : "Evet ( ) Hayır (X)"}</td></tr>
+                       </tbody>
+                     </table>
+
+                     <p class="font-bold text-sm mb-1 mt-6">C. Diğer Kararlar</p>
+                     <div class="mb-6 border border-black p-4 min-h-[60px]">
+                        1. Öğrencinin ilgisini çekecek pekiştireçler kullanılacaktır.<br/>
+                        2. Bir sonraki toplantı tarihi: ${new Date(std.bepEndDate).toLocaleDateString('tr-TR')}
+                     </div>
+
+                     <h2 class="font-bold bg-slate-200 p-2 border border-black mb-4 mt-8">V- BEP GELİŞTİRME BİRİM ÜYELERİ</h2>
+                     <table class="text-center !border-collapse !border-black">
+                       <thead>
+                         <tr><th class="w-[30%]">Unvanı</th><th class="w-[40%]">Adı Soyadı</th><th class="w-[30%] text-center">İmza</th></tr>
+                       </thead>
+                       <tbody>
+                         <tr><td class="align-middle py-3">Müdür / Müdür Yrd. (Başkan)</td><td></td><td></td></tr>
+                         <tr><td class="align-middle py-3">Öğrencinin Velisi</td><td class="align-middle font-bold">${veli}</td><td></td></tr>
+                         <tr><td class="align-middle py-3">Sınıf Öğretmeni / BEP Sorumlusu</td><td class="align-middle font-bold">${teacher}</td><td></td></tr>
+                         <tr><td class="align-middle py-3">Rehber Öğretmen / Psikolojik Danışman</td><td></td><td></td></tr>
+                         <tr><td class="align-middle py-3">Alan Öğretmenleri (Varsa)</td><td></td><td></td></tr>
+                       </tbody>
+                     </table>
+
+                     <div class="text-right mt-12 pr-12 font-bold">
+                       <p>Uygundur</p>
+                       <p>..... / ..... / 20...</p>
+                       <p>Okul Müdürü</p>
+                     </div>
+                  </div>
+                </div>`;
+            };
+
+            const anaBEP = renderBEPPart(std.bep, "");
+            const destekBEPList = std.bep.filter(a => std.supportRoomCourses.includes(a.area));
+            const destekBEP = (std.usesSupportRoom === "Evet" && destekBEPList.length > 0) 
+              ? `<div class="print-break mt-10 pt-10 border-t-4 border-dashed border-slate-300 hide-on-print"><p class="text-center text-slate-400 font-bold mb-4 uppercase">AŞAĞIDAKİ BÖLÜM "DESTEK EĞİTİM ODASI" İÇİN AYRI BİR DOSYADIR</p></div>${renderBEPPart(destekBEPList, "DESTEK EĞİTİM ODASI ")}` 
+              : '';
+            
+            const fileName = `${std.firstName}_${std.lastName}_BEP_Dosyasi.docx`;
 
             return `
-            <div class="min-h-screen bg-slate-200 p-8 print:p-0 print:bg-white flex flex-col items-center text-[12px]">
-              <div class="w-full max-w-[210mm] mb-4 flex justify-between hide-on-print bg-white p-4 rounded-lg shadow-sm">
-                <button onclick="setView('dashboard')" class="text-blue-600 font-bold flex items-center"><i data-lucide="arrow-left" class="mr-1 w-4 h-4"></i> Panele Dön</button>
+            <div class="min-h-screen bg-slate-200 p-8 print:p-0 print:bg-white flex flex-col items-center">
+              <div class="w-full max-w-[210mm] mb-6 flex flex-col md:flex-row justify-between hide-on-print bg-white p-4 rounded-xl shadow-md border border-slate-300 gap-4">
                 <div class="flex gap-2">
-                  <button onclick="setView('evalFormsView')" class="bg-indigo-100 text-indigo-700 px-4 py-2 rounded font-bold hover:bg-indigo-200">Değerlendirme Formları</button>
-                  <button onclick="exportHTMLToWord('bep-wrapper')" class="bg-blue-800 text-white px-4 py-2 rounded">Word'e Aktar</button>
-                  <button onclick="window.print()" class="bg-slate-800 text-white px-4 py-2 rounded">Yazdır / PDF Al</button>
+                    <button onclick="setView('dashboard')" class="text-blue-700 font-bold flex items-center bg-blue-50 px-4 py-2 rounded-lg hover:bg-blue-100 transition"><i data-lucide="arrow-left" class="mr-2 w-5 h-5"></i> Panele Dön</button>
+                    <button onclick="editStudent(${std.id})" class="text-slate-600 font-bold flex items-center bg-slate-100 px-4 py-2 rounded-lg hover:bg-slate-200 transition"><i data-lucide="edit" class="mr-2 w-4 h-4"></i> Düzenle</button>
+                    <button onclick="deleteStudentAndGoHome(${std.id})" class="text-red-600 font-bold flex items-center bg-red-50 px-4 py-2 rounded-lg hover:bg-red-100 transition"><i data-lucide="trash-2" class="mr-2 w-4 h-4"></i> Sil</button>
+                </div>
+                <div class="flex gap-3">
+                  <button onclick="setView('evalFormsView')" class="bg-indigo-600 text-white px-5 py-2 rounded-lg font-bold shadow-sm hover:bg-indigo-700">Değerlendirme Formları (ÖBÖA)</button>
+                  <button onclick="exportHTMLToExcel('bep-wrapper', '${std.firstName}_${std.lastName}_BEP.xls')" class="bg-green-700 text-white px-5 py-2 rounded-lg font-bold hover:bg-green-800">Excel'e Aktar</button>
+                  <button onclick="exportHTMLToWord('bep-wrapper', '${fileName}')" class="bg-slate-700 text-white px-5 py-2 rounded-lg font-bold hover:bg-slate-800">Word'e Aktar</button>
+                  <button onclick="window.print()" class="bg-blue-800 text-white px-6 py-2 rounded-lg flex items-center font-bold shadow-lg hover:bg-blue-900 transition">
+                    <i data-lucide="printer" class="mr-2 w-5 h-5"></i> Yazdır / PDF
+                  </button>
                 </div>
               </div>
-              <div id="bep-wrapper" class="w-full print:p-0">${buildSingleBEPHtml(std, "ANA")}${destek}</div>
+              <div id="bep-wrapper" class="w-full print:p-0">${anaBEP}${destekBEP}</div>
             </div>`;
         }
 
         function renderEvalForms() {
             const std = appState.generatedBEP;
             if (!std) return '';
+            const fileName = `${std.firstName}_${std.lastName}_Degerlendirme_Formlari.docx`;
 
             return `
-            <div class="min-h-screen bg-slate-200 p-8 print:p-0 print:bg-white flex flex-col items-center text-[12px]">
-              <div class="w-full max-w-[210mm] mb-4 flex justify-between hide-on-print bg-white p-4 rounded-lg shadow-sm">
-                <button onclick="setView('bepView')" class="text-blue-600 font-bold flex items-center"><i data-lucide="arrow-left" class="mr-1 w-4 h-4"></i> BEP'e Dön</button>
+            <div class="min-h-screen bg-slate-200 p-8 print:p-0 print:bg-white flex flex-col items-center">
+              <div class="w-full max-w-[210mm] mb-6 flex justify-between hide-on-print bg-white p-4 rounded-xl shadow-md border border-slate-300">
                 <div class="flex gap-2">
-                  <button onclick="exportHTMLToWord('eval-wrapper', 'Degerlendirme_Formlari.doc')" class="bg-blue-800 text-white px-4 py-2 rounded">Word'e Aktar</button>
-                  <button onclick="window.print()" class="bg-slate-800 text-white px-4 py-2 rounded">Yazdır / PDF Al</button>
+                    <button onclick="setView('bepView')" class="text-blue-700 font-bold flex items-center bg-blue-50 px-4 py-2 rounded-lg"><i data-lucide="arrow-left" class="mr-2 w-5 h-5"></i> BEP Dosyasına Dön</button>
+                    <button onclick="editStudent(${std.id})" class="text-slate-600 font-bold flex items-center bg-slate-100 px-4 py-2 rounded-lg hover:bg-slate-200 transition"><i data-lucide="edit" class="mr-2 w-4 h-4"></i> Düzenle</button>
+                    <button onclick="deleteStudentAndGoHome(${std.id})" class="text-red-600 font-bold flex items-center bg-red-50 px-4 py-2 rounded-lg hover:bg-red-100 transition"><i data-lucide="trash-2" class="mr-2 w-4 h-4"></i> Sil</button>
+                </div>
+                <div class="flex gap-2">
+                  <button onclick="exportHTMLToExcel('eval-wrapper', '${std.firstName}_${std.lastName}_OBOA.xls')" class="bg-green-700 text-white px-5 py-2 rounded-lg font-bold hover:bg-green-800">Excel'e Aktar</button>
+                  <button onclick="exportHTMLToWord('eval-wrapper', '${fileName}')" class="bg-slate-700 text-white px-5 py-2 rounded-lg font-bold">Word'e Aktar</button>
+                  <button onclick="window.print()" class="bg-blue-800 text-white px-6 py-2 rounded-lg flex items-center font-bold">
+                    <i data-lucide="printer" class="mr-2 w-5 h-5"></i> Yazdır / PDF
+                  </button>
                 </div>
               </div>
               <div id="eval-wrapper" class="w-full print:p-0">${buildEvaluationFormsHtml(std)}</div>
