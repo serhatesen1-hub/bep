@@ -31,7 +31,6 @@
     --color-amber-50: oklch(98.7% 0.022 95.277);
     --color-amber-100: oklch(96.2% 0.059 95.617);
     --color-amber-300: oklch(87.9% 0.169 91.605);
-    --color-amber-700: oklch(55.5% 0.163 48.998);
     --color-amber-800: oklch(47.3% 0.137 46.201);
     --color-amber-900: oklch(41.4% 0.112 45.904);
     --color-green-600: oklch(62.7% 0.194 149.214);
@@ -50,6 +49,7 @@
     --color-teal-300: oklch(85.5% 0.138 181.071);
     --color-teal-500: oklch(70.4% 0.14 182.503);
     --color-teal-600: oklch(60% 0.118 184.704);
+    --color-teal-700: oklch(51.1% 0.096 186.391);
     --color-teal-800: oklch(43.7% 0.078 188.216);
     --color-blue-50: oklch(97% 0.014 254.604);
     --color-blue-100: oklch(93.2% 0.032 255.585);
@@ -319,9 +319,6 @@
   .mb-8 {
     margin-bottom: calc(var(--spacing) * 8);
   }
-  .ml-auto {
-    margin-left: auto;
-  }
   .block {
     display: block;
   }
@@ -498,9 +495,6 @@
   }
   .border-emerald-100 {
     border-color: var(--color-emerald-100);
-  }
-  .border-emerald-200 {
-    border-color: var(--color-emerald-200);
   }
   .border-emerald-400 {
     border-color: var(--color-emerald-400);
@@ -699,9 +693,6 @@
     --tw-font-weight: var(--font-weight-normal);
     font-weight: var(--font-weight-normal);
   }
-  .text-amber-700 {
-    color: var(--color-amber-700);
-  }
   .text-amber-800 {
     color: var(--color-amber-800);
   }
@@ -722,9 +713,6 @@
   }
   .text-emerald-600 {
     color: var(--color-emerald-600);
-  }
-  .text-emerald-700 {
-    color: var(--color-emerald-700);
   }
   .text-emerald-800 {
     color: var(--color-emerald-800);
@@ -832,6 +820,9 @@
     }
     .hover\:bg-slate-800:hover {
       background-color: var(--color-slate-800);
+    }
+    .hover\:bg-teal-700:hover {
+      background-color: var(--color-teal-700);
     }
     .hover\:text-white:hover {
       color: var(--color-white);
@@ -1086,7 +1077,7 @@
 </style>
     <script id="iconShim">
 (function () {
-  var ICONS = {"arrow-left": "<path d=\"M19 12H5\"/><path d=\"m12 19-7-7 7-7\"/>", "user": "<path d=\"M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2\"/><circle cx=\"12\" cy=\"7\" r=\"4\"/>", "users": "<path d=\"M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2\"/><circle cx=\"9\" cy=\"7\" r=\"4\"/><path d=\"M22 21v-2a4 4 0 0 0-3-3.87\"/><path d=\"M16 3.13a4 4 0 0 1 0 7.75\"/>", "trash-2": "<path d=\"M3 6h18\"/><path d=\"M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6\"/><path d=\"M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2\"/><path d=\"M10 11v6\"/><path d=\"M14 11v6\"/>", "edit": "<path d=\"M12 3H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7\"/><path d=\"M18.4 2.6a2.1 2.1 0 0 1 3 3L12 15l-4 1 1-4Z\"/>", "printer": "<path d=\"M6 9V2h12v7\"/><path d=\"M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2\"/><rect x=\"6\" y=\"14\" width=\"12\" height=\"8\"/>", "lock": "<rect x=\"3\" y=\"11\" width=\"18\" height=\"11\" rx=\"2\"/><path d=\"M7 11V7a5 5 0 0 1 10 0v4\"/>", "info": "<circle cx=\"12\" cy=\"12\" r=\"10\"/><path d=\"M12 16v-4\"/><path d=\"M12 8h.01\"/>", "file-text": "<path d=\"M15 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7z\"/><path d=\"M14 2v4a2 2 0 0 0 2 2h4\"/><path d=\"M10 9H8\"/><path d=\"M16 13H8\"/><path d=\"M16 17H8\"/>", "book-open": "<path d=\"M12 7v14\"/><path d=\"M3 18a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1h5a4 4 0 0 1 4 4 4 4 0 0 1 4-4h5a1 1 0 0 1 1 1v13a1 1 0 0 1-1 1h-6a3 3 0 0 0-3 3 3 3 0 0 0-3-3z\"/>", "plus": "<path d=\"M5 12h14\"/><path d=\"M12 5v14\"/>", "search": "<circle cx=\"11\" cy=\"11\" r=\"8\"/><path d=\"m21 21-4.3-4.3\"/>", "download": "<path d=\"M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4\"/><path d=\"m7 10 5 5 5-5\"/><path d=\"M12 15V3\"/>", "upload": "<path d=\"M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4\"/><path d=\"m17 8-5-5-5 5\"/><path d=\"M12 3v12\"/>", "shield-check": "<path d=\"M20 13c0 5-3.5 7.5-7.66 8.95a1 1 0 0 1-.67-.01C7.5 20.5 4 18 4 13V6a1 1 0 0 1 1-1c2 0 4.5-1.2 6.24-2.72a1.17 1.17 0 0 1 1.52 0C14.51 3.81 17 5 19 5a1 1 0 0 1 1 1z\"/><path d=\"m9 12 2 2 4-4\"/>", "sliders-horizontal": "<path d=\"M21 4h-7\"/><path d=\"M10 4H3\"/><path d=\"M21 12h-9\"/><path d=\"M8 12H3\"/><path d=\"M21 20h-5\"/><path d=\"M12 20H3\"/><path d=\"M14 2v4\"/><path d=\"M8 10v4\"/><path d=\"M16 18v4\"/>", "x": "<path d=\"M18 6 6 18\"/><path d=\"m6 6 12 12\"/>"};
+  var ICONS = {"arrow-left": "<path d=\"M19 12H5\"/><path d=\"m12 19-7-7 7-7\"/>", "user": "<path d=\"M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2\"/><circle cx=\"12\" cy=\"7\" r=\"4\"/>", "users": "<path d=\"M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2\"/><circle cx=\"9\" cy=\"7\" r=\"4\"/><path d=\"M22 21v-2a4 4 0 0 0-3-3.87\"/><path d=\"M16 3.13a4 4 0 0 1 0 7.75\"/>", "trash-2": "<path d=\"M3 6h18\"/><path d=\"M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6\"/><path d=\"M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2\"/><path d=\"M10 11v6\"/><path d=\"M14 11v6\"/>", "edit": "<path d=\"M12 3H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7\"/><path d=\"M18.4 2.6a2.1 2.1 0 0 1 3 3L12 15l-4 1 1-4Z\"/>", "printer": "<path d=\"M6 9V2h12v7\"/><path d=\"M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2\"/><rect x=\"6\" y=\"14\" width=\"12\" height=\"8\"/>", "lock": "<rect x=\"3\" y=\"11\" width=\"18\" height=\"11\" rx=\"2\"/><path d=\"M7 11V7a5 5 0 0 1 10 0v4\"/>", "info": "<circle cx=\"12\" cy=\"12\" r=\"10\"/><path d=\"M12 16v-4\"/><path d=\"M12 8h.01\"/>", "file-text": "<path d=\"M15 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7z\"/><path d=\"M14 2v4a2 2 0 0 0 2 2h4\"/><path d=\"M10 9H8\"/><path d=\"M16 13H8\"/><path d=\"M16 17H8\"/>", "book-open": "<path d=\"M12 7v14\"/><path d=\"M3 18a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1h5a4 4 0 0 1 4 4 4 4 0 0 1 4-4h5a1 1 0 0 1 1 1v13a1 1 0 0 1-1 1h-6a3 3 0 0 0-3 3 3 3 0 0 0-3-3z\"/>", "plus": "<path d=\"M5 12h14\"/><path d=\"M12 5v14\"/>", "search": "<circle cx=\"11\" cy=\"11\" r=\"8\"/><path d=\"m21 21-4.3-4.3\"/>", "download": "<path d=\"M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4\"/><path d=\"m7 10 5 5 5-5\"/><path d=\"M12 15V3\"/>", "upload": "<path d=\"M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4\"/><path d=\"m17 8-5-5-5 5\"/><path d=\"M12 3v12\"/>", "shield-check": "<path d=\"M20 13c0 5-3.5 7.5-7.66 8.95a1 1 0 0 1-.67-.01C7.5 20.5 4 18 4 13V6a1 1 0 0 1 1-1c2 0 4.5-1.2 6.24-2.72a1.17 1.17 0 0 1 1.52 0C14.51 3.81 17 5 19 5a1 1 0 0 1 1 1z\"/><path d=\"m9 12 2 2 4-4\"/>", "sliders-horizontal": "<path d=\"M21 4h-7\"/><path d=\"M10 4H3\"/><path d=\"M21 12h-9\"/><path d=\"M8 12H3\"/><path d=\"M21 20h-5\"/><path d=\"M12 20H3\"/><path d=\"M14 2v4\"/><path d=\"M8 10v4\"/><path d=\"M16 18v4\"/>", "clipboard-check": "<rect x=\"8\" y=\"2\" width=\"8\" height=\"4\" rx=\"1\" ry=\"1\"/><path d=\"M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2\"/><path d=\"m9 14 2 2 4-4\"/>", "x": "<path d=\"M18 6 6 18\"/><path d=\"m6 6 12 12\"/>"};
   window.lucide = { createIcons: function () {
     document.querySelectorAll('i[data-lucide]').forEach(function (el) {
       var p = ICONS[el.getAttribute('data-lucide')];
@@ -1234,6 +1225,26 @@
             #root .min-h-screen.p-6 { padding: 12px; }
         }
         @media print { .toast, .fab, .appbar { display: none !important; } body { background: #fff; } }
+    </style>
+    <style id="uiCss2">
+        .mgoal { border-top: 1px solid var(--line); padding: 16px 0; }
+        .mgoal:first-of-type { border-top: 0; padding-top: 8px; }
+        .mgoal-text { margin: 0 0 12px; font-weight: 600; line-height: 1.5; }
+        .mgrid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 12px; }
+        @media (min-width: 640px) { .mgrid { grid-template-columns: repeat(4, 1fr); } }
+        .mresult { display: flex; align-items: center; gap: 14px; flex-wrap: wrap; }
+        .seg { display: inline-flex; border: 1px solid #cfd6e8; border-radius: 12px; overflow: hidden; }
+        .seg-opt { position: relative; cursor: pointer; }
+        .seg-opt input { position: absolute; opacity: 0; width: 1px !important; height: 1px !important; min-height: 0 !important; }
+        .seg-opt span { display: block; padding: 11px 22px; font-weight: 700; font-size: 15px; background: #fff; color: var(--muted); min-width: 120px; text-align: center; }
+        .seg-opt.ok input:checked + span { background: #d9f3ea; color: #0b6a49; }
+        .seg-opt.no input:checked + span { background: #ffe5e5; color: #b42323; }
+        .seg-opt + .seg-opt span { border-left: 1px solid #cfd6e8; }
+        .seg-opt input:focus-visible + span { outline: 3px solid var(--brand-200); outline-offset: -3px; }
+        .btn-link { background: none; border: 0; color: var(--brand-600); font-weight: 600; padding: 8px; }
+        .actionbar { position: fixed; left: 0; right: 0; bottom: 0; z-index: 40; padding: 12px 16px calc(12px + env(safe-area-inset-bottom)); background: rgba(255,255,255,.95); backdrop-filter: blur(8px); border-top: 1px solid var(--line); }
+        .actionbar .btn { max-width: 680px; margin: 0 auto; display: flex; }
+        @media print { .actionbar { display: none !important; } }
     </style>
     <style id="docCss">
         /* ---- BELGE STİLLERİ (BEP / ÖBÖA / kaba değerlendirme) ----
@@ -1610,23 +1621,21 @@
             if (std.level === 'Ana Sınıfı' || !std.grade) return esc(`${std.level}${sube}`);
             return esc(`${std.level}, ${std.grade}. Sınıf${sube}`);
         }
-        function courseBadge(course) {
-            const d = courseDb(appState.currentStudent)[course];
-            return d && d.official
-                ? '<span class="ml-auto text-xs font-bold text-emerald-700">Resmî program</span>'
-                : '<span class="ml-auto text-xs font-bold text-amber-700">Doğrulanmamış</span>';
-        }
+        function courseBadge(course) { return ''; }
         function courseNotice() {
             const st = appState.currentStudent;
-            return officialFor(st)
-                ? `<div class="mb-4 p-3 rounded bg-emerald-50 border border-emerald-200 text-sm text-emerald-900">${st.level === 'Ana Sınıfı' ? 'Ana sınıfı' : esc(st.level) + ' ' + esc(st.grade) + '. sınıf'} kazanımları MEB öğretim programlarından aynen alınmıştır; kaynaklar BEP dosyasında yazılır. "Doğrulanmamış" etiketli dersler henüz resmî kaynakla doğrulanmadı.</div>`
-                : `<div class="mb-4 p-3 rounded bg-amber-50 border border-amber-300 text-sm text-amber-900"><strong>Dikkat:</strong> Bu kademe/sınıf için resmî kazanım listesi henüz eklenmedi. Aşağıdaki listeler resmî kaynakla doğrulanmamıştır; kullanmadan önce ilgili öğretim programıyla karşılaştırın.</div>`;
+            return officialFor(st) ? '' : `<div class="mb-4 p-3 rounded bg-amber-50 border border-amber-300 text-sm text-amber-900"><strong>Dikkat:</strong> Bu kademe/sınıf için resmî kazanım listesi henüz eklenmedi. Listeler genel örnektir; kullanmadan önce ilgili öğretim programıyla karşılaştırın.</div>`;
+        }
+        function stripCode(area, text) {
+            const t = String(text || '');
+            const codes = (area && area.official && area.official.codes) || [];
+            for (const c of codes) { if (t.startsWith(c + ' ')) return t.slice(c.length + 1); }
+            return t;
         }
         function perfText(area) {
-            if (area.official && area.official.codes && area.official.codes.length) {
-                return `Öğrenci bu ${area.official.grade ? 'derste ' + esc(area.official.grade) + '. sınıf öğretim programındaki öğrenme çıktılarından' : 'alanda okul öncesi eğitim programındaki kazanımlardan'} ${esc(area.official.codes.join(', '))} kodlu olanları gerçekleştirmede bağımsız değildir. Desteklenmesi gerekmektedir.`;
-            }
-            return `Öğrenci bu derste/alanda "${esc(area.uda)}" amacını gerçekleştirmede bağımsız değildir. Desteklenmesi gerekmektedir.`;
+            const items = (area.kdaList || []).map(k => stripCode(area, k.description));
+            const intro = `Öğrenci bu ${area.official && area.official.grade ? 'derste' : 'alanda'} aşağıdaki öğrenme çıktılarını/becerileri gerçekleştirmede bağımsız değildir; desteklenmesi gerekmektedir:`;
+            return esc(intro) + '<br>' + items.map(t => '&bull; ' + esc(t)).join('<br>');
         }
 
         // ==========================================
@@ -1998,7 +2007,7 @@ div.WordSection2 { page: WordSection2; }
             id: null, tcNo: '', firstName: '', lastName: '', gender: GENDER_TYPES[0], level: LEVEL_TYPES[1], 
             birthDate: '', schoolName: '', schoolNo: '', className: '', motherName: '', fatherName: '', 
             motherSurname: '', fatherSurname: '',
-            bepStartDate: todayStr, bepEndDate: futureDateStr, criterion: '4/5 (%80)', grade: 1, specialTeacher1: '', specialTeacher2: '', counselor: '', principalName: '',
+            bepStartDate: todayStr, bepEndDate: futureDateStr, criterion: '4/5 (%80)', grade: 1, specialTeacher1: '', specialTeacher2: '', classTeacher1: '', classTeacher2: '', counselor: '', principalName: '',
             guardian: GUARDIAN_TYPES[0], decision: DECISION_TYPES[0], disability: DISABILITY_TYPES[0],
             supportEduHistory: '', currentSupportEdu: '', devices: '', healthInfo: '', environmentMods: '',
             parentPhone: '', parentAddress: '', parentWorkAddress: '',
@@ -2059,7 +2068,7 @@ div.WordSection2 { page: WordSection2; }
                 usesSupportRoom: fd.get('usesSupportRoom') || 'Hayır',
                 supportRoomHours: parseInt(fd.get('supportRoomHours') || 2), supportRoomTeacher: fd.get('supportRoomTeacher') || '',
                 supportEduHistory: fd.get('supportEduHistory') || '', healthInfo: fd.get('healthInfo') || '',
-                environmentMods: fd.get('environmentMods') || '', devices: fd.get('devices') || '', specialTeacher1: fd.has('specialTeacher1') ? fd.get('specialTeacher1') : (appState.currentStudent.specialTeacher1 || ''), specialTeacher2: fd.has('specialTeacher2') ? fd.get('specialTeacher2') : (appState.currentStudent.specialTeacher2 || ''), counselor: fd.get('counselor') || '', principalName: fd.get('principalName') || '',
+                environmentMods: fd.get('environmentMods') || '', devices: fd.get('devices') || '', specialTeacher1: fd.has('specialTeacher1') ? fd.get('specialTeacher1') : (appState.currentStudent.specialTeacher1 || ''), specialTeacher2: fd.has('specialTeacher2') ? fd.get('specialTeacher2') : (appState.currentStudent.specialTeacher2 || ''), classTeacher1: fd.has('classTeacher1') ? fd.get('classTeacher1') : (appState.currentStudent.classTeacher1 || ''), classTeacher2: fd.has('classTeacher2') ? fd.get('classTeacher2') : (appState.currentStudent.classTeacher2 || ''), counselor: fd.get('counselor') || '', principalName: fd.get('principalName') || '',
                 criterion: fd.get('criterion') || '4/5 (%80)', grade: fd.has('grade') ? (parseInt(fd.get('grade')) || '') : (appState.currentStudent.grade || ''),
                 motherName: fd.get('motherName') || '', motherSurname: fd.get('motherSurname') || '',
                 fatherName: fd.get('fatherName') || '', fatherSurname: fd.get('fatherSurname') || '',
@@ -2248,9 +2257,16 @@ div.WordSection2 { page: WordSection2; }
                 
                 const dates = distributeDates(selectedKdas.length, startD, endD);
                 
-                const kdaWithDates = selectedKdas.map((kdaStr, index) => ({
-                    description: kdaStr, startDate: dates[index]?.start || "-", endDate: dates[index]?.end || "-"
-                }));
+                const prevArea = ((appState.students.find(x => x.id === appState.currentStudent.id) || {}).bep || []).find(a => a.area === course);
+                const kdaWithDates = selectedKdas.map((kdaStr, index) => {
+                    const prev = prevArea && (prevArea.kdaList || []).find(k => k.description === kdaStr);
+                    return {
+                        description: kdaStr,
+                        startDate: prev ? (prev.startDate || '') : '', endDate: prev ? (prev.endDate || '') : '',
+                        measureMethod: prev ? (prev.measureMethod || 'Gözlem') : 'Gözlem',
+                        measureDate: prev ? (prev.measureDate || '') : '', result: prev ? (prev.result || '') : ''
+                    };
+                });
 
                 let materialsStr = courseData.materials || "Ders materyalleri";
                 if (ACADEMIC_COURSES.includes(course) && !materialsStr.toLowerCase().includes("ders kitabı")) {
@@ -2529,6 +2545,7 @@ div.WordSection2 { page: WordSection2; }
                     </dl>
                     <div class="student-actions">
                       <button class="btn primary grow" onclick="openBEP(${id})"><i data-lucide="file-text" class="ic"></i> BEP'i aç</button>
+                      <button class="iconbtn soft" onclick="openMeasure(${id})" aria-label="Ölçme değerlendirme" title="Ölçme değerlendirme"><i data-lucide="clipboard-check" class="ic"></i></button>
                       <button class="iconbtn soft" onclick="editStudent(${id})" aria-label="Düzenle"><i data-lucide="edit" class="ic"></i></button>
                       <button class="iconbtn soft danger" onclick="deleteStudent(${id})" aria-label="Sil"><i data-lucide="trash-2" class="ic"></i></button>
                     </div>
@@ -2660,7 +2677,7 @@ div.WordSection2 { page: WordSection2; }
                   <h2 class="card-title">Tehlikeli bölge</h2>
                   <button class="btn danger" onclick="clearAllData()">Tüm verileri sil</button>
                 </section>
-                <p class="version">BEP Hazırlama Sistemi · v2.0</p>
+                <p class="version">BEP Hazırlama Sistemi · v2.1</p>
               </main>
             </div>`;
         }
@@ -2764,11 +2781,14 @@ div.WordSection2 { page: WordSection2; }
 
                    <section class="border-t pt-6">
                      <h3 class="font-bold mb-1">BEP Geliştirme Birimi</h3>
-                     <p class="text-xs text-slate-500 mb-4">Adlar BEP dosyasının imza bölümüne otomatik yazılır. Tam zamanlı kaynaştırmada özel eğitim öğretmeni, özel eğitim sınıfında sınıf öğretmeni/BEP sorumlusu satırı yer almaz.</p>
+                     <p class="text-xs text-slate-500 mb-4">Adlar BEP dosyasının imza bölümüne otomatik yazılır. Tam zamanlı kaynaştırmada sınıf öğretmeni (en fazla 2), özel eğitim sınıfında ise özel eğitim öğretmenleri imza bölümünde yer alır.</p>
                      <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
                        ${!std.decision.includes('Kaynaştırma') ? `
                        <div><label class="block text-sm font-medium mb-1">Özel Eğitim Öğretmeni 1</label><input name="specialTeacher1" value="${esc(std.specialTeacher1)}" class="w-full px-3 py-2 border rounded-md" /></div>
                        <div><label class="block text-sm font-medium mb-1">Özel Eğitim Öğretmeni 2</label><input name="specialTeacher2" value="${esc(std.specialTeacher2)}" class="w-full px-3 py-2 border rounded-md" /></div>` : ''}
+                       ${std.decision.includes('Kaynaştırma') ? `
+                       <div><label class="block text-sm font-medium mb-1">Sınıf Öğretmeni 1 (BEP Sorumlusu)</label><input name="classTeacher1" value="${esc(std.classTeacher1)}" class="w-full px-3 py-2 border rounded-md" /></div>
+                       <div><label class="block text-sm font-medium mb-1">Sınıf Öğretmeni 2 (varsa)</label><input name="classTeacher2" value="${esc(std.classTeacher2)}" class="w-full px-3 py-2 border rounded-md" /></div>` : ''}
                        <div><label class="block text-sm font-medium mb-1">Rehber Öğretmen / Psikolojik Danışman</label><input name="counselor" value="${esc(std.counselor)}" class="w-full px-3 py-2 border rounded-md" /></div>
                        <div><label class="block text-sm font-medium mb-1">Okul Müdürü (onay imzası için)</label><input name="principalName" value="${esc(std.principalName)}" class="w-full px-3 py-2 border rounded-md" /></div>
                      </div>
@@ -2838,7 +2858,6 @@ div.WordSection2 { page: WordSection2; }
                       <button type="button" onclick="setAllEvals('${course}', 'Hayır')" class="bg-red-600 text-white px-3 py-1 text-xs rounded font-bold">Tümünü Hayır Seç</button>
                     </div>
                   </div>
-                  <div class="hide-on-print text-xs px-4 py-2 mb-2 ${data.official ? 'bg-emerald-50 text-emerald-900' : 'bg-amber-50 text-amber-900'}">${data.official ? 'Kaynak: ' + srcText : '<strong>Doğrulanmamış liste:</strong> bu ders için resmî kaynak doğrulaması yapılmadı.'}</div>
                   <div class="print-only">
                     <h2 class="doc-title">${esc(course.toLocaleUpperCase('tr-TR'))} KABA DEĞERLENDİRME FORMU</h2>
                     <table>
@@ -2848,7 +2867,6 @@ div.WordSection2 { page: WordSection2; }
                         <tr><td class="k">Okulu / Sınıfı / No</td><td>${esc(std.schoolName)} / ${classLabel(std)} / ${esc(std.schoolNo)}</td></tr>
                         <tr><td class="k">Değerlendiren</td><td>${evaluator}</td></tr>
                         <tr><td class="k">Tarih</td><td>${today}</td></tr>
-                        <tr><td class="k">Kazanım kaynağı</td><td>${srcText}</td></tr>
                       </tbody>
                     </table>
                   </div>
@@ -2937,7 +2955,11 @@ div.WordSection2 { page: WordSection2; }
             const sigRows = [
                 sigRow('Müdür / Müdür Yrd. (Başkan)', ''),
                 sigRow('Öğrencinin Velisi', `<strong>${veli}</strong>`),
-                ...(inclusion ? [sigRow('Sınıf Öğretmeni / BEP Sorumlusu', `<strong>${teacher}</strong>`)] : []),
+                ...(inclusion ? (() => {
+                    const names = [std.classTeacher1, std.classTeacher2].filter(n => n && String(n).trim());
+                    if (!names.length) return [sigRow('Sınıf Öğretmeni / BEP Sorumlusu', `<strong>${teacher}</strong>`)];
+                    return names.map((n, i) => sigRow(i === 0 ? 'Sınıf Öğretmeni / BEP Sorumlusu' : 'Sınıf Öğretmeni', `<strong>${esc(n)}</strong>`));
+                })() : []),
                 ...(!inclusion ? [sigRow('Özel Eğitim Öğretmeni', `<strong>${esc(std.specialTeacher1)}</strong>`), sigRow('Özel Eğitim Öğretmeni', `<strong>${esc(std.specialTeacher2)}</strong>`)] : []),
                 sigRow('Rehber Öğretmen / Psikolojik Danışman', `<strong>${esc(std.counselor)}</strong>`),
                 sigRow('Alan Öğretmenleri (Varsa)', '')
@@ -2986,7 +3008,6 @@ div.WordSection2 { page: WordSection2; }
                   ${bepList.map(area => `<tr><td class="k">${esc(area.area)}</td><td>${perfText(area)}</td></tr>`).join('')}
                 </tbody>
               </table>
-              <div class="note sm">${srcNote}</div>
             </div>`;
 
             // Her tablo en çok 8 satır: rowspan'lı satırlar sayfa sonunda bölünüp çerçeveyi kaydırmasın
@@ -3011,11 +3032,11 @@ div.WordSection2 { page: WordSection2; }
                       ${rows.map((kda, k) => `
                       <tr>
                         ${k === 0 ? `<td rowspan="${rows.length}">${esc(area.uda)}</td>` : ''}
-                        <td>${esc(kda.description)}</td>
+                        <td>${esc(stripCode(area, kda.description))}</td>
                         <td class="c">${crit}</td>
                         ${k === 0 ? `<td rowspan="${rows.length}">${esc(area.methods)}</td><td rowspan="${rows.length}">${esc(area.materials)}</td>` : ''}
-                        <td class="c sm">${esc(kda.startDate)}<br>-<br>${esc(kda.endDate)}</td>
-                        <td class="c sm">Gözlem</td><td class="c sm">${esc(kda.endDate)}</td><td class="c sm">(+) / (-)</td>
+                        <td class="c sm">${rangeText(kda.startDate, kda.endDate)}</td>
+                        <td class="c sm">${esc(kda.measureMethod || 'Gözlem')}</td><td class="c sm">${showDate(kda.measureDate)}</td><td class="c sm">${resultText(kda.result)}</td>
                       </tr>`).join('')}
                     </tbody>
                   </table>
@@ -3087,7 +3108,7 @@ div.WordSection2 { page: WordSection2; }
             return std.bep.map((area, ai) => {
                 const rows = area.kdaList.map(kda => `
                   <tr>
-                    <td>${esc(kda.description)}</td><td class="c sm">${crit}</td>
+                    <td>${esc(stripCode(area, kda.description))}</td><td class="c sm">${crit}</td>
                     <td class="mark"></td><td class="mark"></td><td class="mark"></td><td class="mark"></td><td class="mark"></td>
                   </tr>`).join('');
                 const dateTh = '<th class="sm">.../.../20...</th>'.repeat(5);
@@ -3132,12 +3153,167 @@ div.WordSection2 { page: WordSection2; }
                   <button onclick="deleteStudentAndGoHome(${id})" class="text-red-600 font-bold flex items-center bg-red-50 px-4 py-2 rounded-lg hover:bg-red-100 transition"><i data-lucide="trash-2" class="mr-2 w-4 h-4"></i> Sil</button>
                 </div>
                 <div class="flex flex-wrap gap-2">
-                  ${wrapperId === 'bep-wrapper' ? `<button onclick="setView('evalFormsView')" class="bg-indigo-600 text-white px-5 py-2 rounded-lg font-bold shadow-sm hover:bg-indigo-700">Değerlendirme Formları (ÖBÖA)</button>` : ''}
+                  ${wrapperId === 'bep-wrapper' ? `<button onclick="setView('evalFormsView')" class="bg-indigo-600 text-white px-5 py-2 rounded-lg font-bold shadow-sm hover:bg-indigo-700">Değerlendirme Formları (ÖBÖA)</button><button onclick="setView('measure')" class="bg-teal-600 text-white px-5 py-2 rounded-lg font-bold shadow-sm hover:bg-teal-700">Ölçme Değerlendirme</button>` : ''}
                   <button onclick="exportXlsx('${wrapperId}', '${base}_${suffix}.xlsx')" class="bg-green-700 text-white px-5 py-2 rounded-lg font-bold hover:bg-green-800">Excel'e Aktar</button>
                   <button onclick="exportHTMLToWord('${wrapperId}', '${base}_${suffix}.doc')" class="bg-slate-700 text-white px-5 py-2 rounded-lg font-bold hover:bg-slate-800">Word'e Aktar</button>
                   <button onclick="printDoc()" class="bg-blue-800 text-white px-6 py-2 rounded-lg flex items-center font-bold shadow-lg hover:bg-blue-900 transition"><i data-lucide="printer" class="mr-2 w-5 h-5"></i> Yazdır / PDF</button>
                 </div>
               </div>`;
+        }
+
+        // ==========================================
+        // ÖLÇME DEĞERLENDİRME (çevrim içi doldurma + form çıktısı)
+        // ==========================================
+        const MEASURE_METHODS = ['Gözlem', 'Performans Görevi', 'Sözlü Soru-Cevap', 'Kontrol Listesi', 'Çalışma Kâğıdı'];
+        function isoOf(v) {
+            const t = String(v || '');
+            if (/^\d{4}-\d{2}-\d{2}$/.test(t)) return t;
+            const m = t.match(/^(\d{1,2})\.(\d{1,2})\.(\d{4})$/);
+            return m ? `${m[3]}-${m[2].padStart(2, '0')}-${m[1].padStart(2, '0')}` : '';
+        }
+        function rangeText(a, b) { const x = showDate(a), y = showDate(b); return (x || y) ? `${x}<br>-<br>${y}` : ''; }
+        function showDate(v) { const i = isoOf(v); return i ? fmtDate(i) : ''; }
+        function resultText(r) { return r === 'yapiyor' ? '(+) Yapıyor' : r === 'yapamiyor' ? '(-) Yapamıyor' : '(+) / (-)'; }
+
+        function measureCounts(std) {
+            let yes = 0, no = 0, total = 0;
+            (std.bep || []).forEach(a => (a.kdaList || []).forEach(k => { total++; if (k.result === 'yapiyor') yes++; else if (k.result === 'yapamiyor') no++; }));
+            return { yes, no, total, left: total - yes - no };
+        }
+        function updateMeasureSummary() {
+            const c = measureCounts(appState.generatedBEP);
+            const set = (id, v) => { const el = document.getElementById(id); if (el) el.textContent = v; };
+            set('ms_yes', c.yes); set('ms_no', c.no); set('ms_left', c.left);
+        }
+        function setMeasure(ai, ki, field, value) {
+            const std = appState.generatedBEP; if (!std) return;
+            const k = std.bep[ai].kdaList[ki];
+            k[field] = value;
+            saveStore(); updateMeasureSummary();
+        }
+        function clearMeasureResult(ai, ki) {
+            setMeasure(ai, ki, 'result', '');
+            const y = window.scrollY; renderApp(); window.scrollTo(0, y);
+        }
+        function openMeasure(id) {
+            const std = appState.students.find(s => s.id === id);
+            if (!std) return;
+            appState.generatedBEP = std; setView('measure');
+        }
+
+        function renderMeasure() {
+            const std = appState.generatedBEP;
+            if (!std) return '';
+            const c = measureCounts(std);
+            const areas = (std.bep || []).map((area, ai) => `
+              <section class="card">
+                <h2 class="card-title">${esc(area.area)}</h2>
+                ${(area.kdaList || []).map((k, ki) => `
+                  <div class="mgoal">
+                    <p class="mgoal-text">${esc(stripCode(area, k.description))}</p>
+                    <div class="mgrid">
+                      <label class="field"><span>Başlama tarihi</span><input type="date" value="${isoOf(k.startDate)}" onchange="setMeasure(${ai},${ki},'startDate',this.value)" /></label>
+                      <label class="field"><span>Bitiş tarihi</span><input type="date" value="${isoOf(k.endDate)}" onchange="setMeasure(${ai},${ki},'endDate',this.value)" /></label>
+                      <label class="field"><span>Ölçme tarihi</span><input type="date" value="${isoOf(k.measureDate)}" onchange="setMeasure(${ai},${ki},'measureDate',this.value)" /></label>
+                      <label class="field"><span>Ölçme yöntemi</span><select onchange="setMeasure(${ai},${ki},'measureMethod',this.value)">${MEASURE_METHODS.map(m => `<option ${((k.measureMethod || 'Gözlem') === m) ? 'selected' : ''}>${m}</option>`).join('')}</select></label>
+                    </div>
+                    <div class="mresult">
+                      <div class="seg" role="radiogroup" aria-label="Sonuç">
+                        <label class="seg-opt ok"><input type="radio" name="r_${ai}_${ki}" value="yapiyor" ${k.result === 'yapiyor' ? 'checked' : ''} onchange="setMeasure(${ai},${ki},'result','yapiyor')"><span>Yapıyor</span></label>
+                        <label class="seg-opt no"><input type="radio" name="r_${ai}_${ki}" value="yapamiyor" ${k.result === 'yapamiyor' ? 'checked' : ''} onchange="setMeasure(${ai},${ki},'result','yapamiyor')"><span>Yapamıyor</span></label>
+                      </div>
+                      <button type="button" class="btn-link" onclick="clearMeasureResult(${ai},${ki})">Temizle</button>
+                    </div>
+                  </div>`).join('')}
+              </section>`).join('');
+            return `
+            <div class="app">
+              ${appBar('Ölçme Değerlendirme', "setView('bepView')", '')}
+              <main class="page narrow">
+                <section class="card">
+                  <h2 class="card-title">${esc(std.firstName)} ${esc(std.lastName)}</h2>
+                  <p class="muted">${classLabel(std)} &bull; BEP dönemi: ${fmtDate(std.bepStartDate)} – ${fmtDate(std.bepEndDate)}</p>
+                  <p class="muted sm-gap" style="margin-top:8px">Her kısa dönemli amaç için tarihleri takvimden seçin, öğrencinin amacı yapıp yapmadığını işaretleyin. Girdiğiniz bilgiler otomatik kaydedilir ve BEP planına yansır.</p>
+                  <div class="stats" style="margin:0">
+                    <div class="stat"><b id="ms_yes">${c.yes}</b><span>Yapıyor</span></div>
+                    <div class="stat"><b id="ms_no">${c.no}</b><span>Yapamıyor</span></div>
+                    <div class="stat"><b id="ms_left">${c.left}</b><span>İşaretlenmedi</span></div>
+                  </div>
+                </section>
+                ${areas}
+              </main>
+              <div class="actionbar hide-on-print"><button class="btn primary lg" onclick="setView('measureDoc')"><i data-lucide="printer" class="ic"></i> Formu oluştur / Çıktı al</button></div>
+            </div>`;
+        }
+
+        function buildMeasureDocHtml(std) {
+            const teacher = esc(`${appState.currentUser.firstName} ${appState.currentUser.lastName}`.trim());
+            const c = measureCounts(std);
+            const done = c.yes + c.no;
+            const pct = done ? Math.round((c.yes / done) * 100) : 0;
+            return (std.bep || []).map((area, ai) => {
+                const rows = (area.kdaList || []).map((k, ki) => `
+                  <tr>
+                    <td class="c">${ki + 1}</td>
+                    <td>${esc(stripCode(area, k.description))}</td>
+                    <td class="c sm">${rangeText(k.startDate, k.endDate)}</td>
+                    <td class="c sm">${esc(k.measureMethod || 'Gözlem')}</td>
+                    <td class="c sm">${showDate(k.measureDate)}</td>
+                    <td class="c mark">${k.result === 'yapiyor' ? 'X' : ''}</td>
+                    <td class="c mark">${k.result === 'yapamiyor' ? 'X' : ''}</td>
+                  </tr>`).join('');
+                const ay = (area.kdaList || []).filter(k => k.result === 'yapiyor').length;
+                const an = (area.kdaList || []).filter(k => k.result === 'yapamiyor').length;
+                const last = ai === std.bep.length - 1;
+                return `
+                <div class="doc doc-portrait paper WordSection1 ${ai > 0 ? 'sec-break' : ''}" data-sheet="${esc(area.area)}" data-chars="110">
+                  <h2 class="doc-title">ÖLÇME DEĞERLENDİRME FORMU</h2>
+                  <table>
+                    <colgroup><col style="width:30%"><col style="width:70%"></colgroup>
+                    <tbody>
+                      <tr><td class="k">Öğrenci</td><td>${esc(std.firstName)} ${esc(std.lastName)}</td></tr>
+                      <tr><td class="k">Okul / Sınıf / No</td><td>${esc(std.schoolName)} / ${classLabel(std)} / ${esc(std.schoolNo)}</td></tr>
+                      <tr><td class="k">Gelişim Alanı / Ders</td><td>${esc(area.area)}</td></tr>
+                      <tr><td class="k">Uzun Dönemli Amaç</td><td>${esc(area.uda)}</td></tr>
+                      <tr><td class="k">BEP Dönemi</td><td>${fmtDate(std.bepStartDate)} - ${fmtDate(std.bepEndDate)}</td></tr>
+                    </tbody>
+                  </table>
+                  <table>
+                    <colgroup><col style="width:6%"><col style="width:30%"><col style="width:14%"><col style="width:14%"><col style="width:12%"><col style="width:12%"><col style="width:12%"></colgroup>
+                    <thead>
+                      <tr><th class="bar dark" colspan="7">Kısa Dönemli Amaçların Ölçme Değerlendirmesi</th></tr>
+                      <tr><th>No</th><th>Kısa Dönemli Amaç</th><th>Başlama - Bitiş</th><th>Ölçme Yöntemi</th><th>Ölçme Tarihi</th><th>Yapıyor</th><th>Yapamıyor</th></tr>
+                    </thead>
+                    <tbody>${rows}
+                      <tr><td class="k" colspan="5">Bu alanda toplam</td><td class="c"><strong>${ay}</strong></td><td class="c"><strong>${an}</strong></td></tr>
+                    </tbody>
+                  </table>
+                  ${last ? `<table>
+                    <colgroup><col style="width:30%"><col style="width:70%"></colgroup>
+                    <tbody>
+                      <tr><td class="k">Genel sonuç</td><td>Yapıyor: ${c.yes} &nbsp; Yapamıyor: ${c.no} &nbsp; İşaretlenmedi: ${c.left} ${done ? ` &nbsp; (Başarı oranı: %${pct})` : ''}</td></tr>
+                    </tbody>
+                  </table>` : ''}
+                  <div class="nobreak">
+                    <table>
+                      <colgroup><col style="width:50%"><col style="width:50%"></colgroup>
+                      <thead><tr><th>Değerlendiren Öğretmen</th><th>Okul Müdürü</th></tr></thead>
+                      <tbody><tr><td class="sig">${teacher}<br><br>İmza:</td><td class="sig">${esc(std.principalName) || ''}<br><br>İmza:</td></tr></tbody>
+                    </table>
+                  </div>
+                </div>`;
+            }).join('');
+        }
+
+        function renderMeasureDoc() {
+            const std = appState.generatedBEP;
+            if (!std) return '';
+            const back = `<button onclick="setView('measure')" class="text-blue-700 font-bold flex items-center bg-blue-50 px-4 py-2 rounded-lg hover:bg-blue-100 transition"><i data-lucide="arrow-left" class="mr-2 w-5 h-5"></i> Ölçme Değerlendirmeye Dön</button>`;
+            return `
+            <div class="min-h-screen bg-slate-200 p-4 md:p-8 flex flex-col items-center">
+              ${docToolbar(std, back, 'measure-wrapper', 'OlcmeDegerlendirme', 'OlcmeDegerlendirme')}
+              <div id="measure-wrapper" class="w-full">${buildMeasureDocHtml(std)}</div>
+            </div>`;
         }
 
         function renderBEP() {
@@ -3178,6 +3354,8 @@ div.WordSection2 { page: WordSection2; }
                 case 'selectGoals': root.innerHTML = renderGoalSelection(); break;
                 case 'bepView': root.innerHTML = renderBEP(); break;
                 case 'evalFormsView': root.innerHTML = renderEvalForms(); break;
+                case 'measure': root.innerHTML = renderMeasure(); break;
+                case 'measureDoc': root.innerHTML = renderMeasureDoc(); break;
             }
             if (window.lucide) lucide.createIcons();
         }
