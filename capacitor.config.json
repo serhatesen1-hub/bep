@@ -1,0 +1,7 @@
+{
+  "appId": "com.example.bephazirlama",
+  "appName": "BEP",
+  "webDir": "www",
+  "server": { "androidScheme": "https" },
+  "ios": { "contentInset": "always" }
+}

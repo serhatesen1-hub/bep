@@ -1,0 +1,17 @@
+{
+  "name": "bep-hazirlama-sistemi",
+  "version": "2.0.0",
+  "private": true,
+  "description": "BEP Hazırlama Sistemi – Capacitor ile Android/iOS paketleme",
+  "scripts": {
+    "sync": "npx cap sync",
+    "android": "npx cap open android",
+    "ios": "npx cap open ios"
+  },
+  "dependencies": {
+    "@capacitor/android": "^6.0.0",
+    "@capacitor/cli": "^6.0.0",
+    "@capacitor/core": "^6.0.0",
+    "@capacitor/ios": "^6.0.0"
+  }
+}
