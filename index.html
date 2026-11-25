@@ -31,6 +31,8 @@
     --color-amber-50: oklch(98.7% 0.022 95.277);
     --color-amber-100: oklch(96.2% 0.059 95.617);
     --color-amber-300: oklch(87.9% 0.169 91.605);
+    --color-amber-600: oklch(66.6% 0.179 58.318);
+    --color-amber-700: oklch(55.5% 0.163 48.998);
     --color-amber-800: oklch(47.3% 0.137 46.201);
     --color-amber-900: oklch(41.4% 0.112 45.904);
     --color-green-600: oklch(62.7% 0.194 149.214);
@@ -385,9 +387,6 @@
   .flex-1 {
     flex: 1;
   }
-  .grow {
-    flex-grow: 1;
-  }
   .transform {
     transform: var(--tw-rotate-x,) var(--tw-rotate-y,) var(--tw-rotate-z,) var(--tw-skew-x,) var(--tw-skew-y,);
   }
@@ -519,6 +518,9 @@
   }
   .bg-amber-100 {
     background-color: var(--color-amber-100);
+  }
+  .bg-amber-600 {
+    background-color: var(--color-amber-600);
   }
   .bg-blue-50 {
     background-color: var(--color-blue-50);
@@ -787,6 +789,9 @@
     }
     .hover\:border-teal-300:hover {
       border-color: var(--color-teal-300);
+    }
+    .hover\:bg-amber-700:hover {
+      background-color: var(--color-amber-700);
     }
     .hover\:bg-blue-100:hover {
       background-color: var(--color-blue-100);
@@ -1077,7 +1082,7 @@
 </style>
     <script id="iconShim">
 (function () {
-  var ICONS = {"arrow-left": "<path d=\"M19 12H5\"/><path d=\"m12 19-7-7 7-7\"/>", "user": "<path d=\"M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2\"/><circle cx=\"12\" cy=\"7\" r=\"4\"/>", "users": "<path d=\"M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2\"/><circle cx=\"9\" cy=\"7\" r=\"4\"/><path d=\"M22 21v-2a4 4 0 0 0-3-3.87\"/><path d=\"M16 3.13a4 4 0 0 1 0 7.75\"/>", "trash-2": "<path d=\"M3 6h18\"/><path d=\"M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6\"/><path d=\"M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2\"/><path d=\"M10 11v6\"/><path d=\"M14 11v6\"/>", "edit": "<path d=\"M12 3H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7\"/><path d=\"M18.4 2.6a2.1 2.1 0 0 1 3 3L12 15l-4 1 1-4Z\"/>", "printer": "<path d=\"M6 9V2h12v7\"/><path d=\"M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2\"/><rect x=\"6\" y=\"14\" width=\"12\" height=\"8\"/>", "lock": "<rect x=\"3\" y=\"11\" width=\"18\" height=\"11\" rx=\"2\"/><path d=\"M7 11V7a5 5 0 0 1 10 0v4\"/>", "info": "<circle cx=\"12\" cy=\"12\" r=\"10\"/><path d=\"M12 16v-4\"/><path d=\"M12 8h.01\"/>", "file-text": "<path d=\"M15 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7z\"/><path d=\"M14 2v4a2 2 0 0 0 2 2h4\"/><path d=\"M10 9H8\"/><path d=\"M16 13H8\"/><path d=\"M16 17H8\"/>", "book-open": "<path d=\"M12 7v14\"/><path d=\"M3 18a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1h5a4 4 0 0 1 4 4 4 4 0 0 1 4-4h5a1 1 0 0 1 1 1v13a1 1 0 0 1-1 1h-6a3 3 0 0 0-3 3 3 3 0 0 0-3-3z\"/>", "plus": "<path d=\"M5 12h14\"/><path d=\"M12 5v14\"/>", "search": "<circle cx=\"11\" cy=\"11\" r=\"8\"/><path d=\"m21 21-4.3-4.3\"/>", "download": "<path d=\"M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4\"/><path d=\"m7 10 5 5 5-5\"/><path d=\"M12 15V3\"/>", "upload": "<path d=\"M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4\"/><path d=\"m17 8-5-5-5 5\"/><path d=\"M12 3v12\"/>", "shield-check": "<path d=\"M20 13c0 5-3.5 7.5-7.66 8.95a1 1 0 0 1-.67-.01C7.5 20.5 4 18 4 13V6a1 1 0 0 1 1-1c2 0 4.5-1.2 6.24-2.72a1.17 1.17 0 0 1 1.52 0C14.51 3.81 17 5 19 5a1 1 0 0 1 1 1z\"/><path d=\"m9 12 2 2 4-4\"/>", "sliders-horizontal": "<path d=\"M21 4h-7\"/><path d=\"M10 4H3\"/><path d=\"M21 12h-9\"/><path d=\"M8 12H3\"/><path d=\"M21 20h-5\"/><path d=\"M12 20H3\"/><path d=\"M14 2v4\"/><path d=\"M8 10v4\"/><path d=\"M16 18v4\"/>", "clipboard-check": "<rect x=\"8\" y=\"2\" width=\"8\" height=\"4\" rx=\"1\" ry=\"1\"/><path d=\"M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2\"/><path d=\"m9 14 2 2 4-4\"/>", "x": "<path d=\"M18 6 6 18\"/><path d=\"m6 6 12 12\"/>"};
+  var ICONS = {"arrow-left": "<path d=\"M19 12H5\"/><path d=\"m12 19-7-7 7-7\"/>", "user": "<path d=\"M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2\"/><circle cx=\"12\" cy=\"7\" r=\"4\"/>", "users": "<path d=\"M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2\"/><circle cx=\"9\" cy=\"7\" r=\"4\"/><path d=\"M22 21v-2a4 4 0 0 0-3-3.87\"/><path d=\"M16 3.13a4 4 0 0 1 0 7.75\"/>", "trash-2": "<path d=\"M3 6h18\"/><path d=\"M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6\"/><path d=\"M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2\"/><path d=\"M10 11v6\"/><path d=\"M14 11v6\"/>", "edit": "<path d=\"M12 3H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7\"/><path d=\"M18.4 2.6a2.1 2.1 0 0 1 3 3L12 15l-4 1 1-4Z\"/>", "printer": "<path d=\"M6 9V2h12v7\"/><path d=\"M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2\"/><rect x=\"6\" y=\"14\" width=\"12\" height=\"8\"/>", "lock": "<rect x=\"3\" y=\"11\" width=\"18\" height=\"11\" rx=\"2\"/><path d=\"M7 11V7a5 5 0 0 1 10 0v4\"/>", "info": "<circle cx=\"12\" cy=\"12\" r=\"10\"/><path d=\"M12 16v-4\"/><path d=\"M12 8h.01\"/>", "file-text": "<path d=\"M15 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7z\"/><path d=\"M14 2v4a2 2 0 0 0 2 2h4\"/><path d=\"M10 9H8\"/><path d=\"M16 13H8\"/><path d=\"M16 17H8\"/>", "book-open": "<path d=\"M12 7v14\"/><path d=\"M3 18a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1h5a4 4 0 0 1 4 4 4 4 0 0 1 4-4h5a1 1 0 0 1 1 1v13a1 1 0 0 1-1 1h-6a3 3 0 0 0-3 3 3 3 0 0 0-3-3z\"/>", "plus": "<path d=\"M5 12h14\"/><path d=\"M12 5v14\"/>", "search": "<circle cx=\"11\" cy=\"11\" r=\"8\"/><path d=\"m21 21-4.3-4.3\"/>", "download": "<path d=\"M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4\"/><path d=\"m7 10 5 5 5-5\"/><path d=\"M12 15V3\"/>", "upload": "<path d=\"M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4\"/><path d=\"m17 8-5-5-5 5\"/><path d=\"M12 3v12\"/>", "shield-check": "<path d=\"M20 13c0 5-3.5 7.5-7.66 8.95a1 1 0 0 1-.67-.01C7.5 20.5 4 18 4 13V6a1 1 0 0 1 1-1c2 0 4.5-1.2 6.24-2.72a1.17 1.17 0 0 1 1.52 0C14.51 3.81 17 5 19 5a1 1 0 0 1 1 1z\"/><path d=\"m9 12 2 2 4-4\"/>", "sliders-horizontal": "<path d=\"M21 4h-7\"/><path d=\"M10 4H3\"/><path d=\"M21 12h-9\"/><path d=\"M8 12H3\"/><path d=\"M21 20h-5\"/><path d=\"M12 20H3\"/><path d=\"M14 2v4\"/><path d=\"M8 10v4\"/><path d=\"M16 18v4\"/>", "clipboard-check": "<rect x=\"8\" y=\"2\" width=\"8\" height=\"4\" rx=\"1\" ry=\"1\"/><path d=\"M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2\"/><path d=\"m9 14 2 2 4-4\"/>", "x": "<path d=\"M18 6 6 18\"/><path d=\"m6 6 12 12\"/>", "lightbulb": "<path d=\"M15 14c.2-1 .7-1.7 1.5-2.5 1-.9 1.5-2.2 1.5-3.5A6 6 0 0 0 6 8c0 1 .2 2.2 1.5 3.5.7.7 1.3 1.5 1.5 2.5\"/><path d=\"M9 18h6\"/><path d=\"M10 22h4\"/>", "bell": "<path d=\"M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9\"/><path d=\"M10.3 21a1.94 1.94 0 0 0 3.4 0\"/>"};
   window.lucide = { createIcons: function () {
     document.querySelectorAll('i[data-lucide]').forEach(function (el) {
       var p = ICONS[el.getAttribute('data-lucide')];
@@ -1246,6 +1251,59 @@
         .actionbar .btn { max-width: 680px; margin: 0 auto; display: flex; }
         @media print { .actionbar { display: none !important; } }
     </style>
+    <style id="uiCss3">
+        .student-actions { display: grid !important; grid-template-columns: 1fr 1fr; gap: 8px; }
+        .student-actions .btn { padding: 8px 10px; line-height: 1.2; text-align: center; font-size: 14px; min-height: 48px; }
+        .student-foot { display: flex; justify-content: space-between; border-top: 1px solid var(--line); padding-top: 6px; margin-top: -4px; }
+        .btn-link.danger { color: var(--bad); }
+        .btn-link .ic { width: 18px; height: 18px; margin-right: 4px; }
+        .tabs { display: flex; gap: 8px; overflow-x: auto; padding: 2px 2px 8px; margin-bottom: 8px; -webkit-overflow-scrolling: touch; }
+        .tab { flex: none; border: 1px solid var(--line); background: #fff; border-radius: 12px; padding: 10px 14px; font-weight: 700; display: flex; flex-direction: column; align-items: flex-start; gap: 2px; min-width: 130px; text-align: left; color: var(--ink); }
+        .tab small { color: var(--muted); font-weight: 600; font-size: 12px; }
+        .tab.on { background: var(--brand-600); color: #fff; border-color: var(--brand-600); box-shadow: 0 4px 14px rgba(51,71,200,.28); }
+        .tab.on small { color: #dfe5ff; }
+        .mgrid > * { min-width: 0; } .mgrid input, .mgrid select { width: 100%; min-width: 0; max-width: 100%; box-sizing: border-box; }
+        .saved { color: var(--ok); font-size: 13px; font-weight: 700; opacity: 0; transition: opacity .2s; }
+        .saved.on { opacity: 1; }
+        .actionbar-in { max-width: 680px; margin: 0 auto; display: flex; gap: 10px; }
+        .actionbar-in .btn { flex: 1; }
+        .actionbar .btn { max-width: none; margin: 0; }
+        .doc-chips { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+        .doc-chips-label { font-weight: 700; font-size: 14px; color: var(--muted); }
+        .chip { border: 1px solid #cfd6e8; background: #fff; border-radius: 999px; padding: 8px 14px; font-weight: 700; font-size: 14px; color: var(--muted); }
+        .chip.on { background: var(--brand-50); border-color: var(--brand-500); color: var(--brand-700); }
+    </style>
+    <style id="uiCss4">
+        .fieldset { border: 0; padding: 0; margin: 0; display: grid; gap: 8px; }
+        .check { display: flex; align-items: center; gap: 10px; padding: 10px 12px; border: 1px solid var(--line); border-radius: 12px; background: #fff; font-weight: 600; font-size: 15px; }
+        .chips { display: flex; gap: 8px; overflow-x: auto; margin-bottom: 14px; padding-bottom: 2px; }
+        .chips .chip { flex: none; }
+        .bell { position: relative; }
+        .badge { position: absolute; top: 4px; right: 2px; min-width: 18px; height: 18px; border-radius: 9px; background: #d62d2d; color: #fff; font-size: 11px; font-weight: 800; display: grid; place-items: center; padding: 0 4px; }
+        .notif.warn { border-color: #f2d28b; background: #fffaf0; }
+        .notif.ok { background: #f2fbf7; border-color: #bfe8d7; }
+        .count { display: inline-grid; place-items: center; min-width: 24px; height: 24px; border-radius: 12px; background: #d62d2d; color: #fff; font-size: 13px; margin-left: 6px; padding: 0 6px; vertical-align: 2px; }
+        .notif-std { margin: 12px 0 6px; font-size: 15px; }
+        .notif-row { width: 100%; display: grid; grid-template-columns: auto 1fr; gap: 4px 10px; align-items: center; text-align: left; background: #fff; border: 1px solid var(--line); border-radius: 12px; padding: 10px 12px; margin-bottom: 6px; color: var(--ink); }
+        .notif-row .notif-date { grid-column: 2; font-size: 12px; color: var(--muted); }
+        .notif-txt { font-size: 14px; line-height: 1.35; overflow-wrap: anywhere; }
+        .tag { font-size: 11px; font-weight: 800; padding: 4px 8px; border-radius: 999px; white-space: nowrap; }
+        .tag.late { background: var(--bad-bg); color: var(--bad); } .tag.today { background: var(--warn-bg); color: var(--warn); } .tag.open { background: #e3e8ff; color: #2a3aa8; }
+        .student-foot { flex-wrap: wrap; gap: 2px 8px; }
+        /* Etkinlik ve materyal */
+        .act { border: 1px solid var(--line); border-radius: 14px; padding: 14px; margin: 10px 0; background: #fff; }
+        .act.sel { border-color: var(--brand-500); background: var(--brand-50); }
+        .act h4 { margin: 0 0 4px; font-size: 16px; font-weight: 800; letter-spacing: -.01em; }
+        .act .meta { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 8px; }
+        .act .meta span { font-size: 12px; font-weight: 700; background: #eef1f8; color: var(--muted); padding: 3px 9px; border-radius: 999px; }
+        .act ol { margin: 6px 0 8px 18px; padding: 0; font-size: 14px; line-height: 1.5; }
+        .act p { margin: 4px 0; font-size: 14px; line-height: 1.5; }
+        .act .adapt { background: #fff7e6; border-radius: 10px; padding: 8px 10px; }
+        .kda-title { font-weight: 700; margin: 16px 0 4px; line-height: 1.45; }
+        .pick { display: flex; align-items: center; gap: 10px; font-weight: 700; margin-top: 8px; }
+        .mat-list { columns: 2; font-size: 14px; }
+        @media (max-width: 520px) { .mat-list { columns: 1; } }
+    </style>
     <style id="docCss">
         /* ---- BELGE STİLLERİ (BEP / ÖBÖA / kaba değerlendirme) ----
            Tailwind'e bağlı değildir: ekranda, PDF'te ve Word'e aktarırken aynı görünür. */
@@ -1319,11 +1377,19 @@
         // 1. VERİTABANI VE SABİTLER
         // ==========================================
 
-        const DISABILITY_TYPES = [
-            "Zihinsel Yetersizlik", "İşitme Yetersizliği", "Görme Yetersizliği", 
-            "Bedensel Yetersizlik", "Dil ve Konuşma Güçlüğü", "Özel Öğrenme Güçlüğü", 
-            "Otizm Spektrum Bozukluğu", "Süreğen Hastalıklar", "Dikkat Eksikliği ve Hiperaktivite Bozukluğu (DEHB)"
+        // Özel Eğitim Hizmetleri Yönetmeliği (RG 07.07.2018/30471) madde 4'te tanımlanan engel türleri
+        const MEVZUAT_ENGEL = [
+            "Hafif düzeyde zihinsel engelli", "Orta düzeyde zihinsel engelli", "Ağır düzeyde zihinsel engelli", "Çok ağır düzeyde zihinsel engelli",
+            "Hafif düzeyde otizmi olan", "Orta düzeyde otizmi olan", "Ağır düzeyde otizmi olan",
+            "Görme engelli", "İşitme engelli", "Bedensel engelli"
         ];
+        // Eğitsel değerlendirme (RAM) raporlarında sık görülen, yönetmelik md.4'te ayrıca tanımlanmayan tanılar
+        const DIGER_TANI = ["Dil ve konuşma güçlüğü", "Özel öğrenme güçlüğü", "Süreğen hastalık", "Dikkat eksikliği ve hiperaktivite bozukluğu (DEHB)", "Duygusal ve davranış bozukluğu", "Özel yetenekli"];
+        const DISABILITY_TYPES = MEVZUAT_ENGEL.concat(DIGER_TANI);
+        const AGE_GROUPS = ["36-48 ay (3-4 yaş)", "48-60 ay (4-5 yaş)", "60-72 ay (5-6 yaş)"];
+        const SERVICE_LEVELS = ["Okul Öncesi", "İlkokul", "Ortaokul", "Lise"];
+        const SUBJECT_BRANCHES = ["Özel Eğitim", "Türkçe", "Türk Dili ve Edebiyatı", "Matematik", "Fen Bilimleri", "Fizik", "Kimya", "Biyoloji", "Sosyal Bilgiler", "Tarih", "Coğrafya", "Felsefe", "İngilizce / Yabancı Dil", "Din Kültürü ve Ahlak Bilgisi", "Beden Eğitimi", "Görsel Sanatlar", "Müzik", "Teknoloji ve Tasarım", "Bilişim Teknolojileri", "Rehberlik ve Psikolojik Danışmanlık", "Diğer"];
+        const LEVEL_OF_SERVICE = { "Okul Öncesi": "Ana Sınıfı", "İlkokul": "İlkokul", "Ortaokul": "Ortaokul", "Lise": "Lise" };
 
         const DECISION_TYPES = [
             "Tam Zamanlı Kaynaştırma / Bütünleştirme",
@@ -1738,7 +1804,7 @@
                 const u = appState.users[0] || {};
                 localStorage.setItem(STORE_KEY, JSON.stringify({
                     students: appState.students,
-                    profile: { firstName: u.firstName || '', lastName: u.lastName || '', branch: u.branch || '' }
+                    profile: { firstName: u.firstName || '', lastName: u.lastName || '', branch: u.branch || '', serviceLevel: u.serviceLevel || '', ageGroup: u.ageGroup || '', taskType: u.taskType || '', classGrade: u.classGrade || '', disabilityFocus: Array.isArray(u.disabilityFocus) ? u.disabilityFocus : [], subject: u.subject || '' }
                 }));
             } catch (e) { console.warn('Veriler tarayıcıya kaydedilemedi:', e); }
         }
@@ -2007,7 +2073,7 @@ div.WordSection2 { page: WordSection2; }
             id: null, tcNo: '', firstName: '', lastName: '', gender: GENDER_TYPES[0], level: LEVEL_TYPES[1], 
             birthDate: '', schoolName: '', schoolNo: '', className: '', motherName: '', fatherName: '', 
             motherSurname: '', fatherSurname: '',
-            bepStartDate: todayStr, bepEndDate: futureDateStr, criterion: '4/5 (%80)', grade: 1, specialTeacher1: '', specialTeacher2: '', classTeacher1: '', classTeacher2: '', counselor: '', principalName: '',
+            bepStartDate: todayStr, bepEndDate: futureDateStr, criterion: '4/5 (%80)', grade: 1, specialTeacher1: '', specialTeacher2: '', classTeacher1: '', classTeacher2: '', ageGroup: '', counselor: '', principalName: '',
             guardian: GUARDIAN_TYPES[0], decision: DECISION_TYPES[0], disability: DISABILITY_TYPES[0],
             supportEduHistory: '', currentSupportEdu: '', devices: '', healthInfo: '', environmentMods: '',
             parentPhone: '', parentAddress: '', parentWorkAddress: '',
@@ -2016,9 +2082,9 @@ div.WordSection2 { page: WordSection2; }
         };
 
         const appState = {
-            users: [{ firstName: initialStore.profile.firstName ?? '', lastName: initialStore.profile.lastName ?? '', branch: initialStore.profile.branch ?? 'Özel Eğitim Öğretmeni' }],
+            users: [Object.assign({ firstName: '', lastName: '', branch: 'Özel Eğitim Öğretmeni', serviceLevel: '', ageGroup: '', taskType: '', classGrade: '', disabilityFocus: [], subject: '' }, initialStore.profile)],
             currentUser: null,
-            view: 'dashboard', 
+            view: (!initialStore.profile.firstName && !initialStore.profile.serviceLevel && !(initialStore.students || []).length) ? 'profile' : 'dashboard', 
             students: initialStore.students,
             search: '',
             currentStudent: JSON.parse(JSON.stringify(defaultStudentState)),
@@ -2041,14 +2107,33 @@ div.WordSection2 { page: WordSection2; }
         // 4. OLAY İŞLEYİCİLER
         // ==========================================
 
+        function readProfileForm() {
+            const f = document.getElementById('profileForm');
+            if (!f) return;
+            const fd = new FormData(f);
+            const u = appState.currentUser;
+            ['firstName', 'lastName', 'serviceLevel', 'ageGroup', 'taskType', 'classGrade', 'subject'].forEach(k => { if (fd.has(k)) u[k] = String(fd.get(k)); });
+            u.disabilityFocus = fd.getAll('disabilityFocus').map(String);
+            deriveBranch(u);
+        }
+        function deriveBranch(u) {
+            if (u.serviceLevel === 'Okul Öncesi') u.branch = 'Okul Öncesi Öğretmeni';
+            else if (u.serviceLevel === 'İlkokul') u.branch = u.taskType === 'Özel eğitim sınıfı' ? 'Özel Eğitim Öğretmeni' : 'Sınıf Öğretmeni';
+            else if (u.serviceLevel === 'Ortaokul' || u.serviceLevel === 'Lise') u.branch = (u.subject ? u.subject + ' Öğretmeni' : 'Öğretmen');
+        }
+        function onProfileChange() { readProfileForm(); renderApp(); }
         function handleProfileSave(event) {
             event.preventDefault();
-            const formData = new FormData(event.target);
-            appState.currentUser.firstName = formData.get('firstName');
-            appState.currentUser.lastName = formData.get('lastName');
-            appState.currentUser.branch = formData.get('branch');
+            readProfileForm();
+            const u = appState.currentUser;
+            if (!u.serviceLevel) { alert('Lütfen çalıştığınız kademeyi seçin.'); return; }
+            if (u.serviceLevel === 'Okul Öncesi' && !u.ageGroup) { alert('Lütfen yaş grubunu seçin.'); return; }
+            if (u.serviceLevel === 'İlkokul' && !u.taskType) { alert('Lütfen görevinizi seçin (sınıf öğretmeni / özel eğitim sınıfı).'); return; }
+            if (u.serviceLevel === 'İlkokul' && u.taskType === 'Sınıf öğretmeni' && !u.classGrade) { alert('Lütfen sınıf düzeyini seçin.'); return; }
+            if (u.serviceLevel === 'İlkokul' && u.taskType === 'Özel eğitim sınıfı' && !u.disabilityFocus.length) { alert('Lütfen en az bir engel türü seçin.'); return; }
+            if ((u.serviceLevel === 'Ortaokul' || u.serviceLevel === 'Lise') && !u.subject) { alert('Lütfen branşınızı seçin.'); return; }
             saveStore();
-            toast('Profil bilgileriniz kaydedildi');
+            toast('Kayıt bilgileriniz kaydedildi');
             setView('dashboard');
         }
 
@@ -2061,7 +2146,7 @@ div.WordSection2 { page: WordSection2; }
                 ...appState.currentStudent,
                 tcNo: fd.get('tcNo') || '', firstName: fd.get('firstName') || '', lastName: fd.get('lastName') || '',
                 gender: fd.get('gender') || GENDER_TYPES[0], birthDate: fd.get('birthDate') || '',
-                level: fd.get('level') || LEVEL_TYPES[1], schoolName: fd.get('schoolName') || '',
+                ageGroup: fd.has('ageGroup') ? fd.get('ageGroup') : (appState.currentStudent.ageGroup || ''), level: fd.get('level') || LEVEL_TYPES[1], schoolName: fd.get('schoolName') || '',
                 className: fd.get('className') || '', schoolNo: fd.get('schoolNo') || '',
                 decision: fd.get('decision') || DECISION_TYPES[0], disability: fd.get('disability') || DISABILITY_TYPES[0],
                 bepStartDate: fd.get('bepStartDate') || todayStr, bepEndDate: fd.get('bepEndDate') || futureDateStr,
@@ -2307,6 +2392,19 @@ div.WordSection2 { page: WordSection2; }
             appState.evaluations = {};
             appState.selectedBEPGoals = {};
             appState.selectedCourses = [];
+            const u = appState.currentUser || {};
+            const st = appState.currentStudent;
+            if (u.serviceLevel && LEVEL_OF_SERVICE[u.serviceLevel]) {
+                st.level = LEVEL_OF_SERVICE[u.serviceLevel];
+                st.grade = (GRADES_BY_LEVEL[st.level] || [])[0] || '';
+                if (st.level === 'Ana Sınıfı') st.ageGroup = u.ageGroup || '';
+                if (st.level === 'İlkokul' && u.taskType === 'Sınıf öğretmeni' && u.classGrade) st.grade = parseInt(u.classGrade) || st.grade;
+                if (st.level === 'İlkokul' && u.taskType === 'Özel eğitim sınıfı') {
+                    st.decision = 'Özel Eğitim Sınıfı';
+                    if ((u.disabilityFocus || []).length) st.disability = u.disabilityFocus[0];
+                }
+                if (st.level === 'İlkokul' && u.taskType === 'Sınıf öğretmeni') st.decision = DECISION_TYPES[0];
+            }
             setView('addStudent');
         }
 
@@ -2512,10 +2610,71 @@ div.WordSection2 { page: WordSection2; }
               </section>`;
         }
 
+        // ---- Ölçme zamanı gelen kazanımlar (ana ekran bildirimi) ----
+        function groupKey(std) { return std.level === 'Ana Sınıfı' ? ('Ana Sınıfı' + (std.ageGroup ? ' · ' + std.ageGroup : '')) : std.level; }
+        function measureDue() {
+            const today = localISO(new Date());
+            const out = [];
+            appState.students.forEach(std => (std.bep || []).forEach((area, ai) => (area.kdaList || []).forEach((k, ki) => {
+                if (k.result) return;
+                const st = isoOf(k.startDate), en = isoOf(k.endDate), me = isoOf(k.measureDate);
+                if (!st && !en && !me) return;
+                let status = null;
+                if ((en && en < today) || (me && me < today)) status = 'late';
+                else if (me === today || en === today) status = 'today';
+                else if ((!st || st <= today) && (!en || today <= en)) status = 'open';
+                if (status) out.push({ std, ai, ki, area, k, status, st, en, me });
+            })));
+            const rank = { late: 0, today: 1, open: 2 };
+            return out.sort((a, b) => rank[a.status] - rank[b.status] || (a.en || '9').localeCompare(b.en || '9'));
+        }
+        function openMeasureAt(id, ai) {
+            const std = appState.students.find(x => x.id === id); if (!std) return;
+            std.measureCourse = ai; appState.generatedBEP = std; saveStore(); setView('measure');
+        }
+        function dueHtml() {
+            if (!appState.students.length) return '';
+            const items = measureDue();
+            const anyDates = appState.students.some(st => (st.bep || []).some(a => (a.kdaList || []).some(k => isoOf(k.startDate) || isoOf(k.endDate) || isoOf(k.measureDate))));
+            if (!items.length) {
+                return anyDates ? `<section class="card notif ok" id="bildirimler"><h2 class="card-title">Ölçme değerlendirme bildirimleri</h2><p class="muted">Şu an ölçme zamanı gelen kazanım yok.</p></section>`
+                    : `<section class="card notif" id="bildirimler"><h2 class="card-title">Ölçme değerlendirme bildirimleri</h2><p class="muted">Kazanımların başlama, bitiş ve ölçme tarihlerini girdiğinizde ölçme zamanı gelenler burada hatırlatılır. Tarihleri "Ölçme ve değerlendirme formu" ekranından seçebilirsiniz.</p></section>`;
+            }
+            const label = { late: 'Gecikti', today: 'Bugün', open: 'Ölçme dönemi' };
+            const byStd = {};
+            items.forEach(it => { (byStd[it.std.id] = byStd[it.std.id] || { std: it.std, list: [] }).list.push(it); });
+            const counts = { late: 0, today: 0, open: 0 };
+            items.forEach(i => counts[i.status]++);
+            return `<section class="card notif warn" id="bildirimler">
+              <h2 class="card-title">Ölçme zamanı gelen kazanımlar <span class="count">${items.length}</span></h2>
+              <p class="muted sm-gap">${counts.late ? counts.late + ' gecikmiş, ' : ''}${counts.today ? counts.today + ' bugün, ' : ''}${counts.open} ölçme döneminde. Başlama–bitiş tarihleri arasındaki kazanımlar işaretlenene kadar listelenir.</p>
+              ${Object.values(byStd).map(g => `
+                <div class="notif-std"><strong>${esc(g.std.firstName)} ${esc(g.std.lastName)}</strong></div>
+                ${g.list.slice(0, 5).map(it => `
+                  <button class="notif-row ${it.status}" onclick="openMeasureAt(${Number(it.std.id)}, ${it.ai})">
+                    <span class="tag ${it.status}">${label[it.status]}</span>
+                    <span class="notif-txt"><b>${esc(it.area.area)}</b> · ${esc(stripCode(it.area, it.k.description))}</span>
+                    <span class="notif-date">${it.st ? fmtDate(it.st) : ''}${(it.st || it.en) ? ' – ' : ''}${it.en ? fmtDate(it.en) : ''}</span>
+                  </button>`).join('')}
+                ${g.list.length > 5 ? `<p class="muted" style="margin:4px 0 8px">+ ${g.list.length - 5} kazanım daha — öğrencinin ölçme formunda görebilirsiniz.</p>` : ''}`).join('')}
+            </section>`;
+        }
+        function setFilter(v) { appState.filter = v; renderApp(); }
+        function filterBarHtml() {
+            const keys = [...new Set(appState.students.map(groupKey))];
+            if (keys.length < 2) return '';
+            const f = appState.filter || '';
+            return `<div class="chips hide-on-print" role="group" aria-label="Kademe filtresi">
+              <button class="chip ${f === '' ? 'on' : ''}" onclick="setFilter('')">Tümü (${appState.students.length})</button>
+              ${keys.map(k => `<button class="chip ${f === k ? 'on' : ''}" onclick='setFilter(${JSON.stringify(k).replace(/'/g, "&#39;")})'>${esc(k)} (${appState.students.filter(s => groupKey(s) === k).length})</button>`).join('')}
+            </div>`;
+        }
+
         function studentListHtml() {
             const q = (appState.search || '').toLocaleLowerCase('tr-TR').trim();
             const list = appState.students.filter(s =>
-                !q || `${s.firstName} ${s.lastName} ${s.schoolName} ${s.className}`.toLocaleLowerCase('tr-TR').includes(q));
+                (!appState.filter || groupKey(s) === appState.filter) &&
+                (!q || `${s.firstName} ${s.lastName} ${s.schoolName} ${s.className}`.toLocaleLowerCase('tr-TR').includes(q)));
 
             if (appState.students.length === 0) return welcomeHtml();
             if (list.length === 0) return `<p class="empty">Aramanızla eşleşen öğrenci bulunamadı.</p>`;
@@ -2534,7 +2693,7 @@ div.WordSection2 { page: WordSection2; }
                       <span class="avatar t${avatarTone(std)}" aria-hidden="true">${initials(std)}</span>
                       <div class="student-id">
                         <h3>${esc(std.firstName)} ${esc(std.lastName)}</h3>
-                        <p>${classLabel(std)}</p>
+                        <p>${classLabel(std)}${std.level === 'Ana Sınıfı' && std.ageGroup ? ' · ' + esc(std.ageGroup) : ''}</p>
                       </div>
                       ${badge}
                     </div>
@@ -2544,10 +2703,13 @@ div.WordSection2 { page: WordSection2; }
                       <div><dt>BEP dönemi</dt><dd>${fmtDate(std.bepStartDate)} – ${fmtDate(std.bepEndDate)}</dd></div>
                     </dl>
                     <div class="student-actions">
-                      <button class="btn primary grow" onclick="openBEP(${id})"><i data-lucide="file-text" class="ic"></i> BEP'i aç</button>
-                      <button class="iconbtn soft" onclick="openMeasure(${id})" aria-label="Ölçme değerlendirme" title="Ölçme değerlendirme"><i data-lucide="clipboard-check" class="ic"></i></button>
-                      <button class="iconbtn soft" onclick="editStudent(${id})" aria-label="Düzenle"><i data-lucide="edit" class="ic"></i></button>
-                      <button class="iconbtn soft danger" onclick="deleteStudent(${id})" aria-label="Sil"><i data-lucide="trash-2" class="ic"></i></button>
+                      <button class="btn primary" onclick="openBEP(${id})"><i data-lucide="file-text" class="ic"></i> BEP dosyası</button>
+                      <button class="btn" onclick="openMeasure(${id})"><i data-lucide="clipboard-check" class="ic"></i> Ölçme ve değerlendirme formu</button>
+                    </div>
+                    <div class="student-foot">
+                      <button class="btn-link" onclick="editStudent(${id})"><i data-lucide="edit" class="ic"></i> Düzenle</button>
+                      <button class="btn-link" onclick="openActivities(${id})"><i data-lucide="lightbulb" class="ic"></i> Etkinlik &amp; Materyal</button>
+                      <button class="btn-link danger" onclick="deleteStudent(${id})"><i data-lucide="trash-2" class="ic"></i> Sil</button>
                     </div>
                   </article>`;
             }).join('')}</div>`;
@@ -2612,13 +2774,15 @@ div.WordSection2 { page: WordSection2; }
             const hello = u.firstName ? `Merhaba, ${esc(u.firstName)}` : 'Merhaba';
             return `
             <div class="app">
-              ${appBar('BEP', null, `<button class="iconbtn" onclick="setView('profile')" aria-label="Ayarlar"><i data-lucide="sliders-horizontal" class="ic"></i></button>`)}
+              ${appBar('BEP', null, `${appState.students.length ? (() => { const n = measureDue().length; return `<button class="iconbtn bell" onclick="document.getElementById('bildirimler') && document.getElementById('bildirimler').scrollIntoView({behavior:'smooth',block:'start'})" aria-label="Bildirimler"><i data-lucide="bell" class="ic"></i>${n ? `<span class="badge">${n > 99 ? '99+' : n}</span>` : ''}</button>`; })() : ''}<button class="iconbtn" onclick="setView('profile')" aria-label="Ayarlar"><i data-lucide="sliders-horizontal" class="ic"></i></button>`)}
               <main class="page">
                 <div class="page-head hide-on-print">
                   <div><h1>${hello}</h1><p class="muted">Bugünkü çalışmanıza buradan devam edin.</p></div>
                   <button class="btn primary desktop-only" onclick="startNewStudent()"><i data-lucide="plus" class="ic"></i> Yeni öğrenci</button>
                 </div>
                 ${appState.students.length ? statsHtml() : ''}
+                ${dueHtml()}
+                ${filterBarHtml()}
                 ${appState.students.length ? `
                 <div class="searchbar hide-on-print">
                   <i data-lucide="search" class="ic"></i>
@@ -2633,22 +2797,39 @@ div.WordSection2 { page: WordSection2; }
 
         function renderProfile() {
             const u = appState.currentUser || {};
+            const first = !u.serviceLevel && !appState.students.length;
             const canInstall = !!window.__bepInstallPrompt;
+            const sel = (name, val, opts, ph) => `<select name="${name}" onchange="onProfileChange()"><option value="">${ph}</option>${opts.map(o => `<option ${String(val) === String(o) ? 'selected' : ''}>${o}</option>`).join('')}</select>`;
+            let extra = '';
+            if (u.serviceLevel === 'Okul Öncesi') {
+                extra = `<label class="field"><span>Yaş grubu</span>${sel('ageGroup', u.ageGroup, AGE_GROUPS, 'Seçiniz')}</label>`;
+            } else if (u.serviceLevel === 'İlkokul') {
+                extra = `<label class="field"><span>Göreviniz</span>${sel('taskType', u.taskType, ['Sınıf öğretmeni', 'Özel eğitim sınıfı'], 'Seçiniz')}</label>`;
+                if (u.taskType === 'Sınıf öğretmeni') extra += `<label class="field"><span>Sınıf düzeyi</span><select name="classGrade" onchange="onProfileChange()"><option value="">Seçiniz</option>${[1, 2, 3, 4].map(g => `<option value="${g}" ${String(u.classGrade) === String(g) ? 'selected' : ''}>${g}. Sınıf</option>`).join('')}</select></label>`;
+                if (u.taskType === 'Özel eğitim sınıfı') extra += `
+                  <fieldset class="field fieldset"><span>Sınıfınızdaki engel türü (Özel Eğitim Hizmetleri Yönetmeliği md. 4)</span>
+                    ${MEVZUAT_ENGEL.map(e => `<label class="check"><input type="checkbox" name="disabilityFocus" value="${e}" ${(u.disabilityFocus || []).includes(e) ? 'checked' : ''} onchange="onProfileChange()"> ${e}</label>`).join('')}
+                  </fieldset>`;
+            } else if (u.serviceLevel === 'Ortaokul' || u.serviceLevel === 'Lise') {
+                extra = `<label class="field"><span>Branşınız</span>${sel('subject', u.subject, SUBJECT_BRANCHES, 'Seçiniz')}</label>`;
+            }
             return `
             <div class="app">
-              ${appBar('Ayarlar', "setView('dashboard')", '')}
+              ${appBar(first ? 'Hoş geldiniz' : 'Ayarlar', first ? null : "setView('dashboard')", '')}
               <main class="page narrow">
                 <section class="card">
-                  <h2 class="card-title">Öğretmen bilgileri</h2>
-                  <p class="muted sm-gap">Bu bilgiler BEP ve değerlendirme formlarında kullanılır.</p>
-                  <form onsubmit="handleProfileSave(event)" class="form">
+                  <h2 class="card-title">${first ? 'Kayıt: öğretmen bilgileri' : 'Öğretmen bilgileri'}</h2>
+                  <p class="muted sm-gap">Bu bilgiler BEP ve formlarda kullanılır; yeni öğrenci eklerken kademe, yaş grubu ve tanı alanları buna göre önceden seçilir.</p>
+                  <form id="profileForm" onsubmit="handleProfileSave(event)" class="form">
                     <label class="field"><span>Adınız</span><input name="firstName" value="${esc(u.firstName)}" autocomplete="given-name" required type="text" /></label>
                     <label class="field"><span>Soyadınız</span><input name="lastName" value="${esc(u.lastName)}" autocomplete="family-name" required type="text" /></label>
-                    <label class="field"><span>Branşınız</span><input name="branch" value="${esc(u.branch)}" placeholder="Örn: Özel Eğitim Öğretmeni" required type="text" /></label>
+                    <label class="field"><span>Çalıştığınız kademe</span>${sel('serviceLevel', u.serviceLevel, SERVICE_LEVELS, 'Seçiniz')}</label>
+                    ${extra}
+                    ${u.branch && u.serviceLevel ? `<p class="muted">Branş: <strong>${esc(u.branch)}</strong></p>` : ''}
                     <button type="submit" class="btn primary lg">Kaydet</button>
                   </form>
                 </section>
-
+                ${first ? '' : `
                 <section class="card">
                   <h2 class="card-title">Yedekleme</h2>
                   <p class="muted sm-gap">Kayıtlar bu cihazda tutulur. Cihaz değiştirmeden veya uygulamayı silmeden önce yedek alın.</p>
@@ -2659,25 +2840,17 @@ div.WordSection2 { page: WordSection2; }
                     </label>
                   </div>
                 </section>
-
                 ${canInstall ? `<section class="card"><h2 class="card-title">Uygulamayı yükle</h2><p class="muted sm-gap">Ana ekranınıza ekleyin; internet olmadan da açılır.</p><button class="btn primary" onclick="installApp()">Ana ekrana ekle</button></section>` : ''}
-
                 <section class="card">
                   <h2 class="card-title">Gizlilik ve veri güvenliği</h2>
-                  <p class="muted">Öğrenci bilgileri (kimlik, sağlık ve eğitim bilgileri dâhil) yalnızca bu cihazın içinde saklanır. Uygulama internete veri göndermez, hesap veya sunucu kullanmaz. Cihazınızı ekran kilidiyle koruyun; paylaşılan cihazlarda işiniz bitince yedek alıp kayıtları silin.</p>
+                  <p class="muted">Öğrenci bilgileri yalnızca bu cihazın içinde saklanır. Uygulama internete veri göndermez, hesap veya sunucu kullanmaz. Cihazınızı ekran kilidiyle koruyun; paylaşılan cihazlarda işiniz bitince yedek alıp kayıtları silin.</p>
                   <a class="link" href="gizlilik.html" target="_blank" rel="noopener">Gizlilik ve aydınlatma metni</a>
                 </section>
-
-                <section class="card">
-                  <h2 class="card-title">Kazanım kaynakları</h2>
-                  <p class="muted">Etiketi "Resmî program" olan derslerde öğrenme çıktıları MEB öğretim programlarından kodlarıyla alınmıştır; kaynak her BEP dosyasında yazılır. "Doğrulanmamış" etiketli listeler ise genel örnek listelerdir, kullanmadan önce ilgili programla karşılaştırın. Aşama aşama güncellenmektedir.</p>
-                </section>
-
                 <section class="card danger-zone">
                   <h2 class="card-title">Tehlikeli bölge</h2>
                   <button class="btn danger" onclick="clearAllData()">Tüm verileri sil</button>
-                </section>
-                <p class="version">BEP Hazırlama Sistemi · v2.1</p>
+                </section>`}
+                <p class="version">BEP Hazırlama Sistemi · v2.3</p>
               </main>
             </div>`;
         }
@@ -2709,7 +2882,10 @@ div.WordSection2 { page: WordSection2; }
                       ${(GRADES_BY_LEVEL[std.level] || []).length ? `<div><label class="block text-sm font-medium mb-1">Sınıf Düzeyi</label>
                         <select name="grade" required onchange="handleGradeChange(this.value)" class="w-full px-3 py-2 border rounded-md bg-blue-50 font-bold text-blue-700">
                           ${GRADES_BY_LEVEL[std.level].map(g => `<option value="${g}" ${Number(std.grade) === g ? 'selected' : ''}>${g}. Sınıf</option>`).join('')}
-                        </select></div>` : '<div></div>'}
+                        </select></div>` : (std.level === 'Ana Sınıfı' ? `<div><label class="block text-sm font-medium mb-1">Yaş Grubu</label>
+                        <select name="ageGroup" required class="w-full px-3 py-2 border rounded-md bg-blue-50 font-bold text-blue-700">
+                          <option value="">Seçiniz</option>${AGE_GROUPS.map(a => `<option ${std.ageGroup === a ? 'selected' : ''}>${a}</option>`).join('')}
+                        </select></div>` : '<div></div>')}
                       <div><label class="block text-sm font-medium mb-1">Doğum Tarihi</label><input name="birthDate" required value="${esc(std.birthDate)}" type="date" class="w-full px-3 py-2 border rounded-md" /></div>
                       <div><label class="block text-sm font-medium mb-1">Cinsiyet</label><select name="gender" class="w-full px-3 py-2 border rounded-md">${GENDER_TYPES.map(g=>`<option ${std.gender===g?'selected':''}>${g}</option>`).join('')}</select></div>
                       <div class="md:col-span-2"><label class="block text-sm font-medium mb-1">Okul Adı</label><input name="schoolName" required value="${esc(std.schoolName)}" type="text" class="w-full px-3 py-2 border rounded-md" /></div>
@@ -2731,7 +2907,10 @@ div.WordSection2 { page: WordSection2; }
                      <h3 class="font-bold mb-4">Özel Eğitim Bilgileri</h3>
                      <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
                        <div><label class="block text-sm font-medium mb-1">Tedbir Kararı</label><select name="decision" onchange="syncFormState(); renderApp();" class="w-full px-3 py-2 border rounded-md">${DECISION_TYPES.map(d=>`<option ${std.decision===d?'selected':''}>${d}</option>`).join('')}</select></div>
-                       <div><label class="block text-sm font-medium mb-1">Tanı</label><select name="disability" class="w-full px-3 py-2 border rounded-md">${DISABILITY_TYPES.map(d=>`<option ${std.disability===d?'selected':''}>${d}</option>`).join('')}</select></div>
+                       <div><label class="block text-sm font-medium mb-1">Tanı</label><select name="disability" class="w-full px-3 py-2 border rounded-md">
+                          <optgroup label="Özel Eğitim Hizmetleri Yönetmeliği md. 4">${MEVZUAT_ENGEL.map(d=>`<option ${std.disability===d?'selected':''}>${d}</option>`).join('')}</optgroup>
+                          <optgroup label="Diğer tanılar (RAM raporu)">${DIGER_TANI.map(d=>`<option ${std.disability===d?'selected':''}>${d}</option>`).join('')}${(!DISABILITY_TYPES.includes(std.disability) && std.disability) ? `<option selected>${esc(std.disability)}</option>` : ''}</optgroup>
+                        </select></div>
                        
                        ${std.decision.includes("Kaynaştırma") ? `
                         <div class="md:col-span-2 bg-blue-50 p-4 rounded-md border">
@@ -2978,6 +3157,7 @@ div.WordSection2 { page: WordSection2; }
                   ${info('Adı-Soyadı', `${esc(std.firstName)} ${esc(std.lastName)}`)}
                   ${info('Okul / No / Sınıf', `${esc(std.schoolName)} / ${esc(std.schoolNo)} / ${classLabel(std)}`)}
                   ${info('Doğum Tarihi', fmtDate(std.birthDate))}
+                  ${std.level === 'Ana Sınıfı' && std.ageGroup ? info('Yaş Grubu', esc(std.ageGroup)) : ''}
                   ${info('Tanı / Karar', `${esc(std.disability)} / ${esc(std.decision)}`)}
                   ${info('Daha önce aldığı destek eğitimleri ve süresi', esc(std.supportEduHistory) || '-')}
                   ${info('Kullandığı cihaz / materyaller', esc(std.devices) || '-')}
@@ -3034,7 +3214,7 @@ div.WordSection2 { page: WordSection2; }
                         ${k === 0 ? `<td rowspan="${rows.length}">${esc(area.uda)}</td>` : ''}
                         <td>${esc(stripCode(area, kda.description))}</td>
                         <td class="c">${crit}</td>
-                        ${k === 0 ? `<td rowspan="${rows.length}">${esc(area.methods)}</td><td rowspan="${rows.length}">${esc(area.materials)}</td>` : ''}
+                        ${k === 0 ? `<td rowspan="${rows.length}">${esc(area.methods)}</td><td rowspan="${rows.length}">${esc(areaMaterialText(area))}</td>` : ''}
                         <td class="c sm">${rangeText(kda.startDate, kda.endDate)}</td>
                         <td class="c sm">${esc(kda.measureMethod || 'Gözlem')}</td><td class="c sm">${showDate(kda.measureDate)}</td><td class="c sm">${resultText(kda.result)}</td>
                       </tr>`).join('')}
@@ -3153,7 +3333,7 @@ div.WordSection2 { page: WordSection2; }
                   <button onclick="deleteStudentAndGoHome(${id})" class="text-red-600 font-bold flex items-center bg-red-50 px-4 py-2 rounded-lg hover:bg-red-100 transition"><i data-lucide="trash-2" class="mr-2 w-4 h-4"></i> Sil</button>
                 </div>
                 <div class="flex flex-wrap gap-2">
-                  ${wrapperId === 'bep-wrapper' ? `<button onclick="setView('evalFormsView')" class="bg-indigo-600 text-white px-5 py-2 rounded-lg font-bold shadow-sm hover:bg-indigo-700">Değerlendirme Formları (ÖBÖA)</button><button onclick="setView('measure')" class="bg-teal-600 text-white px-5 py-2 rounded-lg font-bold shadow-sm hover:bg-teal-700">Ölçme Değerlendirme</button>` : ''}
+                  ${wrapperId === 'bep-wrapper' ? `<button onclick="setView('evalFormsView')" class="bg-indigo-600 text-white px-5 py-2 rounded-lg font-bold shadow-sm hover:bg-indigo-700">Değerlendirme Formları (ÖBÖA)</button><button onclick="setView('measure')" class="bg-teal-600 text-white px-5 py-2 rounded-lg font-bold shadow-sm hover:bg-teal-700">Ölçme Değerlendirme</button><button onclick="setView('activities')" class="bg-amber-600 text-white px-5 py-2 rounded-lg font-bold shadow-sm hover:bg-amber-700">Etkinlik ve Materyal</button>` : ''}
                   <button onclick="exportXlsx('${wrapperId}', '${base}_${suffix}.xlsx')" class="bg-green-700 text-white px-5 py-2 rounded-lg font-bold hover:bg-green-800">Excel'e Aktar</button>
                   <button onclick="exportHTMLToWord('${wrapperId}', '${base}_${suffix}.doc')" class="bg-slate-700 text-white px-5 py-2 rounded-lg font-bold hover:bg-slate-800">Word'e Aktar</button>
                   <button onclick="printDoc()" class="bg-blue-800 text-white px-6 py-2 rounded-lg flex items-center font-bold shadow-lg hover:bg-blue-900 transition"><i data-lucide="printer" class="mr-2 w-5 h-5"></i> Yazdır / PDF</button>
@@ -3180,52 +3360,89 @@ div.WordSection2 { page: WordSection2; }
             (std.bep || []).forEach(a => (a.kdaList || []).forEach(k => { total++; if (k.result === 'yapiyor') yes++; else if (k.result === 'yapamiyor') no++; }));
             return { yes, no, total, left: total - yes - no };
         }
-        function updateMeasureSummary() {
-            const c = measureCounts(appState.generatedBEP);
+        function areaCounts(area) {
+            let yes = 0, no = 0, total = 0;
+            (area.kdaList || []).forEach(k => { total++; if (k.result === 'yapiyor') yes++; else if (k.result === 'yapamiyor') no++; });
+            return { yes, no, total, left: total - yes - no };
+        }
+        function curMeasureCourse(std) {
+            const n = (std.bep || []).length;
+            const i = Number.isInteger(std.measureCourse) ? std.measureCourse : 0;
+            return i >= 0 && i < n ? i : 0;
+        }
+        function updateMeasureSummary(ai) {
+            const std = appState.generatedBEP; if (!std) return;
+            const c = areaCounts(std.bep[ai]);
             const set = (id, v) => { const el = document.getElementById(id); if (el) el.textContent = v; };
             set('ms_yes', c.yes); set('ms_no', c.no); set('ms_left', c.left);
+            set('tabp_' + ai, `${c.yes + c.no}/${c.total} işaretlendi`);
         }
         function setMeasure(ai, ki, field, value) {
             const std = appState.generatedBEP; if (!std) return;
-            const k = std.bep[ai].kdaList[ki];
-            k[field] = value;
-            saveStore(); updateMeasureSummary();
+            std.bep[ai].kdaList[ki][field] = value;
+            saveStore(); updateMeasureSummary(ai);
+            const el = document.getElementById(`sv_${ai}_${ki}`);
+            if (el) { el.classList.add('on'); clearTimeout(el._t); el._t = setTimeout(() => el.classList.remove('on'), 1800); }
         }
         function clearMeasureResult(ai, ki) {
             setMeasure(ai, ki, 'result', '');
             const y = window.scrollY; renderApp(); window.scrollTo(0, y);
+        }
+        function selectMeasureCourse(ai) {
+            const std = appState.generatedBEP; if (!std) return;
+            std.measureCourse = ai; saveStore(); renderApp(); window.scrollTo(0, 0);
         }
         function openMeasure(id) {
             const std = appState.students.find(s => s.id === id);
             if (!std) return;
             appState.generatedBEP = std; setView('measure');
         }
+        function openActivities(id) {
+            const std = appState.students.find(s => s.id === id);
+            if (!std) return;
+            appState.generatedBEP = std; setView('activities');
+        }
+        function openMeasureDoc(all) {
+            const std = appState.generatedBEP; if (!std) return;
+            appState.measureDocSel = all ? std.bep.map((_, i) => i) : [curMeasureCourse(std)];
+            setView('measureDoc');
+        }
+        function toggleMeasureDoc(ai) {
+            const sel = appState.measureDocSel || [];
+            const i = sel.indexOf(ai);
+            if (i > -1) { if (sel.length === 1) return; sel.splice(i, 1); } else sel.push(ai);
+            appState.measureDocSel = sel.sort((a, b) => a - b);
+            renderApp();
+        }
 
         function renderMeasure() {
             const std = appState.generatedBEP;
             if (!std) return '';
-            const c = measureCounts(std);
-            const areas = (std.bep || []).map((area, ai) => `
-              <section class="card">
-                <h2 class="card-title">${esc(area.area)}</h2>
-                ${(area.kdaList || []).map((k, ki) => `
+            const cur = curMeasureCourse(std);
+            const area = std.bep[cur];
+            const c = areaCounts(area);
+            const tabs = std.bep.map((a, i) => {
+                const ac = areaCounts(a);
+                return `<button type="button" class="tab ${i === cur ? 'on' : ''}" onclick="selectMeasureCourse(${i})" aria-pressed="${i === cur}"><span>${esc(a.area)}</span><small id="tabp_${i}">${ac.yes + ac.no}/${ac.total} işaretlendi</small></button>`;
+            }).join('');
+            const goals = (area.kdaList || []).map((k, ki) => `
                   <div class="mgoal">
-                    <p class="mgoal-text">${esc(stripCode(area, k.description))}</p>
+                    <p class="mgoal-text">${ki + 1}. ${esc(stripCode(area, k.description))}</p>
                     <div class="mgrid">
-                      <label class="field"><span>Başlama tarihi</span><input type="date" value="${isoOf(k.startDate)}" onchange="setMeasure(${ai},${ki},'startDate',this.value)" /></label>
-                      <label class="field"><span>Bitiş tarihi</span><input type="date" value="${isoOf(k.endDate)}" onchange="setMeasure(${ai},${ki},'endDate',this.value)" /></label>
-                      <label class="field"><span>Ölçme tarihi</span><input type="date" value="${isoOf(k.measureDate)}" onchange="setMeasure(${ai},${ki},'measureDate',this.value)" /></label>
-                      <label class="field"><span>Ölçme yöntemi</span><select onchange="setMeasure(${ai},${ki},'measureMethod',this.value)">${MEASURE_METHODS.map(m => `<option ${((k.measureMethod || 'Gözlem') === m) ? 'selected' : ''}>${m}</option>`).join('')}</select></label>
+                      <label class="field"><span>Başlama tarihi</span><input type="date" value="${isoOf(k.startDate)}" onchange="setMeasure(${cur},${ki},'startDate',this.value)" /></label>
+                      <label class="field"><span>Bitiş tarihi</span><input type="date" value="${isoOf(k.endDate)}" onchange="setMeasure(${cur},${ki},'endDate',this.value)" /></label>
+                      <label class="field"><span>Ölçme tarihi</span><input type="date" value="${isoOf(k.measureDate)}" onchange="setMeasure(${cur},${ki},'measureDate',this.value)" /></label>
+                      <label class="field"><span>Ölçme yöntemi</span><select onchange="setMeasure(${cur},${ki},'measureMethod',this.value)">${MEASURE_METHODS.map(m => `<option ${((k.measureMethod || 'Gözlem') === m) ? 'selected' : ''}>${m}</option>`).join('')}</select></label>
                     </div>
                     <div class="mresult">
                       <div class="seg" role="radiogroup" aria-label="Sonuç">
-                        <label class="seg-opt ok"><input type="radio" name="r_${ai}_${ki}" value="yapiyor" ${k.result === 'yapiyor' ? 'checked' : ''} onchange="setMeasure(${ai},${ki},'result','yapiyor')"><span>Yapıyor</span></label>
-                        <label class="seg-opt no"><input type="radio" name="r_${ai}_${ki}" value="yapamiyor" ${k.result === 'yapamiyor' ? 'checked' : ''} onchange="setMeasure(${ai},${ki},'result','yapamiyor')"><span>Yapamıyor</span></label>
+                        <label class="seg-opt ok"><input type="radio" name="r_${cur}_${ki}" value="yapiyor" ${k.result === 'yapiyor' ? 'checked' : ''} onchange="setMeasure(${cur},${ki},'result','yapiyor')"><span>Yapıyor</span></label>
+                        <label class="seg-opt no"><input type="radio" name="r_${cur}_${ki}" value="yapamiyor" ${k.result === 'yapamiyor' ? 'checked' : ''} onchange="setMeasure(${cur},${ki},'result','yapamiyor')"><span>Yapamıyor</span></label>
                       </div>
-                      <button type="button" class="btn-link" onclick="clearMeasureResult(${ai},${ki})">Temizle</button>
+                      <button type="button" class="btn-link" onclick="clearMeasureResult(${cur},${ki})">Temizle</button>
+                      <span class="saved" id="sv_${cur}_${ki}">Kaydedildi &#10003;</span>
                     </div>
-                  </div>`).join('')}
-              </section>`).join('');
+                  </div>`).join('');
             return `
             <div class="app">
               ${appBar('Ölçme Değerlendirme', "setView('bepView')", '')}
@@ -3233,25 +3450,35 @@ div.WordSection2 { page: WordSection2; }
                 <section class="card">
                   <h2 class="card-title">${esc(std.firstName)} ${esc(std.lastName)}</h2>
                   <p class="muted">${classLabel(std)} &bull; BEP dönemi: ${fmtDate(std.bepStartDate)} – ${fmtDate(std.bepEndDate)}</p>
-                  <p class="muted sm-gap" style="margin-top:8px">Her kısa dönemli amaç için tarihleri takvimden seçin, öğrencinin amacı yapıp yapmadığını işaretleyin. Girdiğiniz bilgiler otomatik kaydedilir ve BEP planına yansır.</p>
-                  <div class="stats" style="margin:0">
+                  <p class="muted sm-gap" style="margin-top:8px">Önce dersi seçin, sonra her kısa dönemli amaç için tarihleri takvimden seçip öğrencinin amacı yapıp yapmadığını işaretleyin. Her değişiklik anında kaydedilir.</p>
+                </section>
+                <div class="tabs" role="tablist" aria-label="Dersler">${tabs}</div>
+                <section class="card">
+                  <h2 class="card-title">${esc(area.area)}</h2>
+                  <div class="stats" style="margin:8px 0 6px">
                     <div class="stat"><b id="ms_yes">${c.yes}</b><span>Yapıyor</span></div>
                     <div class="stat"><b id="ms_no">${c.no}</b><span>Yapamıyor</span></div>
                     <div class="stat"><b id="ms_left">${c.left}</b><span>İşaretlenmedi</span></div>
                   </div>
+                  ${goals}
                 </section>
-                ${areas}
               </main>
-              <div class="actionbar hide-on-print"><button class="btn primary lg" onclick="setView('measureDoc')"><i data-lucide="printer" class="ic"></i> Formu oluştur / Çıktı al</button></div>
+              <div class="actionbar hide-on-print"><div class="actionbar-in">
+                <button class="btn" onclick="openMeasureDoc(false)">Bu dersin formu</button>
+                <button class="btn primary" onclick="openMeasureDoc(true)"><i data-lucide="printer" class="ic"></i> Tüm dersler / Çıktı al</button>
+              </div></div>
             </div>`;
         }
 
-        function buildMeasureDocHtml(std) {
+        function buildMeasureDocHtml(std, sel) {
             const teacher = esc(`${appState.currentUser.firstName} ${appState.currentUser.lastName}`.trim());
-            const c = measureCounts(std);
-            const done = c.yes + c.no;
-            const pct = done ? Math.round((c.yes / done) * 100) : 0;
-            return (std.bep || []).map((area, ai) => {
+            const idx = (sel && sel.length ? sel : std.bep.map((_, i) => i)).filter(i => std.bep[i]);
+            let yes = 0, no = 0, left = 0;
+            idx.forEach(i => { const c = areaCounts(std.bep[i]); yes += c.yes; no += c.no; left += c.left; });
+            const done = yes + no;
+            const pct = done ? Math.round((yes / done) * 100) : 0;
+            return idx.map((ai, pos) => {
+                const area = std.bep[ai];
                 const rows = (area.kdaList || []).map((k, ki) => `
                   <tr>
                     <td class="c">${ki + 1}</td>
@@ -3262,11 +3489,10 @@ div.WordSection2 { page: WordSection2; }
                     <td class="c mark">${k.result === 'yapiyor' ? 'X' : ''}</td>
                     <td class="c mark">${k.result === 'yapamiyor' ? 'X' : ''}</td>
                   </tr>`).join('');
-                const ay = (area.kdaList || []).filter(k => k.result === 'yapiyor').length;
-                const an = (area.kdaList || []).filter(k => k.result === 'yapamiyor').length;
-                const last = ai === std.bep.length - 1;
+                const ac = areaCounts(area);
+                const last = pos === idx.length - 1;
                 return `
-                <div class="doc doc-portrait paper WordSection1 ${ai > 0 ? 'sec-break' : ''}" data-sheet="${esc(area.area)}" data-chars="110">
+                <div class="doc doc-portrait paper WordSection1 ${pos > 0 ? 'sec-break' : ''}" data-sheet="${esc(area.area)}" data-chars="110">
                   <h2 class="doc-title">ÖLÇME DEĞERLENDİRME FORMU</h2>
                   <table>
                     <colgroup><col style="width:30%"><col style="width:70%"></colgroup>
@@ -3285,13 +3511,13 @@ div.WordSection2 { page: WordSection2; }
                       <tr><th>No</th><th>Kısa Dönemli Amaç</th><th>Başlama - Bitiş</th><th>Ölçme Yöntemi</th><th>Ölçme Tarihi</th><th>Yapıyor</th><th>Yapamıyor</th></tr>
                     </thead>
                     <tbody>${rows}
-                      <tr><td class="k" colspan="5">Bu alanda toplam</td><td class="c"><strong>${ay}</strong></td><td class="c"><strong>${an}</strong></td></tr>
+                      <tr><td class="k" colspan="5">Bu alanda toplam</td><td class="c"><strong>${ac.yes}</strong></td><td class="c"><strong>${ac.no}</strong></td></tr>
                     </tbody>
                   </table>
-                  ${last ? `<table>
+                  ${last && idx.length > 1 ? `<table>
                     <colgroup><col style="width:30%"><col style="width:70%"></colgroup>
                     <tbody>
-                      <tr><td class="k">Genel sonuç</td><td>Yapıyor: ${c.yes} &nbsp; Yapamıyor: ${c.no} &nbsp; İşaretlenmedi: ${c.left} ${done ? ` &nbsp; (Başarı oranı: %${pct})` : ''}</td></tr>
+                      <tr><td class="k">Genel sonuç</td><td>Yapıyor: ${yes} &nbsp; Yapamıyor: ${no} &nbsp; İşaretlenmedi: ${left} ${done ? ` &nbsp; (Başarı oranı: %${pct})` : ''}</td></tr>
                     </tbody>
                   </table>` : ''}
                   <div class="nobreak">
@@ -3308,11 +3534,277 @@ div.WordSection2 { page: WordSection2; }
         function renderMeasureDoc() {
             const std = appState.generatedBEP;
             if (!std) return '';
+            let sel = (appState.measureDocSel || []).filter(i => std.bep[i]);
+            if (!sel.length) sel = std.bep.map((_, i) => i);
+            appState.measureDocSel = sel;
             const back = `<button onclick="setView('measure')" class="text-blue-700 font-bold flex items-center bg-blue-50 px-4 py-2 rounded-lg hover:bg-blue-100 transition"><i data-lucide="arrow-left" class="mr-2 w-5 h-5"></i> Ölçme Değerlendirmeye Dön</button>`;
+            const chips = std.bep.length > 1 ? `
+              <div class="w-full max-w-[210mm] mb-4 hide-on-print doc-chips" role="group" aria-label="Formda yer alacak dersler">
+                <span class="doc-chips-label">Formda yer alacak dersler:</span>
+                ${std.bep.map((a, i) => `<button type="button" class="chip ${sel.includes(i) ? 'on' : ''}" aria-pressed="${sel.includes(i)}" onclick="toggleMeasureDoc(${i})">${sel.includes(i) ? '&#10003; ' : ''}${esc(a.area)}</button>`).join('')}
+              </div>` : '';
             return `
             <div class="min-h-screen bg-slate-200 p-4 md:p-8 flex flex-col items-center">
               ${docToolbar(std, back, 'measure-wrapper', 'OlcmeDegerlendirme', 'OlcmeDegerlendirme')}
-              <div id="measure-wrapper" class="w-full">${buildMeasureDocHtml(std)}</div>
+              ${chips}
+              <div id="measure-wrapper" class="w-full">${buildMeasureDocHtml(std, sel)}</div>
+            </div>`;
+        }
+
+        // ==========================================
+        // ETKİNLİK VE MATERYAL (öneri kütüphanesi: şablon tabanlı, MEB onaylı içerik değildir)
+        // ==========================================
+        const ACT_LIB = [
+            { id: 'okuma', name: 'Okuma-yazma ve sözcük', re: /harf|hece|okuma|okur|yazma|yazar|sözcük|kelime|cümle|metin|sesbirim|ses |dinle|anlat|hikâye|hikaye|şiir|noktalama|alfabe/,
+              list: [
+                { t: 'Harf Avı', dk: 15, grp: 'Bireysel / ikili', steps: ['Sınıfa gizlenmiş harf kartlarını öğrenciyle birlikte bulun.', 'Bulunan harfin sesini söyletin, harfle başlayan nesneyi gösterin.', 'Kartı harf kutusuna yerleştirtin; her doğru eşleşmeyi pekiştirin.'], mat: ['Harf kartları', 'Resimli sözcük kartları', 'Harf kutusu'] },
+                { t: 'Hece Treni', dk: 15, grp: 'Küçük grup', steps: ['Vagon şeklindeki hece kartlarını masaya dizin.', 'Öğrenci vagonları birleştirerek sözcük oluşturur ve yüksek sesle okur.', 'Oluşan sözcüğün resmini eşleştirir.'], mat: ['Hece vagonu kartları', 'Resim kartları', 'Yapıştırıcı bant'] },
+                { t: 'Kum Tepsisinde Yazı', dk: 10, grp: 'Bireysel', steps: ['Tepsiye ince kum veya irmik serin.', 'Harfi parmakla yazmasını sağlayın, sonra kalemle kâğıda geçin.', 'Yazının yönünü ok işaretleriyle destekleyin.'], mat: ['Kum veya irmik tepsisi', 'Yönlü harf şablonları', 'Kalın uçlu kalem'] }
+              ] },
+            { id: 'sayi', name: 'Sayılar ve işlemler', re: /sayı|sayma|rakam|toplama|çıkarma|çarp|bölme|işlem|basamak|kesir|ritmik|say[ıi]l/,
+              list: [
+                { t: 'Market Oyunu', dk: 20, grp: 'İkili / küçük grup', steps: ['Sınıfta küçük bir market kurun, ürünlere sayı etiketleri koyun.', 'Öğrenci istenen sayıda ürünü sepete koyar ve sayar.', 'Toplama/çıkarma için "2 ürün daha ekle / 1 ürün çıkar" yönergeleri verin.'], mat: ['Oyuncak market ürünleri', 'Sayı etiketleri', 'Sepet', 'Oyuncak para'] },
+                { t: 'Sayı Basamakları', dk: 15, grp: 'Bireysel', steps: ['Zemine yapışkan bantla 1–10 basamakları çizin.', 'Öğrenci her basamakta sayıyı söyleyerek ilerler.', 'Zar atıp o kadar basamak ilerleyerek toplama pekiştirilir.'], mat: ['Renkli bant', 'Sayı kartları', 'Zar'] },
+                { t: 'Somut Nesnelerle İşlem', dk: 15, grp: 'Bireysel', steps: ['İşlemi önce nesnelerle (düğme, küp) gösterin.', 'Sonra sayı çizgisinde, en son kâğıt üzerinde yaptırın.', 'Her aşamada doğru yanıtı sözlü ve görsel olarak pekiştirin.'], mat: ['Sayma küpleri', 'Düğme/fasulye', 'Sayı çizgisi'] }
+              ] },
+            { id: 'geometri', name: 'Geometri, ölçme, zaman ve para', re: /şekil|geometri|ölç|uzunluk|saat|zaman|para|kütle|sıvı|takvim|konum|yön|desen|örüntü|büyük|küçük|uzun|kısa/,
+              list: [
+                { t: 'Şekil Dedektifi', dk: 15, grp: 'Küçük grup', steps: ['Sınıftaki nesneler arasında daire, kare, üçgen şekillerini arattırın.', 'Bulunan nesneyi şekil kartıyla eşleştirtin.', 'Karton şekillerle basit bir resim (ev, robot) yaptırın.'], mat: ['Geometrik şekil kartları', 'Karton şekiller', 'Yapıştırıcı'] },
+                { t: 'Kendi Saatimi Yapıyorum', dk: 20, grp: 'Bireysel', steps: ['Kartondan akrep-yelkovanlı saat yaptırın.', 'Günlük program kartlarındaki saatleri göstertin.', 'Önemli saatleri (ders, teneffüs, eve gidiş) birlikte işaretleyin.'], mat: ['Karton', 'Dönen akrep/yelkovan düzeneği', 'Günlük program kartları'] },
+                { t: 'Ölçelim, Kıyaslayalım', dk: 15, grp: 'İkili', steps: ['Ayak, karış, kalem gibi birimlerle masayı ölçtürün.', 'Sonuçları iki öğrenci karşılaştırır.', '"En uzun / en kısa" sıralaması yaptırın.'], mat: ['Cetvel', 'Şerit metre', 'Karşılaştırma nesneleri'] }
+              ] },
+            { id: 'fen', name: 'Doğa, canlılar ve çevre', re: /canlı|bitki|hayvan|madde|doğa|çevre|mevsim|hava|su |toprak|güneş|ay |dünya|deney|fen |vücut|duyu|sağlık|beslen/,
+              list: [
+                { t: 'Mini Bahçe', dk: 20, grp: 'Küçük grup', steps: ['Bir fasulye tohumunu pamukla saksıya ekin.', 'Her gün büyümeyi gözleyip çizelgeye resim çizdirin.', 'Bitkinin ihtiyaçlarını (su, ışık) sohbetle pekiştirin.'], mat: ['Fasulye tohumu', 'Pamuk', 'Şeffaf bardak', 'Gözlem çizelgesi'] },
+                { t: 'Duyu Kutusu', dk: 15, grp: 'Bireysel / ikili', steps: ['Kapalı kutuya farklı dokulu nesneler koyun.', 'Öğrenci elini sokup dokuyu tarif eder (pürüzlü, yumuşak).', 'Nesneyi tahmin eder, sonra çıkarıp doğrular.'], mat: ['Kapalı kutu', 'Farklı dokulu nesneler'] },
+                { t: 'Mevsim Panosu', dk: 20, grp: 'Sınıf', steps: ['Dört mevsim için pano hazırlayın.', 'Öğrenci giysi ve doğa resimlerini ilgili mevsime yapıştırır.', 'Her hafta hava durumu takvimini işaretler.'], mat: ['Pano', 'Mevsim resimleri', 'Hava durumu takvimi'] }
+              ] },
+            { id: 'sosyal', name: 'Toplum, aile ve vatandaşlık', re: /aile|okul|toplum|bayram|vatan|tarih|atatürk|meslek|kural|hak |sorumluluk|harita|ülke|kültür|trafik|vatandaş|akraba/,
+              list: [
+                { t: 'Meslek Rol Oyunu', dk: 20, grp: 'Küçük grup', steps: ['Doktor, öğretmen, fırıncı gibi kıyafet/aksesuar seçtirin.', 'Rolü canlandırırken mesleğin görevini konuşun.', 'Her rolden sonra "Ne yaptık?" sorusuyla özetleyin.'], mat: ['Meslek aksesuarları', 'Meslek kartları'] },
+                { t: 'Aile Ağacım', dk: 20, grp: 'Bireysel', steps: ['Aile fotoğraflarını/resimlerini getirtin.', 'Ağaç şablonuna yakınlık sırasıyla yapıştırın.', 'Her kişiyi "Bu benim ..." cümlesiyle tanıtın.'], mat: ['Ağaç şablonu', 'Aile fotoğrafları', 'Yapıştırıcı'] },
+                { t: 'Sınıf Kuralları Posteri', dk: 20, grp: 'Sınıf', steps: ['Üç temel kuralı resimli kartlarla belirleyin.', 'Doğru/yanlış davranış kartlarını gruplayın.', 'Posteri birlikte hazırlayıp panoya asın.'], mat: ['Davranış kartları', 'Poster kâğıdı', 'Boyalar'] }
+              ] },
+            { id: 'motor', name: 'İnce ve kaba motor beceriler', re: /motor|kalem|kesme|boyama|el |parmak|denge|koordinasyon|kavrama|sıçra|yürü|koş|tutma|çizgi|beden/,
+              list: [
+                { t: 'Hamurla Güçlenen Eller', dk: 15, grp: 'Küçük grup', steps: ['Oyun hamurundan yılan, top, harf yaptırın.', 'Çamaşır mandalıyla hamura iplik gibi çubuklar takın.', 'Süre sonunda ürünleri sergileyin.'], mat: ['Oyun hamuru', 'Mandal', 'Çubuk'] },
+                { t: 'Engel Parkuru', dk: 20, grp: 'Küçük grup', steps: ['Minder, çember ve ipten kolay bir parkur kurun.', 'Sıra ile geçişi gösterip yaptırın.', 'Başarılı geçişte alkışla pekiştirin; zorluğu kademeli artırın.'], mat: ['Minder', 'Çember', 'İp', 'Koni'] },
+                { t: 'Boncuk Dizme', dk: 15, grp: 'Bireysel', steps: ['Deseni örnek kartta gösterin.', 'Öğrenci aynı desende boncukları iplige dizer.', 'Deseni kendisi oluşturarak ilerleyin.'], mat: ['Büyük boncuklar', 'Kalın ip', 'Desen kartları'] }
+              ] },
+            { id: 'sanat', name: 'Sanat, müzik ve drama', re: /sanat|müzik|şarkı|resim|ritim|drama|dans|oyun|yaratıcı|boya|hayal|enstrüman|tiyatro/,
+              list: [
+                { t: 'Ritim Atölyesi', dk: 15, grp: 'Sınıf', steps: ['Davul, tef veya el çırpmasıyla ritim verin.', 'Öğrenci ritmi taklit eder, sonra kendi ritmini önerir.', 'Şarkıya eşlik ederek pekiştirin.'], mat: ['Tef', 'Davul', 'Marakas', 'Şarkı kartları'] },
+                { t: 'Atık Malzemeyle Heykel', dk: 25, grp: 'Küçük grup', steps: ['Kutu, kapak, rulolardan bir hayvan tasarlatın.', 'Yapıştırıcı ve boyayla birleştirip adlandırtın.', 'Eserini arkadaşlarına tanıtır.'], mat: ['Atık kutular', 'Yapıştırıcı', 'Boya', 'Makas'] },
+                { t: 'Gölge Tiyatrosu', dk: 20, grp: 'Küçük grup', steps: ['Karton kuklaları çubuğa yapıştırın.', 'Beyaz perde arkasında fenerle gölge oluşturun.', 'Kısa bir hikâyeyi birlikte oynayın.'], mat: ['Karton kukla', 'El feneri', 'Beyaz perde'] }
+              ] },
+            { id: 'oz', name: 'Öz bakım ve günlük yaşam', re: /öz bakım|öz-bakım|giyin|giysi|yıka|tuvalet|beslen|yemek|temizlik|diş|el yıka|düğme|fermuar|ayakkabı|bağcık|bağımsız|günlük yaşam|kişisel/,
+              list: [
+                { t: 'Adım Adım Kart Zinciri', dk: 15, grp: 'Bireysel', steps: ['Beceriyi (el yıkama) resimli adımlara bölün.', 'Kartları sırayla göstererek birlikte yapın.', 'Yardımı kademeli azaltın; tamamlayınca pekiştirin.'], mat: ['Resimli adım kartları', 'Sabun', 'Havlu'] },
+                { t: 'Giysi Çalışma Panosu', dk: 15, grp: 'Bireysel', steps: ['Düğme, fermuar, çıtçıt panosunda ayrı ayrı çalışın.', 'Beceriyi önce panoda, sonra kendi giysisinde uygulatın.', 'Her başarılı denemeyi çizelgeye işaretleyin.'], mat: ['Beceri panosu (düğme/fermuar)', 'Ceket', 'Kontrol çizelgesi'] },
+                { t: 'Sofra Hazırlığı', dk: 20, grp: 'İkili', steps: ['Tabak, bardak, kaşığı yerleştirme şablonunu gösterin.', 'Öğrenci şablona bakarak sofra kurar.', 'Yemek sonrası toplama sorumluluğu verin.'], mat: ['Plastik tabak/bardak', 'Sofra şablonu'] }
+              ] },
+            { id: 'iletisim', name: 'İletişim ve konuşma', re: /iletişim|konuş|söz|ifade|soru|yanıt|sohbet|dil |anlatır|isteği|selam|tanış|cevap/,
+              list: [
+                { t: 'Konuşan Kartlar', dk: 15, grp: 'İkili', steps: ['Resimli kartlardan biri çekilir.', 'Öğrenci kartı betimleyen bir cümle kurar.', 'Eş gönderilen soruyu yanıtlayarak diyalog kurulur.'], mat: ['Resimli kartlar', 'Cümle başlangıç kartları'] },
+                { t: 'Telefon Oyunu', dk: 15, grp: 'İkili', steps: ['İki oyuncak telefon ile selamlaşma ve istekte bulunma çalışın.', 'Sırayla "Merhaba, ... istiyorum" kalıplarını kullandırın.', 'Rolleri değiştirip tekrarlayın.'], mat: ['Oyuncak telefon', 'Kalıp cümle kartları'] },
+                { t: 'Resimli Günlük', dk: 15, grp: 'Bireysel', steps: ['Gün içinden bir olayı çizdirin.', 'Resmi anlatmasını isteyin; öğretmen cümleyi yazar.', 'Hafta sonunda günlükten sunum yaptırın.'], mat: ['Çizim defteri', 'Boya kalemleri'] }
+              ] },
+            { id: 'duygu', name: 'Duygu ve sosyal beceri', re: /duygu|sosyal|arkadaş|paylaş|sıra|işbirliği|empati|öfke|davranış|kurala|yardımlaş|uyum/,
+              list: [
+                { t: 'Duygu Yüzleri', dk: 15, grp: 'Küçük grup', steps: ['Mutlu, üzgün, kızgın yüz kartlarını gösterin.', 'Öğrenci kartı seçip o duyguyu yaşattığı bir durumu söyler.', 'Sakinleşme için derin nefes çalışması ekleyin.'], mat: ['Duygu kartları', 'Ayna'] },
+                { t: 'Sıra Bende', dk: 15, grp: 'Küçük grup', steps: ['Basit bir masa oyununda sıra bekleme kuralını anlatın.', 'Sıra işaretiyle (sıra kartı) dönüşümlü oynayın.', 'Bekleyene ve paylaşana övgü verin.'], mat: ['Masa oyunu', 'Sıra kartı', 'Sayaç'] },
+                { t: 'Hikâye ile Çözüm', dk: 20, grp: 'Küçük grup', steps: ['Küçük bir çatışma durumunu içeren sosyal öykü okuyun.', '"Ne yapabilirdi?" sorusuyla çözümler üretin.', 'Seçilen çözümü rol oyunuyla deneyin.'], mat: ['Sosyal öykü kartları', 'Kuklalar'] }
+              ] },
+            { id: 'algi', name: 'Dikkat, algı ve eşleştirme', re: /dikkat|algı|eşleş|renk|sınıfla|gruplama|ayırt|benzer|farklı|sıralama|bellek|görsel|işitsel|hafıza/,
+              list: [
+                { t: 'Hafıza Kartları', dk: 15, grp: 'İkili', steps: ['Resimli çift kartları ters çevirin.', 'Sırayla iki kart açıp eşini arayın.', 'Kart sayısını yavaş yavaş artırın.'], mat: ['Eşli resim kartları'] },
+                { t: 'Renk Torbaları', dk: 10, grp: 'Bireysel', steps: ['Karışık nesneleri renklerine göre torbalara ayırtın.', 'Ayırma ölçütünü (renk, boyut, şekil) değiştirin.', 'Öğrenci ölçütü sözlü söyler.'], mat: ['Renkli torbalar', 'Karışık nesneler'] },
+                { t: 'Farkı Bul', dk: 10, grp: 'Bireysel / ikili', steps: ['İki benzer resmi yan yana verin.', 'Farkları bulup işaretletin.', 'Zamanı yavaşça kısaltarak dikkati geliştirin.'], mat: ['Farkı bul çalışma kâğıdı', 'Kalem'] }
+              ] },
+            { id: 'beden', name: 'Oyun ve hareket', re: /spor|oyun|hareket|jimnastik|top|zıpla|atma|yakalama|dans|egzersiz|yüzme|sağlık/,
+              list: [
+                { t: 'Balon Oyunu', dk: 15, grp: 'Sınıf', steps: ['Balonu havada tutma ve vurma çalışması yaptırın.', 'Yönergelerle (sağ el, sol el) gelişimi izleyin.', 'Takım olarak balonu düşürmeden sayıp sayı toplayın.'], mat: ['Balon', 'Çember'] },
+                { t: 'Hedef Atışı', dk: 15, grp: 'Küçük grup', steps: ['Kutu veya çemberi hedef olarak yerleştirin.', 'Yumuşak topla atış denemeleri yaptırın.', 'Mesafeyi kademeli artırın.'], mat: ['Yumuşak top', 'Çember', 'Kutu'] },
+                { t: 'Ayna Dansı', dk: 10, grp: 'İkili', steps: ['Öğretmen/arkadaş hareketleri yapar, öğrenci ayna gibi taklit eder.', 'Hareketleri yavaşça zorlaştırın.', 'Rol değiştirip öğrencinin yönetmesini sağlayın.'], mat: ['Müzik çalar'] }
+              ] },
+            { id: 'yabanci', name: 'Yabancı dil', re: /english|ingilizce|yabancı|vocabulary|hello|colou?r words/,
+              list: [
+                { t: 'Resimli Sözcük Oyunu', dk: 15, grp: 'Küçük grup', steps: ['Yeni sözcüğün resmini gösterip tekrar ettirin.', 'Sözcüğü hareketle birleştirin (TPR).', 'Kartlarla eşleştirme oyunu oynayın.'], mat: ['Resimli sözcük kartları', 'Hareket kartları'] },
+                { t: 'Şarkıyla Öğrenme', dk: 10, grp: 'Sınıf', steps: ['Kısa bir şarkıyı birlikte söyleyin.', 'Şarkıdaki sözcükleri resimlerle gösterin.', 'Şarkıyı hareketle destekleyin.'], mat: ['Müzik çalar', 'Resimli şarkı kartları'] }
+              ] },
+            { id: 'dijital', name: 'Teknoloji ve dijital araçlar', re: /bilişim|bilgisayar|teknoloji|tasarım|dijital|kodlama|internet|tablet/,
+              list: [
+                { t: 'Kodlamadan Yürüyüş', dk: 20, grp: 'İkili', steps: ['Zemine ızgara çizin, ok kartlarıyla komut dizisi hazırlayın.', 'Bir arkadaş "robot" olup komutları uygular.', 'Hedefe ulaşınca komutları ters yazdırın.'], mat: ['Izgara zemin', 'Ok komut kartları'] },
+                { t: 'Resimli Sunum', dk: 20, grp: 'Bireysel', steps: ['Tabletle ilgi alanından 3 resim çektirin.', 'Resimleri sıralayıp kısa cümleler söyletin.', 'Sunumu arkadaşlarına gösterin.'], mat: ['Tablet / kamera', 'Sıralama şablonu'] }
+              ] }
+        ];
+        const ACT_GENERIC = { id: 'genel', name: 'Genel öğretim etkinlikleri', list: [
+            { t: 'Önce Göster, Sonra Yap', dk: 15, grp: 'Bireysel', steps: ['Beceriyi öğretmen modelle gösterir.', 'Öğrenci öğretmenle birlikte yapar.', 'Yardımı azaltarak tek başına yapmasını sağlayın.'], mat: ['Somut materyal', 'Resimli yönerge kartı'] },
+            { t: 'Görsel Programla Çalışma', dk: 15, grp: 'Bireysel', steps: ['Çalışma sırasını resimli program kartlarıyla gösterin.', 'Bir adım bitince kartı çevirtin.', 'Tüm kartlar bitince ödül/seçim hakkı verin.'], mat: ['Görsel program kartları', 'Ödül tablosu'] },
+            { t: 'Çalışma İstasyonları', dk: 20, grp: 'Küçük grup', steps: ['Sınıfta 3 istasyon kurun (masa, oyun, bilgisayar).', 'Öğrenciler zil sesiyle istasyon değiştirir.', 'Her istasyonda hedef beceriyi farklı etkinlikle çalışın.'], mat: ['İstasyon kartları', 'Zamanlayıcı', 'Çalışma kâğıtları'] }
+        ] };
+        const ACT_ADAPT = [
+            { re: /otizm/i, tip: 'Görsel program ve zaman çizelgesi kullanın; yönergeleri kısa, tek adımlı verin; geçişlerde süre sayacı gösterin; duyusal hassasiyetlere (ses, ışık) dikkat edin.' },
+            { re: /zihinsel/i, tip: 'Beceriyi küçük adımlara bölün, somut nesneyle başlayın; yönergeleri sade ve tekrarlı verin; her doğru denemede hemen pekiştirin.' },
+            { re: /görme/i, tip: 'Dokunsal ve büyük puntolu/yüksek kontrastlı materyal kullanın; nesneleri adlandırarak tanıtın; çalışma alanındaki düzeni sabit tutun.' },
+            { re: /işitme/i, tip: 'Öğrenciyle yüz yüze ve ışığa dönük konuşun; görsel ipucu ve işaret desteği kullanın; yönergeyi yazılı/resimli de verin.' },
+            { re: /bedensel/i, tip: 'Materyalleri erişilebilir yükseklikte tutun; tutma kolaylaştırıcı (kalın saplı) araçlar kullanın; hareket gerektiren adımlara uyarlama yapın, süreyi esnetin.' },
+            { re: /dikkat eksikliği|DEHB/i, tip: 'Etkinliği kısa bloklara bölün, hareket molası ekleyin; zamanlayıcı kullanın; yönergeyi tek tek verin ve hemen geri bildirim sağlayın.' },
+            { re: /özel öğrenme/i, tip: 'Çok duyulu (görme-dokunma-işitme) yaklaşım kullanın; yazılı yükü azaltın, sözlü yanıtı kabul edin; ek süre verin.' },
+            { re: /dil ve konuşma/i, tip: 'Model olarak doğru sözcüğü tekrar edin; resimli iletişim kartlarıyla destekleyin; yanıt vermesi için bekleme süresi tanıyın.' },
+            { re: /duygusal/i, tip: 'Net kurallar ve beklenen davranışı olumlu dille belirtin; sakinleşme köşesi kullanın; seçenek sunarak kontrol hissi verin.' },
+            { re: /yetenekli/i, tip: 'Etkinliği zenginleştirin: açık uçlu soru, proje ve araştırma görevi ekleyin; liderlik rolü verin.' }
+        ];
+        function normTr(s) { return String(s || '').toLocaleLowerCase('tr-TR'); }
+        function actCategories(area, k) {
+            const txt = normTr((area.area || '') + ' ' + (k ? k.description : '') + ' ' + (area.uda || ''));
+            const hit = ACT_LIB.filter(c => c.re.test(txt));
+            return hit.length ? hit : [ACT_GENERIC];
+        }
+        function actSuggestions(area, k, offset) {
+            const cats = actCategories(area, k);
+            const flat = [];
+            cats.forEach(c => c.list.forEach(a => flat.push({ cat: c.name, ...a })));
+            const out = [];
+            for (let i = 0; i < Math.min(3, flat.length); i++) out.push(flat[(i + (offset || 0)) % flat.length]);
+            return out;
+        }
+        function adaptFor(std) {
+            const d = std.disability || '';
+            const hit = ACT_ADAPT.filter(a => a.re.test(d));
+            return hit.length ? hit[0].tip : '';
+        }
+        function areaMaterialText(area) {
+            const base = String(area.materials || '').trim();
+            const extra = [];
+            (area.kdaList || []).forEach(k => (k.activities || []).forEach(a => (a.mat || []).forEach(m => { if (!extra.includes(m) && !normTr(base).includes(normTr(m))) extra.push(m); })));
+            if (!extra.length) return base;
+            return (base ? base + '; ' : '') + extra.join(', ');
+        }
+        function curActCourse(std) {
+            const n = (std.bep || []).length;
+            const i = Number.isInteger(std.actCourse) ? std.actCourse : 0;
+            return i >= 0 && i < n ? i : 0;
+        }
+        function selectActCourse(i) { const std = appState.generatedBEP; if (!std) return; std.actCourse = i; saveStore(); renderApp(); window.scrollTo(0, 0); }
+        function toggleActivity(ai, ki, title, offset) {
+            const std = appState.generatedBEP; if (!std) return;
+            const area = std.bep[ai]; const k = area && area.kdaList[ki]; if (!k) return;
+            const sug = actSuggestions(area, k, offset).find(a => a.t === title); if (!sug) return;
+            k.activities = Array.isArray(k.activities) ? k.activities : [];
+            const idx = k.activities.findIndex(a => a.t === title);
+            if (idx > -1) k.activities.splice(idx, 1);
+            else k.activities.push({ t: sug.t, dk: sug.dk, grp: sug.grp, steps: sug.steps, mat: sug.mat });
+            saveStore(); renderApp();
+        }
+        function shuffleActivity(ai, ki) {
+            appState.actOffset = appState.actOffset || {};
+            const key = ai + '_' + ki;
+            appState.actOffset[key] = (appState.actOffset[key] || 0) + 3;
+            renderApp();
+        }
+        function actCount(std) { let n = 0; (std.bep || []).forEach(a => (a.kdaList || []).forEach(k => { n += (k.activities || []).length; })); return n; }
+        function renderActivities() {
+            const std = appState.generatedBEP;
+            if (!std) return '';
+            const cur = curActCourse(std);
+            const area = std.bep[cur];
+            if (!area) return `<div class="app">${appBar('Etkinlik ve Materyal', "setView('dashboard')", '')}<main class="page narrow"><section class="card"><p class="muted">Bu öğrenci için henüz BEP oluşturulmamış.</p></section></main></div>`;
+            const adapt = adaptFor(std);
+            const tabs = std.bep.map((a, i) => {
+                const n = (a.kdaList || []).reduce((s, k) => s + (k.activities || []).length, 0);
+                return `<button type="button" class="tab ${i === cur ? 'on' : ''}" onclick="selectActCourse(${i})" aria-pressed="${i === cur}"><span>${esc(a.area)}</span><small>${n} etkinlik seçildi</small></button>`;
+            }).join('');
+            const goals = (area.kdaList || []).map((k, ki) => {
+                const off = (appState.actOffset || {})[cur + '_' + ki] || 0;
+                const sugs = actSuggestions(area, k, off);
+                const chosen = k.activities || [];
+                return `
+                <div class="kda-title">${ki + 1}. ${esc(stripCode(area, k.description))}</div>
+                ${sugs.map(a => {
+                    const on = chosen.some(c => c.t === a.t);
+                    return `<div class="act ${on ? 'sel' : ''}">
+                      <h4>${esc(a.t)}</h4>
+                      <div class="meta"><span>${esc(a.cat)}</span><span>${a.dk} dk</span><span>${esc(a.grp)}</span></div>
+                      <ol>${a.steps.map(s => `<li>${esc(s)}</li>`).join('')}</ol>
+                      <p><b>Materyal:</b> ${a.mat.map(esc).join(', ')}</p>
+                      ${adapt ? `<p class="adapt"><b>Uyarlama (${esc(std.disability)}):</b> ${esc(adapt)}</p>` : ''}
+                      <label class="pick"><input type="checkbox" ${on ? 'checked' : ''} onchange="toggleActivity(${cur},${ki},'${a.t.replace(/'/g, "\\'")}',${off})"> Plana ekle</label>
+                    </div>`;
+                }).join('')}
+                <button class="btn-link" onclick="shuffleActivity(${cur},${ki})">Başka öneriler göster</button>`;
+            }).join('');
+            const total = actCount(std);
+            return `
+            <div class="app">
+              ${appBar('Etkinlik ve Materyal', "setView('dashboard')", '')}
+              <main class="page narrow">
+                <section class="card">
+                  <h2 class="card-title">${esc(std.firstName)} ${esc(std.lastName)}</h2>
+                  <p class="muted">${classLabel(std)} &bull; ${esc(std.disability || '')}</p>
+                  <p class="muted sm-gap" style="margin-top:8px">Her kısa dönemli amaç için önerilen etkinlikleri inceleyin, uygun olanları "Plana ekle" ile seçin. Seçilen etkinliklerin materyalleri BEP planındaki materyal sütununa eklenir. Öneriler şablon niteliğindedir; öğrencinin düzeyine göre uyarlayın.</p>
+                </section>
+                <div class="tabs" role="tablist" aria-label="Dersler">${tabs}</div>
+                <section class="card">
+                  <h2 class="card-title">${esc(area.area)}</h2>
+                  ${goals}
+                </section>
+              </main>
+              <div class="actionbar hide-on-print"><div class="actionbar-in">
+                <button class="btn" onclick="setView('bepView')">BEP dosyasına git</button>
+                <button class="btn primary" onclick="setView('activityDoc')" ${total ? '' : 'disabled'}><i data-lucide="printer" class="ic"></i> Etkinlik planı çıktısı (${total})</button>
+              </div></div>
+            </div>`;
+        }
+        function buildActivityDocHtml(std) {
+            const teacher = esc(`${appState.currentUser.firstName} ${appState.currentUser.lastName}`.trim());
+            const adapt = adaptFor(std);
+            const idx = std.bep.map((a, i) => i).filter(i => (std.bep[i].kdaList || []).some(k => (k.activities || []).length));
+            if (!idx.length) return `<div class="doc doc-portrait paper WordSection1" data-sheet="Etkinlik"><h2 class="doc-title">ETKİNLİK VE MATERYAL PLANI</h2><p>Henüz plana etkinlik eklenmedi.</p></div>`;
+            return idx.map((ai, pos) => {
+                const area = std.bep[ai];
+                const rows = [];
+                (area.kdaList || []).forEach((k, ki) => (k.activities || []).forEach((a, n) => rows.push(`
+                  <tr>
+                    <td class="c">${ki + 1}</td>
+                    <td>${n === 0 ? esc(stripCode(area, k.description)) : ''}</td>
+                    <td><b>${esc(a.t)}</b><br>${a.dk} dk · ${esc(a.grp)}</td>
+                    <td>${(a.steps || []).map((s, i) => `${i + 1}) ${esc(s)}`).join('<br>')}</td>
+                    <td>${(a.mat || []).map(esc).join(', ')}</td>
+                  </tr>`)));
+                return `
+                <div class="doc doc-portrait paper WordSection1 ${pos > 0 ? 'sec-break' : ''}" data-sheet="${esc(area.area)}" data-chars="110">
+                  <h2 class="doc-title">ETKİNLİK VE MATERYAL PLANI</h2>
+                  <table>
+                    <colgroup><col style="width:30%"><col style="width:70%"></colgroup>
+                    <tbody>
+                      <tr><td class="k">Öğrenci</td><td>${esc(std.firstName)} ${esc(std.lastName)}</td></tr>
+                      <tr><td class="k">Okul / Sınıf</td><td>${esc(std.schoolName)} / ${classLabel(std)}</td></tr>
+                      <tr><td class="k">Gelişim Alanı / Ders</td><td>${esc(area.area)}</td></tr>
+                      <tr><td class="k">BEP Dönemi</td><td>${fmtDate(std.bepStartDate)} - ${fmtDate(std.bepEndDate)}</td></tr>
+                      ${adapt ? `<tr><td class="k">Uyarlama notu</td><td>${esc(adapt)}</td></tr>` : ''}
+                    </tbody>
+                  </table>
+                  <table>
+                    <colgroup><col style="width:5%"><col style="width:22%"><col style="width:18%"><col style="width:35%"><col style="width:20%"></colgroup>
+                    <thead>
+                      <tr><th class="bar dark" colspan="5">Kısa Dönemli Amaçlara Yönelik Etkinlikler</th></tr>
+                      <tr><th>No</th><th>Kısa Dönemli Amaç</th><th>Etkinlik</th><th>Uygulama Basamakları</th><th>Materyal</th></tr>
+                    </thead>
+                    <tbody>${rows.join('')}</tbody>
+                  </table>
+                  <table class="sign"><tbody><tr><td class="c">${teacher}<br>${esc(appState.currentUser.branch || '')}</td></tr></tbody></table>
+                </div>`;
+            }).join('');
+        }
+        function renderActivityDoc() {
+            const std = appState.generatedBEP;
+            if (!std) return '';
+            const back = `<button onclick="setView('activities')" class="text-blue-700 font-bold flex items-center bg-blue-50 px-4 py-2 rounded-lg hover:bg-blue-100 transition"><i data-lucide="arrow-left" class="mr-2 w-4 h-4"></i> Etkinliklere dön</button>`;
+            return `
+            <div class="min-h-screen bg-slate-200 p-4 md:p-8 flex flex-col items-center">
+              ${docToolbar(std, back, 'activity-wrapper', 'EtkinlikMateryal', 'EtkinlikMateryal')}
+              <div id="activity-wrapper" class="w-full">${buildActivityDocHtml(std)}</div>
             </div>`;
         }
 
@@ -3355,6 +3847,8 @@ div.WordSection2 { page: WordSection2; }
                 case 'bepView': root.innerHTML = renderBEP(); break;
                 case 'evalFormsView': root.innerHTML = renderEvalForms(); break;
                 case 'measure': root.innerHTML = renderMeasure(); break;
+                case 'activities': root.innerHTML = renderActivities(); break;
+                case 'activityDoc': root.innerHTML = renderActivityDoc(); break;
                 case 'measureDoc': root.innerHTML = renderMeasureDoc(); break;
             }
             if (window.lucide) lucide.createIcons();
