@@ -1852,7 +1852,7 @@
             const raw = localStorage.getItem(STORE_KEY);
             api('PUT', 'api/data.php', { data: JSON.parse(raw || '{"students":[],"profile":{}}'), rev: window.BEP_REV || 0 }, true).then(res => {
                 if (res.status === 200 && res.j.ok) { window.BEP_REV = res.j.rev; setSyncState('ok'); }
-                else if (res.status === 409) { setSyncState('conflict'); alert('Bu hesapta başka bir cihazdan/sekmeden daha yeni değişiklik yapılmış. Verilerin üzerine yazılmaması için sayfa yenilenecek.'); location.reload(); }
+                else if (res.status === 409) { setSyncState('conflict'); alert('Bu hesapta başka bir cihazdan veya sekmeden daha yeni değişiklik yapılmış. Verilerin üzerine yazılmaması için sayfa yenilenecek.'); location.reload(); }
                 else if (res.status === 401) { setSyncState('auth'); alert('Oturumunuz sona erdi. Lütfen yeniden giriş yapın.'); location.reload(); }
                 else setSyncState('err');
             }).catch(() => setSyncState('err')).finally(() => { _syncBusy = false; if (_syncAgain) { _syncAgain = false; syncNow(); } });
@@ -1881,9 +1881,9 @@
                   <label class="field"><span>E-posta</span><input name="email" type="email" required autocomplete="email" /></label>
                   <label class="field"><span>Şifre (en az 8 karakter)</span><input name="password" type="password" minlength="8" required autocomplete="new-password" /></label>
                   <label class="field"><span>Branş</span><select name="branch"><option value="">Seçiniz</option>${['Sınıf Öğretmeni', 'Okul Öncesi Öğretmeni', 'Özel Eğitim'].concat(SUBJECT_BRANCHES.filter(b => b !== 'Özel Eğitim')).map(b => `<option>${b === 'Özel Eğitim' ? 'Özel Eğitim Öğretmeni' : b}</option>`).join('')}</select></label>
-                  <label class="check consent"><input type="checkbox" name="consent" required> <span>Öğrencilere ait kişisel verilerin (sağlık/engel bilgisi dâhil) bu hizmette saklanmasını kabul ediyorum. Bu verilerin 6698 sayılı KVKK ve ilgili mevzuata uygun işlenmesi, velilere/yasal temsilcilere aydınlatma yapılması ve gerekli izinlerin alınması sorumluluğunun <b>bana ait</b> olduğunu, <a href="gizlilik.html" target="_blank" rel="noopener">aydınlatma metnini</a> okuduğumu beyan ederim.</span></label>
+                  <label class="check consent"><input type="checkbox" name="consent" required> <span>Öğrencilere ait kişisel verilerin (sağlık/engel bilgisi dâhil) bu hizmette saklanmasını kabul ediyorum. Bu verilerin 6698 sayılı KVKK ve ilgili mevzuata uygun işlenmesi, velilere ve yasal temsilcilere aydınlatma yapılması ve gerekli izinlerin alınması sorumluluğunun <b>bana ait</b> olduğunu, <a href="gizlilik.html" target="_blank" rel="noopener">aydınlatma metnini</a> okuduğumu beyan ederim.</span></label>
                   <button class="btn primary lg" type="submit">Kayıt ol</button>
-                  <p class="muted">Kaydınız yönetici onayından sonra etkinleşir; onaylandığında e-posta ile bilgilendirilirsiniz.</p>
+                  <p class="muted">Hesabınız yönetici onayından sonra etkinleşir; onaylandıktan sonra giriş yapabilirsiniz.</p>
                 </form>`}
               </section>
             </main></div>`;
@@ -3583,7 +3583,7 @@ div.WordSection2 { page: WordSection2; }
                 <section class="card">
                   <h2 class="card-title">${esc(std.firstName)} ${esc(std.lastName)}</h2>
                   <p class="muted">${classLabel(std)} &bull; BEP dönemi: ${fmtDate(std.bepStartDate)} – ${fmtDate(std.bepEndDate)}</p>
-                  <p class="muted sm-gap" style="margin-top:8px">Önce dersi seçin, sonra her kısa dönemli amaç için başlama ve bitiş tarihini seçin; ölçme tarihi bitiş tarihine otomatik yazılır, isterseniz takvimden değiştirebilirsiniz. Ardından öğrencinin amacı yapıp yapmadığını işaretleyin. Her değişiklik anında kaydedilir.</p>
+                  <p class="muted sm-gap" style="margin-top:8px">Önce dersi seçin, ardından her kısa dönemli amaç için başlama ve bitiş tarihini seçin; ölçme tarihi bitiş tarihine otomatik yazılır, isterseniz takvimden değiştirebilirsiniz. Ardından öğrencinin amacı yapıp yapmadığını işaretleyin. Her değişiklik anında kaydedilir.</p>
                 </section>
                 <div class="tabs" role="tablist" aria-label="Dersler">${tabs}</div>
                 <section class="card">
