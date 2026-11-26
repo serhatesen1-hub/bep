@@ -78,6 +78,23 @@ async function readJson(req, max) {
 }
 
 
+const clip = (v, n) => String(v == null ? '' : v).replace(/[\u0000-\u0008\u000b\u000c\u000e-\u001f]/g, '').slice(0, n);
+async function familySubmit(req, env) {
+  if (req.method !== 'POST' || req.headers.get('X-BEP') !== '1') return json({ error: 'Geçersiz istek.' }, 400);
+  const ip = req.headers.get('CF-Connecting-IP') || '0';
+  const th = await throttle(env, 'fam:' + ip, 5, 3600); if (th) return th;
+  const d = await readJson(req, 30000);
+  const name = clip(d.name, 120).trim(), phone = clip(d.phone, 15).replace(/\D/g, '');
+  if (!name || phone.length < 10) return json({ error: 'Ad soyad ve geçerli bir telefon numarası gerekli.' }, 422);
+  const row = { lang: clip(d.language, 4), name, phone, gender: clip(d.gender, 30), age: clip(d.exactAge, 30), track: clip(d.trackTitle, 200), results: clip(d.testResults, 12000), summary: clip(d.quickSummary, 2000) };
+  await env.DB.prepare('INSERT INTO family_leads(created_at,lang,name,phone,gender,age,track,results,summary,country) VALUES(?,?,?,?,?,?,?,?,?,?)')
+    .bind(now(), row.lang, row.name, row.phone, row.gender, row.age, row.track, row.results, row.summary, (req.cf && req.cf.country) || null).run();
+  await audit(env, req, 'family', 'family_submit', null, row.track);
+  await sendMail(env, env.ADMIN_EMAIL, 'Yeni aile ön değerlendirmesi: ' + row.name,
+    `Yeni bir aile ön değerlendirmesi geldi.\n\nVeli: ${row.name}\nTelefon: ${row.phone}\nÇocuk: ${row.gender}, ${row.age}\nBölüm: ${row.track}\nDil: ${row.lang}\n\n${row.summary}\n\nAyrıntılar için yönetici panelini açın: https://bep.alanyaozelegitim.net/admin\n`);
+  return json({ ok: true });
+}
+
 async function adminApi(req, env, name, url, xhr) {
   const m = req.method;
   if (name === 'admin_login' && m === 'POST') {
@@ -112,6 +129,18 @@ async function adminApi(req, env, name, url, xhr) {
     }
     const logs = (await env.DB.prepare("SELECT ts,actor,action,detail,country FROM audit WHERE target_id=? OR actor=? ORDER BY id DESC LIMIT 100").bind(id, 'user:' + id).all()).results;
     return json({ user: u, data, logs });
+  }
+  if (name === 'admin_family' && m === 'GET') {
+    const id = parseInt(url.searchParams.get('id') || '0');
+    if (id) { const r = await env.DB.prepare('SELECT * FROM family_leads WHERE id=?').bind(id).first(); if (!r) return json({ error: 'Kayıt bulunamadı.' }, 404); await audit(env, req, 'admin', 'admin_view_family', null, r.name); return json({ lead: r }); }
+    const rows = (await env.DB.prepare('SELECT id,created_at,lang,name,phone,gender,age,track,summary,handled FROM family_leads ORDER BY id DESC LIMIT 500').all()).results;
+    return json({ leads: rows });
+  }
+  if (name === 'admin_family_action' && m === 'POST') {
+    const d = await readJson(req, 2000); const id = parseInt(d.id || 0);
+    if (d.action === 'handled') { await env.DB.prepare('UPDATE family_leads SET handled=? WHERE id=?').bind(d.value ? 1 : 0, id).run(); return json({ ok: true }); }
+    if (d.action === 'delete') { await audit(env, req, 'admin', 'admin_delete_family', null, String(id)); await env.DB.prepare('DELETE FROM family_leads WHERE id=?').bind(id).run(); return json({ ok: true }); }
+    return json({ error: 'Geçersiz işlem.' }, 422);
   }
   if (name === 'admin_audit' && m === 'GET') {
     const logs = (await env.DB.prepare('SELECT a.id,a.ts,a.actor,a.action,a.target_id,a.detail,a.country,u.email FROM audit a LEFT JOIN users u ON u.id=a.target_id ORDER BY a.id DESC LIMIT 300').all()).results;
@@ -272,11 +301,12 @@ export default {
         return await api(req, env, name, url);
       }
       const host = url.hostname;
+      if (url.pathname === '/api/family_submit.php' && !host.startsWith('bep.')) return await familySubmit(req, env);
       let areq = req;
       if (!host.startsWith('bep.') && host !== 'localhost') {
         if (host.startsWith('www.')) { url.hostname = host.slice(4); return Response.redirect(url.toString(), 301); }
         if (url.pathname === '/' || url.pathname === '/index.html') { url.pathname = '/landing'; areq = new Request(url.toString(), req); }
-        else if (!['/landing', '/landing.html', '/gizlilik', '/gizlilik.html', '/icons/icon-192.png', '/icons/icon-512.png'].includes(url.pathname)) return new Response('Bulunamadı', { status: 404 });
+        else if (!['/landing', '/landing.html', '/gizlilik', '/gizlilik.html', '/aile', '/aile.html', '/aile.js', '/aile.css', '/aile-gizlilik', '/aile-gizlilik.html', '/site.css', '/icons/icon-192.png', '/icons/icon-512.png'].includes(url.pathname)) return new Response('Bulunamadı', { status: 404 });
       }
       const res = await env.ASSETS.fetch(areq);
       const h = new Headers(res.headers);

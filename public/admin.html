@@ -46,6 +46,20 @@ async function act(id, a) {
   const r = await api('POST', 'api/admin_action.php', { id, action: a, confirm: confirmEmail }); if (r.s !== 200) { alert(r.j.error || 'İşlem yapılamadı.'); return; }
   S.detail = null; S.tab = 'users'; await reload();
 }
+async function showFamily() { S.tab = 'family'; const r = await api('GET', 'api/admin_family.php'); S.leads = r.j.leads || []; render(); }
+async function openLead(id) { const r = await api('GET', 'api/admin_family.php?id=' + id); S.lead = r.j.lead; S.tab = 'flead'; render(); window.scrollTo(0, 0); }
+async function leadAct(id, a, v) { if (a === 'delete' && !confirm('Bu aile başvurusu kalıcı olarak silinsin mi?')) return; await api('POST', 'api/admin_family_action.php', { id, action: a, value: v }); await showFamily(); }
+function familyView() {
+  const L = S.leads || [];
+  return `<div class="card"><p class="mut">Aile ön değerlendirme formundan gelen başvurular (${L.length}). Bir satıra tıklayınca cevaplar açılır; bu görüntüleme kayıt altına alınır.</p><table><thead><tr><th>Tarih (UTC)</th><th>Veli</th><th>Telefon</th><th>Çocuk</th><th>Bölüm</th><th>Durum</th><th></th></tr></thead><tbody>
+  ${L.map(l => `<tr class="click" onclick="openLead(${l.id})"><td>${fmt(l.created_at)}</td><td><b>${esc(l.name)}</b></td><td>${esc(l.phone)}</td><td>${esc(l.gender)} ${esc(l.age)}</td><td class="w">${esc(l.track)}</td><td><span class="tag ${l.handled ? 'active' : 'pending'}">${l.handled ? 'İlgilenildi' : 'Yeni'}</span></td><td></td></tr>`).join('') || '<tr><td colspan="7" class="mut">Henüz başvuru yok.</td></tr>'}</tbody></table></div>`;
+}
+function leadView() {
+  const l = S.lead; if (!l) return '';
+  return `<div class="row"><button class="btn g" onclick="showFamily()">← Listeye dön</button><button class="btn ok" onclick="leadAct(${l.id},'handled',${l.handled ? 0 : 1})">${l.handled ? 'Yeni olarak işaretle' : 'İlgilenildi olarak işaretle'}</button><button class="btn r" onclick="leadAct(${l.id},'delete')">Sil</button></div>
+  <div class="card"><h2 style="margin-top:0">${esc(l.name)}</h2><p class="mut">Telefon: ${esc(l.phone)} · Çocuk: ${esc(l.gender)} ${esc(l.age)} · Dil: ${esc(l.lang)} · ${fmt(l.created_at)} · Ülke: ${esc(l.country || '–')}</p><p><b>${esc(l.track)}</b></p><p>${esc(l.summary)}</p><pre>${esc(l.results)}</pre></div>`;
+}
+
 function tiles() { const t = S.totals; return `<div class="tiles">${[['Toplam kullanıcı', t.all], ['Onay bekleyen', t.pending || 0], ['Aktif', t.active || 0], ['Pasif / reddedilen', (t.disabled || 0) + (t.rejected || 0)], ['Toplam öğrenci kaydı', t.students || 0]].map(x => `<div class="tile"><b>${x[1] ?? 0}</b><span>${x[0]}</span></div>`).join('')}</div>`; }
 function btns(u) { const a = []; if (u.status === 'pending') a.push(['approve', 'Onayla', 'ok'], ['reject', 'Reddet', 'g']); if (u.status === 'active') a.push(['disable', 'Pasife al', 'g']); if (u.status === 'disabled' || u.status === 'rejected') a.push(['enable', 'Etkinleştir', 'ok']); a.push(['delete', 'Sil', 'r']); return a.map(x => `<button class="btn ${x[2]}" onclick="event.stopPropagation();act(${u.id},'${x[0]}')">${x[1]}</button>`).join(' '); }
 function usersView() {
@@ -80,8 +94,8 @@ function render(keepFocus) {
   if (!S.authed) { app.innerHTML = `<form class="login" onsubmit="login(event)"><h1>Yönetici girişi</h1><p class="mut">BEP Sistemi yönetim paneli</p><input name="key" type="password" placeholder="Yönetici anahtarı" autocomplete="current-password" required>${S.err ? `<p class="err">${esc(S.err)}</p>` : ''}<button class="btn" style="width:100%">Giriş</button></form>`; return; }
   const q = document.activeElement && document.activeElement.tagName === 'INPUT' ? document.activeElement.selectionStart : null;
   app.innerHTML = `<header><h1>BEP Yönetici Paneli</h1><button class="btn g" onclick="logout()">Çıkış</button></header><main>${tiles()}
-  <div class="tabs"><button class="${S.tab === 'users' || S.tab === 'detail' ? 'on' : ''}" onclick="S.tab='users';S.detail=null;render()">Kullanıcılar</button><button class="${S.tab === 'audit' ? 'on' : ''}" onclick="showAudit()">Tüm hareketler</button></div>
-  ${S.tab === 'audit' ? `<div class="card">${logsTable(S.logs, true)}</div>` : S.tab === 'detail' ? detailView() : usersView()}</main>`;
+  <div class="tabs"><button class="${S.tab === 'users' || S.tab === 'detail' ? 'on' : ''}" onclick="S.tab='users';S.detail=null;render()">Kullanıcılar</button><button class="${S.tab === 'audit' ? 'on' : ''}" onclick="showAudit()">Tüm hareketler</button><button class="${S.tab === 'family' || S.tab === 'flead' ? 'on' : ''}" onclick="showFamily()">Aile başvuruları</button></div>
+  ${S.tab === 'audit' ? `<div class="card">${logsTable(S.logs, true)}</div>` : S.tab === 'family' ? familyView() : S.tab === 'flead' ? leadView() : S.tab === 'detail' ? detailView() : usersView()}</main>`;
   if (keepFocus) { const i = app.querySelector('input'); if (i) { i.focus(); i.setSelectionRange(q ?? i.value.length, q ?? i.value.length); } }
 }
 boot();
