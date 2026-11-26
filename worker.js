@@ -84,8 +84,9 @@ async function familySubmit(req, env) {
   const ip = req.headers.get('CF-Connecting-IP') || '0';
   const th = await throttle(env, 'fam:' + ip, 5, 3600); if (th) return th;
   const d = await readJson(req, 30000);
-  const name = clip(d.name, 120).trim(), phone = clip(d.phone, 15).replace(/\D/g, '');
-  if (!name || phone.length < 10) return json({ error: 'Ad soyad ve geçerli bir telefon numarası gerekli.' }, 422);
+  const name = clip(d.name, 120).trim(); let phone = clip(d.phone, 20).replace(/\D/g, '').slice(0, 15);
+  if (phone && String(d.phone).trim().startsWith('+')) phone = '+' + phone;
+  if (!name || phone.replace(/\D/g, '').length < 8) return json({ error: 'Ad soyad ve geçerli bir telefon numarası gerekli.' }, 422);
   const row = { lang: clip(d.language, 4), name, phone, gender: clip(d.gender, 30), age: clip(d.exactAge, 30), track: clip(d.trackTitle, 200), results: clip(d.testResults, 12000), summary: clip(d.quickSummary, 2000) };
   await env.DB.prepare('INSERT INTO family_leads(created_at,lang,name,phone,gender,age,track,results,summary,country) VALUES(?,?,?,?,?,?,?,?,?,?)')
     .bind(now(), row.lang, row.name, row.phone, row.gender, row.age, row.track, row.results, row.summary, (req.cf && req.cf.country) || null).run();

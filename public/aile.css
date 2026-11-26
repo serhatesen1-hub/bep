@@ -1359,3 +1359,7 @@ button[class*="border-b-"],a[class*="border-b-"]{border-bottom-color:#0c2419!imp
 .homefab:hover{background:var(--kagit2)}
 .homefab:before{content:"←";font-weight:800}
 @media print{.homefab{display:none}}
+.phone-row{display:grid;grid-template-columns:minmax(0,1.2fr) minmax(0,1fr);gap:8px;align-items:stretch}
+.cc-select,.phone-input{padding:16px 12px;font:700 18px "DM Sans",sans-serif;min-width:0;border-radius:2px!important}
+.cc-code{display:flex;align-items:center;font:800 18px "DM Sans";padding:0 4px;white-space:nowrap}
+@media(max-width:520px){.phone-row{grid-template-columns:1fr 1fr;gap:6px}.cc-select{font-size:14px;padding:14px 6px}.phone-input{font-size:16px}}
