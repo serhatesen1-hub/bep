@@ -1409,13 +1409,15 @@
 
         // Özel Eğitim Hizmetleri Yönetmeliği (RG 07.07.2018/30471) madde 4'te tanımlanan engel türleri
         const MEVZUAT_ENGEL = [
-            "Hafif düzeyde zihinsel engelli", "Orta düzeyde zihinsel engelli", "Ağır düzeyde zihinsel engelli", "Çok ağır düzeyde zihinsel engelli",
+            "Hafif düzeyde zihinsel yetersizliği olan", "Orta düzeyde zihinsel yetersizliği olan", "Ağır düzeyde zihinsel yetersizliği olan", "Çok ağır düzeyde zihinsel yetersizliği olan",
             "Hafif düzeyde otizmi olan", "Orta düzeyde otizmi olan", "Ağır düzeyde otizmi olan",
-            "Görme engelli", "İşitme engelli", "Bedensel engelli"
+            "Görme yetersizliği olan", "İşitme yetersizliği olan", "Bedensel yetersizliği olan"
         ];
         // Eğitsel değerlendirme (RAM) raporlarında sık görülen, yönetmelik md.4'te ayrıca tanımlanmayan tanılar
         const DIGER_TANI = ["Dil ve konuşma güçlüğü", "Özel öğrenme güçlüğü", "Süreğen hastalık", "Dikkat eksikliği ve hiperaktivite bozukluğu (DEHB)", "Duygusal ve davranış bozukluğu", "Özel yetenekli"];
         const DISABILITY_TYPES = MEVZUAT_ENGEL.concat(DIGER_TANI);
+        // Eski kayıtlardaki "…engelli" ifadelerini yeni ifadeye çevirir
+        const normDis = d => (d || '').replace(/ engelli$/, ' yetersizliği olan');
         const AGE_GROUPS = ["36-48 ay (3-4 yaş)", "48-60 ay (4-5 yaş)", "60-72 ay (5-6 yaş)"];
         const SERVICE_LEVELS = ["Okul Öncesi", "İlkokul", "Ortaokul", "Lise"];
         const SUBJECT_BRANCHES = ["Özel Eğitim", "Türkçe", "Türk Dili ve Edebiyatı", "Matematik", "Fen Bilimleri", "Fizik", "Kimya", "Biyoloji", "Sosyal Bilgiler", "Tarih", "Coğrafya", "Felsefe", "İngilizce / Yabancı Dil", "Din Kültürü ve Ahlak Bilgisi", "Beden Eğitimi", "Görsel Sanatlar", "Müzik", "Teknoloji ve Tasarım", "Bilişim Teknolojileri", "Rehberlik ve Psikolojik Danışmanlık", "Diğer"];
@@ -2601,7 +2603,7 @@ div.WordSection2 { page: WordSection2; }
                       ${badge}
                     </div>
                     <p class="text-sm text-slate-500">${classLabel(std)} &bull; TC: ${esc(masked)}</p>
-                    <p class="text-sm text-slate-500 mb-1">${esc(std.disability)}</p>
+                    <p class="text-sm text-slate-500 mb-1">${esc(normDis(std.disability))}</p>
                     <p class="text-xs text-slate-400 mb-4">BEP: ${fmtDate(std.bepStartDate)} - ${fmtDate(std.bepEndDate)}</p>
                     <div class="mt-auto flex gap-2">
                       <button onclick="openBEP(${id})" class="flex-1 bg-blue-50 text-blue-700 hover:bg-blue-600 hover:text-white py-2 rounded-lg flex items-center justify-center font-medium transition">
@@ -2817,7 +2819,7 @@ div.WordSection2 { page: WordSection2; }
                       ${badge}
                     </div>
                     <dl class="student-meta">
-                      <div><dt>Tanı</dt><dd>${esc(std.disability) || '-'}</dd></div>
+                      <div><dt>Tanı</dt><dd>${esc(normDis(std.disability)) || '-'}</dd></div>
                       <div><dt>TC</dt><dd>${esc(masked)}</dd></div>
                       <div><dt>BEP dönemi</dt><dd>${fmtDate(std.bepStartDate)} – ${fmtDate(std.bepEndDate)}</dd></div>
                     </dl>
@@ -2928,7 +2930,7 @@ div.WordSection2 { page: WordSection2; }
                 if (u.taskType === 'Sınıf öğretmeni') extra += `<label class="field"><span>Sınıf düzeyi</span><select name="classGrade" onchange="onProfileChange()"><option value="">Seçiniz</option>${[1, 2, 3, 4].map(g => `<option value="${g}" ${String(u.classGrade) === String(g) ? 'selected' : ''}>${g}. Sınıf</option>`).join('')}</select></label>`;
                 if (u.taskType === 'Özel eğitim sınıfı') extra += `
                   <fieldset class="field fieldset"><span>Sınıfınızdaki engel türü (Özel Eğitim Hizmetleri Yönetmeliği md. 4)</span>
-                    ${MEVZUAT_ENGEL.map(e => `<label class="check"><input type="checkbox" name="disabilityFocus" value="${e}" ${(u.disabilityFocus || []).includes(e) ? 'checked' : ''} onchange="onProfileChange()"> ${e}</label>`).join('')}
+                    ${MEVZUAT_ENGEL.map(e => `<label class="check"><input type="checkbox" name="disabilityFocus" value="${e}" ${(u.disabilityFocus || []).map(normDis).includes(e) ? 'checked' : ''} onchange="onProfileChange()"> ${e}</label>`).join('')}
                   </fieldset>`;
             } else if (u.serviceLevel === 'Ortaokul' || u.serviceLevel === 'Lise') {
                 extra = `<label class="field"><span>Branşınız</span>${sel('subject', u.subject, SUBJECT_BRANCHES, 'Seçiniz')}</label>`;
@@ -3030,8 +3032,8 @@ div.WordSection2 { page: WordSection2; }
                      <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
                        <div><label class="block text-sm font-medium mb-1">Tedbir Kararı</label><select name="decision" onchange="syncFormState(); renderApp();" class="w-full px-3 py-2 border rounded-md">${DECISION_TYPES.map(d=>`<option ${std.decision===d?'selected':''}>${d}</option>`).join('')}</select></div>
                        <div><label class="block text-sm font-medium mb-1">Tanı</label><select name="disability" class="w-full px-3 py-2 border rounded-md">
-                          <optgroup label="Özel Eğitim Hizmetleri Yönetmeliği md. 4">${MEVZUAT_ENGEL.map(d=>`<option ${std.disability===d?'selected':''}>${d}</option>`).join('')}</optgroup>
-                          <optgroup label="Diğer tanılar (RAM raporu)">${DIGER_TANI.map(d=>`<option ${std.disability===d?'selected':''}>${d}</option>`).join('')}${(!DISABILITY_TYPES.includes(std.disability) && std.disability) ? `<option selected>${esc(std.disability)}</option>` : ''}</optgroup>
+                          <optgroup label="Özel Eğitim Hizmetleri Yönetmeliği md. 4">${MEVZUAT_ENGEL.map(d=>`<option ${normDis(std.disability)===d?'selected':''}>${d}</option>`).join('')}</optgroup>
+                          <optgroup label="Diğer tanılar (RAM raporu)">${DIGER_TANI.map(d=>`<option ${normDis(std.disability)===d?'selected':''}>${d}</option>`).join('')}${(!DISABILITY_TYPES.includes(normDis(std.disability)) && normDis(std.disability)) ? `<option selected>${esc(normDis(std.disability))}</option>` : ''}</optgroup>
                         </select></div>
                        
                        ${std.decision.includes("Kaynaştırma") ? `
@@ -3280,7 +3282,7 @@ div.WordSection2 { page: WordSection2; }
                   ${info('Okul / No / Sınıf', `${esc(std.schoolName)} / ${esc(std.schoolNo)} / ${classLabel(std)}`)}
                   ${info('Doğum Tarihi', fmtDate(std.birthDate))}
                   ${std.level === 'Ana Sınıfı' && std.ageGroup ? info('Yaş Grubu', esc(std.ageGroup)) : ''}
-                  ${info('Tanı / Karar', `${esc(std.disability)} / ${esc(std.decision)}`)}
+                  ${info('Tanı / Karar', `${esc(normDis(std.disability))} / ${esc(std.decision)}`)}
                   ${info('Daha önce aldığı destek eğitimleri ve süresi', esc(std.supportEduHistory) || '-')}
                   ${info('Kullandığı cihaz / materyaller', esc(std.devices) || '-')}
                   ${info('Önemli sağlık bilgileri', esc(std.healthInfo) || '-')}
@@ -3804,7 +3806,7 @@ div.WordSection2 { page: WordSection2; }
             return out;
         }
         function adaptFor(std) {
-            const d = std.disability || '';
+            const d = normDis(std.disability) || '';
             const hit = ACT_ADAPT.filter(a => a.re.test(d));
             return hit.length ? hit[0].tip : '';
         }
@@ -3862,7 +3864,7 @@ div.WordSection2 { page: WordSection2; }
                       <div class="meta"><span>${esc(a.cat)}</span><span>${a.dk} dk</span><span>${esc(a.grp)}</span></div>
                       <ol>${a.steps.map(s => `<li>${esc(s)}</li>`).join('')}</ol>
                       <p><b>Materyal:</b> ${a.mat.map(esc).join(', ')}</p>
-                      ${adapt ? `<p class="adapt"><b>Uyarlama (${esc(std.disability)}):</b> ${esc(adapt)}</p>` : ''}
+                      ${adapt ? `<p class="adapt"><b>Uyarlama (${esc(normDis(std.disability))}):</b> ${esc(adapt)}</p>` : ''}
                       <label class="pick"><input type="checkbox" ${on ? 'checked' : ''} onchange="toggleActivity(${cur},${ki},'${a.t.replace(/'/g, "\\'")}',${off})"> Plana ekle</label>
                     </div>`;
                 }).join('')}
@@ -3875,7 +3877,7 @@ div.WordSection2 { page: WordSection2; }
               <main class="page narrow">
                 <section class="card">
                   <h2 class="card-title">${esc(std.firstName)} ${esc(std.lastName)}</h2>
-                  <p class="muted">${classLabel(std)} &bull; ${esc(std.disability || '')}</p>
+                  <p class="muted">${classLabel(std)} &bull; ${esc(normDis(std.disability) || '')}</p>
                   <p class="muted sm-gap" style="margin-top:8px">Her kısa dönemli amaç için önerilen etkinlikleri inceleyin, uygun olanları "Plana ekle" ile seçin. Seçilen etkinliklerin materyalleri BEP planındaki materyal sütununa eklenir. Öneriler şablon niteliğindedir; öğrencinin düzeyine göre uyarlayın.</p>
                 </section>
                 <div class="tabs" role="tablist" aria-label="Dersler">${tabs}</div>
