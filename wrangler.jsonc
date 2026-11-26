@@ -3,10 +3,14 @@
   "name": "bep-sistemi",
   "main": "worker.js",
   "compatibility_date": "2026-11-01",
-  "assets": { "directory": "./public", "binding": "ASSETS", "run_worker_first": ["/api/*"] },
+  "assets": { "directory": "./public", "binding": "ASSETS", "run_worker_first": true },
   "d1_databases": [{ "binding": "DB", "database_name": "bep-db", "database_id": "618b219d-73ce-4582-b948-b8a5f5b8c1bc" }],
   "send_email": [{ "name": "EMAIL" }],
   "vars": { "ADMIN_EMAIL": "serhatesen1@gmail.com", "FROM_EMAIL": "no-reply@alanyaozelegitim.net" },
-  "routes": [{ "pattern": "bep.alanyaozelegitim.net", "custom_domain": true }],
+  "routes": [
+    { "pattern": "bep.alanyaozelegitim.net", "custom_domain": true },
+    { "pattern": "alanyaozelegitim.net", "custom_domain": true },
+    { "pattern": "www.alanyaozelegitim.net", "custom_domain": true }
+  ],
   "observability": { "enabled": true }
 }
