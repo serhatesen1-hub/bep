@@ -113,14 +113,14 @@ async function adminApi(req, env, name, url, xhr) {
   if (m !== 'GET' && !xhr) return json({ error: 'Geçersiz istek.' }, 400);
 
   if (name === 'admin_users' && m === 'GET') {
-    const rows = (await env.DB.prepare('SELECT id,email,first_name,last_name,branch,status,created_at,approved_at,last_login,login_count,last_save,students_count FROM users ORDER BY id DESC LIMIT 1000').all()).results;
+    const rows = (await env.DB.prepare('SELECT id,email,first_name,last_name,branch,phone,school,status,created_at,approved_at,last_login,login_count,last_save,students_count FROM users ORDER BY id DESC LIMIT 1000').all()).results;
     const tot = { all: rows.length, pending: 0, active: 0, disabled: 0, rejected: 0, students: 0 };
     rows.forEach(r => { tot[r.status] = (tot[r.status] || 0) + 1; tot.students += r.students_count || 0; });
     return json({ users: rows, totals: tot });
   }
   if (name === 'admin_user' && m === 'GET') {
     const id = parseInt(url.searchParams.get('id') || '0');
-    const u = await env.DB.prepare('SELECT id,email,first_name,last_name,branch,status,created_at,approved_at,last_login,login_count,last_save,students_count FROM users WHERE id=?').bind(id).first();
+    const u = await env.DB.prepare('SELECT id,email,first_name,last_name,branch,phone,school,status,created_at,approved_at,last_login,login_count,last_save,students_count FROM users WHERE id=?').bind(id).first();
     if (!u) return json({ error: 'Kullanıcı bulunamadı.' }, 404);
     let data = null;
     if (url.searchParams.get('data') === '1') {
@@ -182,7 +182,7 @@ async function api(req, env, name, url) {
   if (name === 'approve') {
     const id = parseInt(url.searchParams.get('id') || '0'); const t = url.searchParams.get('t') || '';
     if (!id || !timingEq(await approvalToken(env, id), t)) return html('<h2>Geçersiz bağlantı</h2>', 403);
-    const u = await env.DB.prepare('SELECT id,email,first_name,last_name,branch,status FROM users WHERE id=?').bind(id).first();
+    const u = await env.DB.prepare('SELECT id,email,first_name,last_name,branch,phone,school,status FROM users WHERE id=?').bind(id).first();
     if (!u) return html('<h2>Kullanıcı bulunamadı</h2>', 404);
     if (m === 'POST') {
       const fd = await req.formData(); const act = fd.get('action');
@@ -194,7 +194,7 @@ async function api(req, env, name, url) {
       }
       if (act === 'reject') { await env.DB.prepare("UPDATE users SET status='rejected' WHERE id=?").bind(id).run(); await audit(env, req, 'admin', 'reject', id, u.email); return html('<h2>Reddedildi</h2>'); }
     }
-    return html(`<h2>Kullanıcı onayı</h2><p><b>${esc(u.first_name + ' ' + u.last_name)}</b><br>${esc(u.email)}<br>Branş: ${esc(u.branch)}<br>Durum: ${esc(u.status)}</p>
+    return html(`<h2>Kullanıcı onayı</h2><p><b>${esc(u.first_name + ' ' + u.last_name)}</b><br>${esc(u.email)}<br>Telefon: ${esc(u.phone || '-')}<br>Okul: ${esc(u.school || '-')}<br>Branş: ${esc(u.branch)}<br>Durum: ${esc(u.status)}</p>
 <form method="post"><button name="action" value="approve" style="padding:12px 20px;background:#12805c;color:#fff;border:0;border-radius:8px;font-size:16px">Onayla</button>
 <button name="action" value="reject" style="padding:12px 20px;background:#d62d2d;color:#fff;border:0;border-radius:8px;font-size:16px;margin-left:8px">Reddet</button></form>`);
   }
@@ -205,21 +205,26 @@ async function api(req, env, name, url) {
     const d = await readJson(req, 20000);
     const email = String(d.email || '').trim().toLowerCase(), pass = String(d.password || '');
     const first = String(d.firstName || '').trim(), last = String(d.lastName || '').trim(), branch = String(d.branch || '').trim();
+    const school = String(d.school || '').trim().replace(/\s+/g, ' ');
+    let ph = String(d.phone || '').replace(/\D/g, ''); if (ph.startsWith('90') && ph.length === 12) ph = ph.slice(2); if (ph.startsWith('0')) ph = ph.slice(1);
     if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email) || email.length > 190) return json({ error: 'Geçerli bir e-posta girin.' }, 422);
     if (pass.length < 8 || pass.length > 200) return json({ error: 'Şifre en az 8 karakter olmalı.' }, 422);
     if (!first || !last || first.length > 80 || last.length > 80) return json({ error: 'Ad ve soyad gerekli.' }, 422);
     if (branch.length > 120) return json({ error: 'Branş çok uzun.' }, 422);
+    if (!/^5\d{9}$/.test(ph)) return json({ error: 'Geçerli bir cep telefonu numarası girin (5XX XXX XX XX).' }, 422);
+    if (school.length < 3 || school.length > 160) return json({ error: 'Çalıştığınız okulu veya kurumu yazın.' }, 422);
+    const phone = '+90' + ph;
     if (!d.consent) return json({ error: 'Aydınlatma metnini ve sorumluluk beyanını onaylamalısınız.' }, 422);
     const ip = req.headers.get('CF-Connecting-IP') || '0';
     const th = await throttle(env, 'reg:' + ip, 5, 3600); if (th) return th;
     if (await env.DB.prepare('SELECT id FROM users WHERE email=?').bind(email).first()) return json({ error: 'Bu e-posta ile daha önce kayıt olunmuş. Giriş yapmayı deneyin.' }, 409);
-    const r = await env.DB.prepare('INSERT INTO users(email,pass_hash,first_name,last_name,branch,status,consent_at,created_at) VALUES(?,?,?,?,?,?,?,?)')
-      .bind(email, await hashPass(pass), first, last, branch, 'pending', now(), now()).run();
+    const r = await env.DB.prepare('INSERT INTO users(email,pass_hash,first_name,last_name,branch,phone,school,status,consent_at,created_at) VALUES(?,?,?,?,?,?,?,?,?,?)')
+      .bind(email, await hashPass(pass), first, last, branch, phone, school, 'pending', now(), now()).run();
     const uid = r.meta.last_row_id;
     await audit(env, req, 'user:' + uid, 'register', uid, email);
     const link = `${origin}/api/approve.php?id=${uid}&t=${await approvalToken(env, uid)}`;
     const ok = await sendMail(env, env.ADMIN_EMAIL, `Yeni BEP kullanıcı kaydı: ${first} ${last}`,
-      `Yeni bir kullanıcı kayıt oldu ve onayınızı bekliyor.\n\nAd Soyad: ${first} ${last}\nE-posta: ${email}\nBranş: ${branch}\nTarih: ${now()} (UTC)\n\nİnceleyip onaylamak veya reddetmek için bağlantıyı açın:\n${link}\n\nBu kaydı siz beklemiyorsanız bağlantıyı açmayın.`);
+      `Yeni bir kullanıcı kayıt oldu ve onayınızı bekliyor.\n\nAd Soyad: ${first} ${last}\nE-posta: ${email}\nTelefon: ${phone}\nOkul: ${school}\nBranş: ${branch}\nTarih: ${now()} (UTC)\n\nİnceleyip onaylamak veya reddetmek için bağlantıyı açın:\n${link}\n\nBu kaydı siz beklemiyorsanız bağlantıyı açmayın.`);
     return json({ ok: true, message: 'Kaydınız alındı. Yönetici onayından sonra giriş yapabilirsiniz.', mail: ok });
   }
   if (name === 'login' && m === 'POST') {
