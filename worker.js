@@ -61,11 +61,83 @@ async function sendMail(env, to, subject, text) {
     return true;
   } catch (e) { console.log('mail error', String(e)); return false; }
 }
+async function audit(env, req, actor, action, target, detail) {
+  try { await env.DB.prepare('INSERT INTO audit(ts,actor,action,target_id,detail,country) VALUES(?,?,?,?,?,?)').bind(now(), actor, action, target ?? null, detail ? String(detail).slice(0, 300) : null, (req && req.cf && req.cf.country) || null).run(); } catch (e) { console.log('audit', String(e)); }
+}
+async function adminOk(req, env) {
+  const c = cookie(req, 'bepadm'); if (!c || !env.SECRET) return false;
+  const [exp, sig] = c.split('.');
+  if (!exp || !sig || Number(exp) < Date.now() / 1000) return false;
+  return timingEq(await hmac(env.SECRET, 'adm|' + exp), sig);
+}
 async function readJson(req, max) {
   const raw = await req.text();
   if (raw.length > max) throw json({ error: 'İstek çok büyük.' }, 413);
   try { const d = JSON.parse(raw); if (d && typeof d === 'object') return d; } catch (e) {}
   throw json({ error: 'Geçersiz istek.' }, 400);
+}
+
+
+async function adminApi(req, env, name, url, xhr) {
+  const m = req.method;
+  if (name === 'admin_login' && m === 'POST') {
+    if (!xhr) return json({ error: 'Geçersiz istek.' }, 400);
+    const ip = req.headers.get('CF-Connecting-IP') || '0';
+    const th = await throttle(env, 'adm:' + ip, 6, 900); if (th) return th;
+    const d = await readJson(req, 2000);
+    if (!env.ADMIN_KEY || !timingEq(await sha256(String(d.key || '')), await sha256(env.ADMIN_KEY))) { await audit(env, req, 'anon', 'admin_login_failed', null, null); return json({ error: 'Yönetici anahtarı hatalı.' }, 401); }
+    const exp = Math.floor(Date.now() / 1000) + 7200;
+    await audit(env, req, 'admin', 'admin_login', null, null);
+    return json({ ok: true }, 200, { 'Set-Cookie': `bepadm=${exp}.${await hmac(env.SECRET, 'adm|' + exp)}; Path=/; Max-Age=7200; HttpOnly; Secure; SameSite=Strict` });
+  }
+  if (name === 'admin_logout' && m === 'POST') return json({ ok: true }, 200, { 'Set-Cookie': 'bepadm=; Path=/; Max-Age=0; HttpOnly; Secure; SameSite=Strict' });
+  if (!(await adminOk(req, env))) return json({ error: 'Yönetici oturumu gerekli.' }, 401);
+  if (m !== 'GET' && !xhr) return json({ error: 'Geçersiz istek.' }, 400);
+
+  if (name === 'admin_users' && m === 'GET') {
+    const rows = (await env.DB.prepare('SELECT id,email,first_name,last_name,branch,status,created_at,approved_at,last_login,login_count,last_save,students_count FROM users ORDER BY id DESC LIMIT 1000').all()).results;
+    const tot = { all: rows.length, pending: 0, active: 0, disabled: 0, rejected: 0, students: 0 };
+    rows.forEach(r => { tot[r.status] = (tot[r.status] || 0) + 1; tot.students += r.students_count || 0; });
+    return json({ users: rows, totals: tot });
+  }
+  if (name === 'admin_user' && m === 'GET') {
+    const id = parseInt(url.searchParams.get('id') || '0');
+    const u = await env.DB.prepare('SELECT id,email,first_name,last_name,branch,status,created_at,approved_at,last_login,login_count,last_save,students_count FROM users WHERE id=?').bind(id).first();
+    if (!u) return json({ error: 'Kullanıcı bulunamadı.' }, 404);
+    let data = null;
+    if (url.searchParams.get('data') === '1') {
+      const meta = await env.DB.prepare('SELECT rev FROM userdata WHERE user_id=?').bind(id).first();
+      if (meta) { const parts = (await env.DB.prepare('SELECT part FROM chunks WHERE user_id=? ORDER BY idx').bind(id).all()).results; data = JSON.parse(parts.map(p => p.part).join('')); }
+      await audit(env, req, 'admin', 'admin_view_data', id, u.email);
+    }
+    const logs = (await env.DB.prepare("SELECT ts,actor,action,detail,country FROM audit WHERE target_id=? OR actor=? ORDER BY id DESC LIMIT 100").bind(id, 'user:' + id).all()).results;
+    return json({ user: u, data, logs });
+  }
+  if (name === 'admin_audit' && m === 'GET') {
+    const logs = (await env.DB.prepare('SELECT a.id,a.ts,a.actor,a.action,a.target_id,a.detail,a.country,u.email FROM audit a LEFT JOIN users u ON u.id=a.target_id ORDER BY a.id DESC LIMIT 300').all()).results;
+    return json({ logs });
+  }
+  if (name === 'admin_action' && m === 'POST') {
+    const d = await readJson(req, 2000); const id = parseInt(d.id || 0); const act = String(d.action || '');
+    const u = await env.DB.prepare('SELECT id,email,first_name,status FROM users WHERE id=?').bind(id).first();
+    if (!u) return json({ error: 'Kullanıcı bulunamadı.' }, 404);
+    const set = { approve: 'active', reject: 'rejected', disable: 'disabled', enable: 'active' }[act];
+    if (set) {
+      await env.DB.prepare('UPDATE users SET status=?' + (act === 'approve' ? ', approved_at=?' : '') + ' WHERE id=?').bind(...(act === 'approve' ? [set, now(), id] : [set, id])).run();
+      if (set !== 'active') await env.DB.prepare('DELETE FROM sessions WHERE user_id=?').bind(id).run();
+      await audit(env, req, 'admin', 'admin_' + act, id, u.email);
+      if (act === 'approve') await sendMail(env, u.email, 'BEP hesabınız onaylandı', `Merhaba ${u.first_name},\n\nHesabınız onaylandı. Şu adresten giriş yapabilirsiniz:\n${url.origin}/\n`);
+      return json({ ok: true });
+    }
+    if (act === 'delete') {
+      if (d.confirm !== u.email) return json({ error: 'Silmek için e-posta adresini aynen yazın.' }, 422);
+      await audit(env, req, 'admin', 'admin_delete', id, u.email);
+      await env.DB.batch([env.DB.prepare('DELETE FROM chunks WHERE user_id=?').bind(id), env.DB.prepare('DELETE FROM userdata WHERE user_id=?').bind(id), env.DB.prepare('DELETE FROM sessions WHERE user_id=?').bind(id), env.DB.prepare('DELETE FROM users WHERE id=?').bind(id)]);
+      return json({ ok: true });
+    }
+    return json({ error: 'Geçersiz işlem.' }, 422);
+  }
+  return json({ error: 'Bulunamadı.' }, 404);
 }
 
 async function api(req, env, name, url) {
@@ -86,23 +158,17 @@ async function api(req, env, name, url) {
       const fd = await req.formData(); const act = fd.get('action');
       if (act === 'approve') {
         await env.DB.prepare("UPDATE users SET status='active', approved_at=? WHERE id=?").bind(now(), id).run();
+        await audit(env, req, 'admin', 'approve', id, u.email);
         await sendMail(env, u.email, 'BEP hesabınız onaylandı', `Merhaba ${u.first_name},\n\nHesabınız onaylandı. Şu adresten giriş yapabilirsiniz:\n${origin}/\n`);
         return html('<h2>Onaylandı ✔</h2><p>' + esc(u.first_name + ' ' + u.last_name) + ' artık giriş yapabilir.</p>');
       }
-      if (act === 'reject') { await env.DB.prepare("UPDATE users SET status='rejected' WHERE id=?").bind(id).run(); return html('<h2>Reddedildi</h2>'); }
+      if (act === 'reject') { await env.DB.prepare("UPDATE users SET status='rejected' WHERE id=?").bind(id).run(); await audit(env, req, 'admin', 'reject', id, u.email); return html('<h2>Reddedildi</h2>'); }
     }
     return html(`<h2>Kullanıcı onayı</h2><p><b>${esc(u.first_name + ' ' + u.last_name)}</b><br>${esc(u.email)}<br>Branş: ${esc(u.branch)}<br>Durum: ${esc(u.status)}</p>
 <form method="post"><button name="action" value="approve" style="padding:12px 20px;background:#12805c;color:#fff;border:0;border-radius:8px;font-size:16px">Onayla</button>
 <button name="action" value="reject" style="padding:12px 20px;background:#d62d2d;color:#fff;border:0;border-radius:8px;font-size:16px;margin-left:8px">Reddet</button></form>`);
   }
-  if (name === 'admin') {
-    // bekleyen kayıtların listesi (e-posta ulaşmazsa yedek yol): /api/admin.php?key=ADMIN_KEY
-    const key = url.searchParams.get('key') || '';
-    if (!env.ADMIN_KEY || !timingEq(await sha256(key), await sha256(env.ADMIN_KEY))) return html('<h2>Yetkisiz</h2>', 403);
-    const rows = (await env.DB.prepare("SELECT id,email,first_name,last_name,branch,status,created_at FROM users ORDER BY id DESC LIMIT 200").all()).results;
-    const items = await Promise.all(rows.map(async r => `<li><b>${esc(r.first_name + ' ' + r.last_name)}</b> · ${esc(r.email)} · ${esc(r.branch)} · <i>${esc(r.status)}</i> · ${esc(r.created_at)}${r.status === 'pending' ? ` — <a href="/api/approve.php?id=${r.id}&t=${await approvalToken(env, r.id)}">incele/onayla</a>` : ''}</li>`));
-    return html('<h2>Kullanıcılar</h2><ul>' + items.join('') + '</ul>');
-  }
+  if (name.startsWith('admin_')) return adminApi(req, env, name, url, xhr);
   // buradan sonrası JSON + X-BEP başlığı ister (GET data hariç)
   if (name === 'register' && m === 'POST') {
     if (!xhr) return json({ error: 'Geçersiz istek.' }, 400);
@@ -120,6 +186,7 @@ async function api(req, env, name, url) {
     const r = await env.DB.prepare('INSERT INTO users(email,pass_hash,first_name,last_name,branch,status,consent_at,created_at) VALUES(?,?,?,?,?,?,?,?)')
       .bind(email, await hashPass(pass), first, last, branch, 'pending', now(), now()).run();
     const uid = r.meta.last_row_id;
+    await audit(env, req, 'user:' + uid, 'register', uid, email);
     const link = `${origin}/api/approve.php?id=${uid}&t=${await approvalToken(env, uid)}`;
     const ok = await sendMail(env, env.ADMIN_EMAIL, `Yeni BEP kullanıcı kaydı: ${first} ${last}`,
       `Yeni bir kullanıcı kayıt oldu ve onayınızı bekliyor.\n\nAd Soyad: ${first} ${last}\nE-posta: ${email}\nBranş: ${branch}\nTarih: ${now()} (UTC)\n\nİnceleyip onaylamak veya reddetmek için bağlantıyı açın:\n${link}\n\nBu kaydı siz beklemiyorsanız bağlantıyı açmayın.`);
@@ -134,9 +201,11 @@ async function api(req, env, name, url) {
     th = await throttle(env, 'loginu:' + email, 8, 900); if (th) return th;
     const u = await env.DB.prepare('SELECT * FROM users WHERE email=?').bind(email).first();
     const ok = u ? await verifyPass(pass, u.pass_hash) : (await hashPass(pass), false);
-    if (!ok) return json({ error: 'E-posta veya şifre hatalı.' }, 401);
+    if (!ok) { await audit(env, req, 'anon', 'login_failed', u ? u.id : null, email); return json({ error: 'E-posta veya şifre hatalı.' }, 401); }
     if (u.status === 'pending') return json({ error: 'Hesabınız henüz yönetici tarafından onaylanmadı.' }, 403);
-    if (u.status !== 'active') return json({ error: 'Hesabınız etkin değil.' }, 403);
+    if (u.status !== 'active') return json({ error: 'Hesabınız etkin değil. Lütfen yönetici ile iletişime geçin.' }, 403);
+    await env.DB.prepare('UPDATE users SET last_login=?, login_count=login_count+1 WHERE id=?').bind(now(), u.id).run();
+    await audit(env, req, 'user:' + u.id, 'login', u.id, null);
     const tok = hex(crypto.getRandomValues(new Uint8Array(32)));
     const exp = Math.floor(Date.now() / 1000) + 30 * 86400;
     await env.DB.prepare('INSERT INTO sessions(tok,user_id,exp) VALUES(?,?,?)').bind(await sha256(tok), u.id, exp).run();
@@ -172,6 +241,7 @@ async function api(req, env, name, url) {
       else stmts.push(env.DB.prepare('INSERT INTO userdata(user_id,rev,n,updated_at) VALUES(?,?,?,?)').bind(u.id, newRev, parts.length, now()));
       stmts.push(env.DB.prepare('DELETE FROM chunks WHERE user_id=?').bind(u.id));
       parts.forEach((p, i) => stmts.push(env.DB.prepare('INSERT INTO chunks(user_id,idx,part) VALUES(?,?,?)').bind(u.id, i, p)));
+      stmts.push(env.DB.prepare('UPDATE users SET last_save=?, students_count=? WHERE id=?').bind(now(), data.students.length, u.id));
       await env.DB.batch(stmts);
       return json({ ok: true, rev: newRev });
     }
@@ -183,6 +253,7 @@ async function api(req, env, name, url) {
     const d = await readJson(req, 5000);
     const row = await env.DB.prepare('SELECT pass_hash FROM users WHERE id=?').bind(u.id).first();
     if (!row || !(await verifyPass(String(d.password || ''), row.pass_hash))) return json({ error: 'Şifre hatalı.' }, 403);
+    await audit(env, req, 'user:' + u.id, 'delete_account', u.id, u.email);
     await env.DB.batch([
       env.DB.prepare('DELETE FROM chunks WHERE user_id=?').bind(u.id), env.DB.prepare('DELETE FROM userdata WHERE user_id=?').bind(u.id),
       env.DB.prepare('DELETE FROM sessions WHERE user_id=?').bind(u.id), env.DB.prepare('DELETE FROM users WHERE id=?').bind(u.id)]);

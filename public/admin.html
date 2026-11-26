@@ -1,0 +1,88 @@
+<!doctype html>
+<html lang="tr"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="robots" content="noindex,nofollow"><title>Yönetici Paneli – BEP</title>
+<style>
+:root{--b:#3347c8;--ink:#14203d;--mut:#5b6785;--line:#e3e8f4;--bg:#f4f6fc;--ok:#12805c;--bad:#d62d2d;--warn:#b26a00}
+*{box-sizing:border-box}body{margin:0;font:15px/1.5 -apple-system,"Segoe UI",Roboto,sans-serif;color:var(--ink);background:var(--bg)}
+header{background:#fff;border-bottom:1px solid var(--line);padding:12px 20px;display:flex;justify-content:space-between;align-items:center;position:sticky;top:0;z-index:3}
+h1{font-size:18px;margin:0}main{max-width:1180px;margin:0 auto;padding:20px}
+.tiles{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px;margin-bottom:18px}
+.tile{background:#fff;border:1px solid var(--line);border-radius:14px;padding:14px}.tile b{display:block;font-size:26px}.tile span{color:var(--mut);font-size:13px}
+.tabs{display:flex;gap:6px;margin-bottom:12px}.tabs button{border:1px solid var(--line);background:#fff;border-radius:10px;padding:8px 14px;font-weight:600;cursor:pointer}.tabs .on{background:var(--b);color:#fff;border-color:var(--b)}
+.card{background:#fff;border:1px solid var(--line);border-radius:14px;padding:16px;margin-bottom:14px;overflow-x:auto}
+table{width:100%;border-collapse:collapse}th,td{text-align:left;padding:8px 10px;border-bottom:1px solid var(--line);vertical-align:top;white-space:nowrap}th{color:var(--mut);font-size:12.5px;text-transform:uppercase;letter-spacing:.03em}
+td.w{white-space:normal}tr.click{cursor:pointer}tr.click:hover{background:#f5f7ff}
+.tag{font-size:12px;font-weight:700;padding:3px 9px;border-radius:999px;display:inline-block}.active{background:#e4f7ee;color:var(--ok)}.pending{background:#fff1d6;color:var(--warn)}.disabled,.rejected{background:#fde8e8;color:var(--bad)}
+input,select,button{font:inherit}input,select{padding:9px 11px;border:1px solid var(--line);border-radius:10px;background:#fff}
+.btn{border:0;border-radius:10px;padding:9px 14px;font-weight:700;cursor:pointer;background:var(--b);color:#fff}.btn.g{background:#eef1fb;color:var(--b)}.btn.r{background:var(--bad)}.btn.ok{background:var(--ok)}
+.row{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-bottom:12px}.mut{color:var(--mut)}.err{color:var(--bad);font-weight:600}
+details{border:1px solid var(--line);border-radius:10px;padding:8px 12px;margin:8px 0;background:#fcfdff}summary{cursor:pointer;font-weight:700}
+pre{background:#f2f4fa;padding:10px;border-radius:8px;overflow:auto;max-height:340px;font-size:12.5px}
+.login{max-width:360px;margin:12vh auto;background:#fff;border:1px solid var(--line);border-radius:16px;padding:24px}
+.login input{width:100%;margin:10px 0}
+.note{background:#fff7e6;border-left:4px solid #e0a100;padding:10px 12px;border-radius:8px;font-size:13.5px;margin-bottom:12px}
+</style></head><body>
+<div id="app"></div>
+<script>
+const $ = s => document.querySelector(s);
+const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const fmt = s => s ? String(s).replace('T',' ').slice(0,16) : '–';
+const ST = { active:'Aktif', pending:'Onay bekliyor', disabled:'Pasif', rejected:'Reddedildi' };
+const ACT = { register:'Kayıt oldu', login:'Giriş yaptı', login_failed:'Hatalı giriş denemesi', delete_account:'Hesabını sildi', approve:'Onaylandı (e-posta bağlantısı)', reject:'Reddedildi (e-posta bağlantısı)', admin_login:'Yönetici girişi', admin_login_failed:'Hatalı yönetici girişi', admin_approve:'Yönetici onayladı', admin_reject:'Yönetici reddetti', admin_disable:'Yönetici pasife aldı', admin_enable:'Yönetici etkinleştirdi', admin_delete:'Yönetici sildi', admin_view_data:'Yönetici öğrenci verilerini görüntüledi' };
+let S = { tab: 'users', users: [], totals: {}, q: '', f: '', detail: null, logs: [], err: '' };
+async function api(m, u, b) {
+  const r = await fetch(u, { method: m, credentials: 'same-origin', headers: { 'X-BEP': '1', 'Content-Type': 'application/json' }, body: b ? JSON.stringify(b) : undefined });
+  const j = await r.json().catch(() => ({})); if (r.status === 401 && !u.includes('admin_login')) { S.authed = false; render(); throw new Error('auth'); } return { s: r.status, j };
+}
+async function boot() { try { const r = await api('GET', 'api/admin_users.php'); if (r.s === 200) { S.authed = true; S.users = r.j.users; S.totals = r.j.totals; } } catch (e) {} render(); }
+async function login(e) { e.preventDefault(); const r = await api('POST', 'api/admin_login.php', { key: new FormData(e.target).get('key') }); if (r.s === 200) boot(); else { S.err = r.j.error || 'Giriş yapılamadı.'; render(); } }
+async function logout() { await api('POST', 'api/admin_logout.php', {}); S.authed = false; S.detail = null; render(); }
+async function reload() { const r = await api('GET', 'api/admin_users.php'); S.users = r.j.users; S.totals = r.j.totals; render(); }
+async function showAudit() { S.tab = 'audit'; const r = await api('GET', 'api/admin_audit.php'); S.logs = r.j.logs; render(); }
+async function openUser(id, withData) { const r = await api('GET', 'api/admin_user.php?id=' + id + (withData ? '&data=1' : '')); S.detail = r.j; S.tab = 'detail'; render(); window.scrollTo(0, 0); }
+async function act(id, a) {
+  let confirmEmail; if (a === 'delete') { const u = S.users.find(x => x.id === id); confirmEmail = prompt('KALICI SİLME: kullanıcının tüm verileri silinir. Onaylamak için e-posta adresini yazın:\n' + u.email); if (!confirmEmail) return; }
+  else if (a === 'disable' && !confirm('Kullanıcı pasife alınsın ve oturumları kapatılsın mı?')) return;
+  const r = await api('POST', 'api/admin_action.php', { id, action: a, confirm: confirmEmail }); if (r.s !== 200) { alert(r.j.error || 'İşlem yapılamadı.'); return; }
+  S.detail = null; S.tab = 'users'; await reload();
+}
+function tiles() { const t = S.totals; return `<div class="tiles">${[['Toplam kullanıcı', t.all], ['Onay bekleyen', t.pending || 0], ['Aktif', t.active || 0], ['Pasif / reddedilen', (t.disabled || 0) + (t.rejected || 0)], ['Toplam öğrenci kaydı', t.students || 0]].map(x => `<div class="tile"><b>${x[1] ?? 0}</b><span>${x[0]}</span></div>`).join('')}</div>`; }
+function btns(u) { const a = []; if (u.status === 'pending') a.push(['approve', 'Onayla', 'ok'], ['reject', 'Reddet', 'g']); if (u.status === 'active') a.push(['disable', 'Pasife al', 'g']); if (u.status === 'disabled' || u.status === 'rejected') a.push(['enable', 'Etkinleştir', 'ok']); a.push(['delete', 'Sil', 'r']); return a.map(x => `<button class="btn ${x[2]}" onclick="event.stopPropagation();act(${u.id},'${x[0]}')">${x[1]}</button>`).join(' '); }
+function usersView() {
+  const q = S.q.toLocaleLowerCase('tr-TR');
+  const list = S.users.filter(u => (!S.f || u.status === S.f) && (!q || (u.first_name + ' ' + u.last_name + ' ' + u.email + ' ' + u.branch).toLocaleLowerCase('tr-TR').includes(q)));
+  return `<div class="row"><input placeholder="Ara: ad, e-posta, branş" value="${esc(S.q)}" oninput="S.q=this.value;render(true)" style="min-width:240px"><select onchange="S.f=this.value;render()"><option value="">Tüm durumlar</option>${Object.entries(ST).map(([k, v]) => `<option value="${k}" ${S.f === k ? 'selected' : ''}>${v}</option>`).join('')}</select><button class="btn g" onclick="reload()">Yenile</button></div>
+  <div class="card"><table><thead><tr><th>Kullanıcı</th><th>Branş</th><th>Durum</th><th>Kayıt</th><th>Son giriş</th><th>Giriş</th><th>Öğrenci</th><th>Son kayıt</th><th></th></tr></thead><tbody>
+  ${list.map(u => `<tr class="click" onclick="openUser(${u.id})"><td class="w"><b>${esc(u.first_name + ' ' + u.last_name)}</b><br><span class="mut">${esc(u.email)}</span></td><td class="w">${esc(u.branch)}</td><td><span class="tag ${u.status}">${ST[u.status] || esc(u.status)}</span></td><td>${fmt(u.created_at)}</td><td>${fmt(u.last_login)}</td><td>${u.login_count}</td><td>${u.students_count}</td><td>${fmt(u.last_save)}</td><td>${btns(u)}</td></tr>`).join('') || '<tr><td colspan="9" class="mut">Kayıt yok.</td></tr>'}</tbody></table></div>`;
+}
+function logsTable(logs, withUser) { return `<table><thead><tr><th>Zaman (UTC)</th><th>Kim</th><th>İşlem</th>${withUser ? '<th>Hedef kullanıcı</th>' : ''}<th>Ayrıntı</th><th>Ülke</th></tr></thead><tbody>${logs.map(l => `<tr><td>${fmt(l.ts)}</td><td>${esc(l.actor)}</td><td>${esc(ACT[l.action] || l.action)}</td>${withUser ? `<td>${esc(l.email || (l.target_id ?? ''))}</td>` : ''}<td class="w">${esc(l.detail || '')}</td><td>${esc(l.country || '')}</td></tr>`).join('') || '<tr><td colspan="6" class="mut">Kayıt yok.</td></tr>'}</tbody></table>`; }
+function stuView(st, i) {
+  const bep = (st.bep || []).map(a => `<details><summary>${esc(a.area)} — ${(a.kdaList || []).length} kısa dönemli amaç</summary><ul>${(a.kdaList || []).map(k => `<li>${esc(k.description)} <span class="mut">${k.startDate ? '[' + esc(k.startDate) + ' → ' + esc(k.endDate || '?') + ']' : ''} ${k.result ? '· sonuç: ' + (k.result === 'yapiyor' ? 'yapıyor' : 'yapamıyor') : ''} ${(k.activities || []).length ? '· etkinlik: ' + (k.activities || []).map(a => esc(a.t)).join(', ') : ''}</span></li>`).join('')}</ul></details>`).join('');
+  return `<details><summary>${i + 1}. ${esc(st.firstName)} ${esc(st.lastName)} <span class="mut">· ${esc(st.level)} ${esc(st.grade)} · ${esc(st.disability || '')}</span></summary>
+  <p class="mut">Okul: ${esc(st.schoolName)} · Sınıf: ${esc(st.className)} · No: ${esc(st.schoolNo)} · T.C.: ${esc(st.tcNo)} · Doğum: ${esc(st.birthDate)} · Karar: ${esc(st.decision)}${st.ageGroup ? ' · Yaş grubu: ' + esc(st.ageGroup) : ''}</p>
+  <p class="mut">Anne: ${esc(st.motherName)} ${esc(st.motherSurname)} · Baba: ${esc(st.fatherName)} ${esc(st.fatherSurname)} · ABC kaydı: ${(st.abc || []).length}</p>
+  ${bep || '<p class="mut">BEP henüz oluşturulmamış.</p>'}
+  ${(st.abc || []).length ? `<details><summary>ABC kayıtları (${st.abc.length})</summary><ul>${st.abc.map(r => `<li>${esc(r.date)} ${esc(r.time)} — Ö: ${esc(r.antecedent)} | D: ${esc(r.behavior)} | S: ${esc(r.consequence)}</li>`).join('')}</ul></details>` : ''}
+  <details><summary>Ham veri (JSON)</summary><pre>${esc(JSON.stringify(st, null, 1))}</pre></details></details>`;
+}
+function detailView() {
+  const d = S.detail; if (!d) return ''; const u = d.user;
+  return `<div class="row"><button class="btn g" onclick="S.tab='users';S.detail=null;render()">← Listeye dön</button> ${btns(u)}</div>
+  <div class="card"><h2 style="margin-top:0">${esc(u.first_name + ' ' + u.last_name)} <span class="tag ${u.status}">${ST[u.status] || esc(u.status)}</span></h2>
+  <p class="mut">${esc(u.email)} · ${esc(u.branch)}<br>Kayıt: ${fmt(u.created_at)} · Onay: ${fmt(u.approved_at)} · Son giriş: ${fmt(u.last_login)} (${u.login_count} giriş) · Son kayıt: ${fmt(u.last_save)} · Öğrenci: ${u.students_count}</p></div>
+  <div class="card"><h3 style="margin-top:0">Öğrenci verileri</h3>
+  ${d.data ? `<div class="note">Bu görüntüleme kayıt altına alındı (kim: yönetici, ne zaman, hangi kullanıcı).</div>${(d.data.students || []).map(stuView).join('') || '<p class="mut">Kullanıcının kayıtlı öğrencisi yok.</p>'}`
+    : `<div class="note">Öğrenci verileri kişisel ve özel nitelikli kişisel veri içerir. Görüntülemek yalnızca teknik destek veya güvenlik gerekçesiyle yapılmalı ve her görüntüleme kayıt altına alınır.</div><button class="btn" onclick="openUser(${u.id}, true)">Öğrenci verilerini görüntüle</button>`}</div>
+  <div class="card"><h3 style="margin-top:0">Bu kullanıcının hareketleri</h3>${logsTable(d.logs, false)}</div>`;
+}
+function render(keepFocus) {
+  const app = $('#app');
+  if (!S.authed) { app.innerHTML = `<form class="login" onsubmit="login(event)"><h1>Yönetici girişi</h1><p class="mut">BEP Sistemi yönetim paneli</p><input name="key" type="password" placeholder="Yönetici anahtarı" autocomplete="current-password" required>${S.err ? `<p class="err">${esc(S.err)}</p>` : ''}<button class="btn" style="width:100%">Giriş</button></form>`; return; }
+  const q = document.activeElement && document.activeElement.tagName === 'INPUT' ? document.activeElement.selectionStart : null;
+  app.innerHTML = `<header><h1>BEP Yönetici Paneli</h1><button class="btn g" onclick="logout()">Çıkış</button></header><main>${tiles()}
+  <div class="tabs"><button class="${S.tab === 'users' || S.tab === 'detail' ? 'on' : ''}" onclick="S.tab='users';S.detail=null;render()">Kullanıcılar</button><button class="${S.tab === 'audit' ? 'on' : ''}" onclick="showAudit()">Tüm hareketler</button></div>
+  ${S.tab === 'audit' ? `<div class="card">${logsTable(S.logs, true)}</div>` : S.tab === 'detail' ? detailView() : usersView()}</main>`;
+  if (keepFocus) { const i = app.querySelector('input'); if (i) { i.focus(); i.setSelectionRange(q ?? i.value.length, q ?? i.value.length); } }
+}
+boot();
+</script></body></html>
