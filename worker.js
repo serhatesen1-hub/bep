@@ -204,8 +204,8 @@ export default {
       let areq = req;
       if (!host.startsWith('bep.') && host !== 'localhost') {
         if (host.startsWith('www.')) { url.hostname = host.slice(4); return Response.redirect(url.toString(), 301); }
-        if (url.pathname === '/' || url.pathname === '/index.html') { url.pathname = '/landing.html'; areq = new Request(url.toString(), req); }
-        else if (!['/gizlilik.html', '/icons/icon-192.png', '/icons/icon-512.png'].includes(url.pathname)) return new Response('Bulunamadı', { status: 404 });
+        if (url.pathname === '/' || url.pathname === '/index.html') { url.pathname = '/landing'; areq = new Request(url.toString(), req); }
+        else if (!['/landing', '/landing.html', '/gizlilik', '/gizlilik.html', '/icons/icon-192.png', '/icons/icon-512.png'].includes(url.pathname)) return new Response('Bulunamadı', { status: 404 });
       }
       const res = await env.ASSETS.fetch(areq);
       const h = new Headers(res.headers);
