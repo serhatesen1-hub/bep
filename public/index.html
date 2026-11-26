@@ -1395,7 +1395,7 @@
         }
     </style>
 <link rel="stylesheet" href="/tema.css">
-</head>
+<style>.homelink{display:inline-block;font:700 13px var(--sans,sans-serif);color:var(--ink);text-decoration:none;border:1.5px solid var(--ink);border-radius:2px;padding:7px 12px;margin-bottom:14px;background:var(--kagit,#f3eee4)}@media print{.homelink{display:none}}</style></head>
 <body class="font-sans text-slate-800 bg-slate-100 min-h-screen">
     
     <div id="root"></div>
@@ -1868,7 +1868,7 @@
             const msg = appState.authMsg ? `<p class="${appState.authOk ? 'auth-ok' : 'auth-err'}" role="alert">${esc(appState.authMsg)}</p>` : '';
             return `
             <div class="app"><main class="page narrow auth">
-              <div class="auth-brand"><span class="brand-tile"><i data-lucide="book-open" class="ic"></i></span><h1>BEP Hazırlama Sistemi</h1><p class="muted">Özel eğitim öğretmenleri için bireyselleştirilmiş eğitim programı</p></div>
+              <a class="homelink" href="https://alanyaozelegitim.net/">← Ana sayfa</a><div class="auth-brand"><span class="brand-tile"><i data-lucide="book-open" class="ic"></i></span><h1>BEP Hazırlama Sistemi</h1><p class="muted">Özel eğitim öğretmenleri için bireyselleştirilmiş eğitim programı</p></div>
               <div class="seg auth-tabs" role="tablist"><label class="seg-opt ${mode === 'login' ? 'on' : ''}"><input type="radio" name="am" ${mode === 'login' ? 'checked' : ''} onchange="setAuthMode('login')"><span>Giriş yap</span></label><label class="seg-opt ${mode === 'register' ? 'on' : ''}"><input type="radio" name="am" ${mode === 'register' ? 'checked' : ''} onchange="setAuthMode('register')"><span>Kayıt ol</span></label></div>
               <section class="card">
                 ${msg}

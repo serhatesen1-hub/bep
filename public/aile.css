@@ -1355,3 +1355,7 @@ button[class*="border-b-"],a[class*="border-b-"]{border-bottom-color:#0c2419!imp
 .bg-indigo-900 button.bg-indigo-600{background:var(--kagit)!important;color:var(--orman)!important}
 .hero-sec button[class*="border-white"]{border:1.5px solid rgba(243,238,228,.6)!important;background:transparent!important;color:#f3eee4!important}
 .svc{padding:26px 0 0!important}
+.homefab{display:flex;gap:8px;align-items:center;background:var(--kagit);color:var(--ink)!important;font:700 14px "DM Sans",sans-serif;text-decoration:none;padding:10px clamp(16px,4vw,48px);border-bottom:2px solid var(--ink)}
+.homefab:hover{background:var(--kagit2)}
+.homefab:before{content:"←";font-weight:800}
+@media print{.homefab{display:none}}

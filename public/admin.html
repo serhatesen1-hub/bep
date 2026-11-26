@@ -93,7 +93,7 @@ function render(keepFocus) {
   const app = $('#app');
   if (!S.authed) { app.innerHTML = `<form class="login" onsubmit="login(event)"><h1>Yönetici girişi</h1><p class="mut">BEP Sistemi yönetim paneli</p><input name="key" type="password" placeholder="Yönetici anahtarı" autocomplete="current-password" required>${S.err ? `<p class="err">${esc(S.err)}</p>` : ''}<button class="btn" style="width:100%">Giriş</button></form>`; return; }
   const q = document.activeElement && document.activeElement.tagName === 'INPUT' ? document.activeElement.selectionStart : null;
-  app.innerHTML = `<header><h1>BEP Yönetici Paneli</h1><button class="btn g" onclick="logout()">Çıkış</button></header><main>${tiles()}
+  app.innerHTML = `<header><h1>BEP Yönetici Paneli</h1><span><a class="btn g" style="text-decoration:none;margin-right:8px" href="https://alanyaozelegitim.net/">Ana sayfa</a><button class="btn g" onclick="logout()">Çıkış</button></span></header><main>${tiles()}
   <div class="tabs"><button class="${S.tab === 'users' || S.tab === 'detail' ? 'on' : ''}" onclick="S.tab='users';S.detail=null;render()">Kullanıcılar</button><button class="${S.tab === 'audit' ? 'on' : ''}" onclick="showAudit()">Tüm hareketler</button><button class="${S.tab === 'family' || S.tab === 'flead' ? 'on' : ''}" onclick="showFamily()">Aile başvuruları</button></div>
   ${S.tab === 'audit' ? `<div class="card">${logsTable(S.logs, true)}</div>` : S.tab === 'family' ? familyView() : S.tab === 'flead' ? leadView() : S.tab === 'detail' ? detailView() : usersView()}</main>`;
   if (keepFocus) { const i = app.querySelector('input'); if (i) { i.focus(); i.setSelectionRange(q ?? i.value.length, q ?? i.value.length); } }
