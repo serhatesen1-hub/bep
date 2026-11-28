@@ -143,4 +143,12 @@ h1,h2,h3,.card-title,.page-head h1,.auth-brand h1,.welcome h2{font-family:var(--
 /* Ekranda belge kâğıdı: sıcak zemin üzerinde net bir sayfa */
 .doc.paper{box-shadow:0 0 0 1px var(--murekkep),8px 8px 0 rgba(28,26,23,.14)!important;border-radius:0}
 }
+@media screen{
+.formlar{margin-top:28px}
+.formlar-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:20px 28px;margin-top:6px}
+.formlar-grp h3{font:700 15px var(--serif);margin:0 0 6px;padding-bottom:6px;border-bottom:2px solid var(--murekkep)}
+.formlar-grp ul{list-style:none;margin:0;padding:0}
+.formlar-grp li{padding:7px 0;border-bottom:1px solid var(--cizgi);font-size:14px;line-height:1.4}
+.fkod{display:inline-block;font:700 11px var(--sans);color:var(--kiremit);letter-spacing:.04em;margin-right:8px}
+}
 @media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}

@@ -2895,6 +2895,46 @@ div.WordSection2 { page: WordSection2; }
             toast('Tüm kayıtlar silindi');
         }
 
+        const FORMLAR_URL = 'https://orgm.meb.gov.tr/meb_iys_dosyalar/2025_05/16122806_formharitasi-16.05.2025-saat_09.45.pdf';
+        const FORMLAR = [
+            ['Yönlendirme formları', [
+                ['S.Y.1.a', 'Eğitsel Değerlendirme İsteği Formu (İlk İnceleme / Yeniden İnceleme)'],
+                ['', 'Rehberlik Servisine Öğrenci Yönlendirme Formu'],
+                ['', 'Psikolojik Destek Yönlendirme Formu'],
+                ['', 'Sağlık Kuruluşuna Yönlendirme Formu'],
+                ['', 'RAM Veli Müracaat Dilekçesi ve Kurul Davetiyesi'],
+                ['', 'Özel Öğrenme Güçlüğü Gözlem Formu']]],
+            ['Gözlem formları', [
+                ['B.G.G.7.c', 'Öğrenci Gözlem Kaydı'],
+                ['B.G.G.3.c', 'DEHB Gözlem Formu'],
+                ['B.G.G.1.c', 'Aile İçi Gözlem Formu'],
+                ['B.G.G.4.c', 'Ev Ziyaret Formu'],
+                ['B.G.G.9.a', 'Sosyometri'],
+                ['B.G.D.1.c', 'Snellen Testi']]],
+            ['Görüşme ve bilgi formları', [
+                ['B.K.G.4.c', 'Öğrenci Bilgi Formu'],
+                ['B.K.G.1.c', 'Aile Bilgi Formu'],
+                ['B.K.G.5.c', 'Öğrenci Görüşme Formu'],
+                ['B.K.G.11.c', 'Veli Görüşme Formu'],
+                ['B.G.G.2.c', 'Çocuğumu Tanıyorum Formu'],
+                ['B.K.G.8.c', 'Öğretmen ile Görüşme Formu']]],
+            ['Takip formları', [
+                ['B.G.D.', 'Rehberlik Servisi İçin Özel Eğitim Öğrencisi Rapor Takip Formu'],
+                ['S.Ç.1.a', 'Görüşme Aylık Kayıt Çizelgesi'],
+                ['S.Ç.2.a', 'Görüşme Yıllık Kayıt Çizelgesi']]]
+        ];
+        function formlarHtml() {
+            return `
+            <section class="card formlar hide-on-print" id="formlar">
+              <h2 class="card-title">FORMLAR</h2>
+              <p class="muted sm-gap">MEB'in \u201cRehberlik ve Psikolojik Danışma Hizmetlerinde Kullanılan Formlar ve Ölçme Araçları\u201d listesinden (08.06.2023) özel eğitim çalışmalarında sık gereken formlar. Kodlar listedeki kodlardır; bazı formların kodu listede okunaklı değildir.</p>
+              <div class="formlar-grid">
+                ${FORMLAR.map(g => `<div class="formlar-grp"><h3>${esc(g[0])}</h3><ul>${g[1].map(f => `<li>${f[0] ? `<span class="fkod">${esc(f[0])}</span>` : ''}${esc(f[1])}</li>`).join('')}</ul></div>`).join('')}
+              </div>
+              <p class="muted" style="margin-top:12px"><a href="${FORMLAR_URL}" target="_blank" rel="noopener">MEB form haritasının tamamını aç (PDF) →</a></p>
+            </section>`;
+        }
+
         function renderDashboard() {
             const u = appState.currentUser || {};
             const hello = u.firstName ? `Merhaba, ${esc(u.firstName)}` : 'Merhaba';
@@ -2915,6 +2955,7 @@ div.WordSection2 { page: WordSection2; }
                   <input type="search" value="${esc(appState.search)}" oninput="onSearch(this.value)" placeholder="Öğrenci veya okul ara" aria-label="Öğrenci ara" />
                 </div>` : ''}
                 <div id="studentList">${studentListHtml()}</div>
+                ${formlarHtml()}
                 <p class="privacy-note hide-on-print"><i data-lucide="shield-check" class="ic"></i> ${window.BEP_API ? 'Öğrenci bilgileri hesabınıza bağlı olarak sunucuda saklanır; yalnızca siz görürsünüz. Düzenli yedek almayı unutmayın.' : 'Öğrenci bilgileri yalnızca bu cihazda saklanır, hiçbir sunucuya gönderilmez. Düzenli yedek almayı unutmayın.'}</p>
               </main>
               ${appState.students.length ? `<button class="fab mobile-only hide-on-print" onclick="startNewStudent()" aria-label="Yeni öğrenci ekle"><i data-lucide="plus" class="ic"></i><span>Yeni öğrenci</span></button>` : ''}
