@@ -2898,38 +2898,24 @@ div.WordSection2 { page: WordSection2; }
         const FORMLAR_URL = 'https://orgm.meb.gov.tr/meb_iys_dosyalar/2025_05/16122806_formharitasi-16.05.2025-saat_09.45.pdf';
         const FORMLAR = [
             ['Yönlendirme formları', [
-                ['S.Y.1.a', 'Eğitsel Değerlendirme İsteği Formu (İlk İnceleme / Yeniden İnceleme)'],
-                ['', 'Rehberlik Servisine Öğrenci Yönlendirme Formu'],
-                ['', 'Psikolojik Destek Yönlendirme Formu'],
-                ['', 'Sağlık Kuruluşuna Yönlendirme Formu'],
-                ['', 'RAM Veli Müracaat Dilekçesi ve Kurul Davetiyesi'],
-                ['', 'Özel Öğrenme Güçlüğü Gözlem Formu']]],
+                ['Eğitsel Değerlendirme İstek Formu (İlk İnceleme)', 'https://orgm.meb.gov.tr/meb_iys_dosyalar/2025_06/02113923_egitseldegerlendirmeistekformuilkinceleme.pdf'],
+                ['Eğitsel Değerlendirme İstek Formu (Yeniden İnceleme)', 'https://orgm.meb.gov.tr/meb_iys_dosyalar/2025_06/02113853_egitseldegerlendirmeistekformuyenidendegerlendirme.pdf'],
+                ['RAM Veli Müracaat Dilekçesi ve Kurul Davetiyesi', 'https://orgm.meb.gov.tr/meb_iys_dosyalar/2025_05/08131617_ramvelimuracaatdilekcesivekuruldavetiyesi.pdf']]],
             ['Gözlem formları', [
-                ['B.G.G.7.c', 'Öğrenci Gözlem Kaydı'],
-                ['B.G.G.3.c', 'DEHB Gözlem Formu'],
-                ['B.G.G.1.c', 'Aile İçi Gözlem Formu'],
-                ['B.G.G.4.c', 'Ev Ziyaret Formu'],
-                ['B.G.G.9.a', 'Sosyometri'],
-                ['B.G.D.1.c', 'Snellen Testi']]],
+                ['Özel Öğrenme Güçlüğü Gözlem Formu', 'https://orgm.meb.gov.tr/meb_iys_dosyalar/2025_05/08131159_ozelogrenmeguclugugozlemformu.pdf'],
+                ['DEHB Gözlem Formu', 'https://orgm.meb.gov.tr/meb_iys_dosyalar/2025_05/08131158_dehbgozlemformu.pdf'],
+                ['Sosyometri', 'https://orgm.meb.gov.tr/meb_iys_dosyalar/2025_05/08131159_sosyometri.pdf']]],
             ['Görüşme ve bilgi formları', [
-                ['B.K.G.4.c', 'Öğrenci Bilgi Formu'],
-                ['B.K.G.1.c', 'Aile Bilgi Formu'],
-                ['B.K.G.5.c', 'Öğrenci Görüşme Formu'],
-                ['B.K.G.11.c', 'Veli Görüşme Formu'],
-                ['B.G.G.2.c', 'Çocuğumu Tanıyorum Formu'],
-                ['B.K.G.8.c', 'Öğretmen ile Görüşme Formu']]],
-            ['Takip formları', [
-                ['B.G.D.', 'Rehberlik Servisi İçin Özel Eğitim Öğrencisi Rapor Takip Formu'],
-                ['S.Ç.1.a', 'Görüşme Aylık Kayıt Çizelgesi'],
-                ['S.Ç.2.a', 'Görüşme Yıllık Kayıt Çizelgesi']]]
+                ['Aile Bilgi Formu', 'https://orgm.meb.gov.tr/meb_iys_dosyalar/2025_05/08131057_ailebilgiformu.pdf'],
+                ['Çocuğumu Tanıyorum / Kendimi Tanıyorum Formu', 'https://orgm.meb.gov.tr/meb_iys_dosyalar/2017_08/07230336_CYOCUGYUMU_TANIYORUM_KENDIYMIY_TANIYORUM_FORMU.pdf']]]
         ];
         function formlarHtml() {
             return `
             <section class="card formlar hide-on-print" id="formlar">
               <h2 class="card-title">FORMLAR</h2>
-              <p class="muted sm-gap">MEB'in \u201cRehberlik ve Psikolojik Danışma Hizmetlerinde Kullanılan Formlar ve Ölçme Araçları\u201d listesinden (08.06.2023) özel eğitim çalışmalarında sık gereken formlar. Kodlar listedeki kodlardır; bazı formların kodu listede okunaklı değildir.</p>
+              <p class="muted sm-gap">MEB Özel Eğitim ve Rehberlik Hizmetleri Genel Müdürlüğü sitesinden alınan resmî formlar. Forma tıklayınca PDF yeni sekmede açılır.</p>
               <div class="formlar-grid">
-                ${FORMLAR.map(g => `<div class="formlar-grp"><h3>${esc(g[0])}</h3><ul>${g[1].map(f => `<li>${f[0] ? `<span class="fkod">${esc(f[0])}</span>` : ''}${esc(f[1])}</li>`).join('')}</ul></div>`).join('')}
+                ${FORMLAR.map(g => `<div class="formlar-grp"><h3>${esc(g[0])}</h3><ul>${g[1].map(f => `<li><a href="${f[1]}" target="_blank" rel="noopener">${esc(f[0])}</a></li>`).join('')}</ul></div>`).join('')}
               </div>
               <p class="muted" style="margin-top:12px"><a href="${FORMLAR_URL}" target="_blank" rel="noopener">MEB form haritasının tamamını aç (PDF) →</a></p>
             </section>`;

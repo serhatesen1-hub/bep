@@ -149,6 +149,7 @@ h1,h2,h3,.card-title,.page-head h1,.auth-brand h1,.welcome h2{font-family:var(--
 .formlar-grp h3{font:700 15px var(--serif);margin:0 0 6px;padding-bottom:6px;border-bottom:2px solid var(--murekkep)}
 .formlar-grp ul{list-style:none;margin:0;padding:0}
 .formlar-grp li{padding:7px 0;border-bottom:1px solid var(--cizgi);font-size:14px;line-height:1.4}
-.fkod{display:inline-block;font:700 11px var(--sans);color:var(--kiremit);letter-spacing:.04em;margin-right:8px}
+.formlar-grp li a{color:var(--murekkep);text-decoration:none}
+.formlar-grp li a:hover{color:var(--kiremit);text-decoration:underline}
 }
 @media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
