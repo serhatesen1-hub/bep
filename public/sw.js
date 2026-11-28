@@ -1,6 +1,6 @@
 // Çevrimdışı çalışma: uygulama kabuğu ilk açılışta önbelleğe alınır.
 // Sürüm numarasını her güncellemede artırın (eski önbellek silinir).
-const VERSION = 'bep-web-v2.6.4';
+const VERSION = 'bep-web-v2.7.0';
 const SHELL = ['./', './index.html', './manifest.webmanifest', './gizlilik.html', './tema.css', './site.css', './fonts/bitter.woff', './fonts/bitter-italic.woff', './fonts/dmsans.woff',
   './icons/icon-192.png', './icons/icon-512.png', './icons/maskable-512.png', './icons/apple-touch-icon.png'];
 
